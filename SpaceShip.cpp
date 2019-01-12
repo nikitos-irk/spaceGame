@@ -6,26 +6,29 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y){
 	this->y = y;
 }
 
-void SpaceShip::change_y(int diff){
+void SpaceShip::change_y(bool forward){
 	
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
-	int top_x = points[0].x;
-	int top_y = points[0].y;
-	
-	int diff_x = (mediana_x - top_x)/5;
-	int diff_y = (mediana_y - top_y)/5;
-	if (diff < 0){
+
+	int diff_x = (mediana_x - points[0].x)/5;
+	int diff_y = (mediana_y - points[0].y)/5;
+
+	if (!forward){
 		diff_x *= -1;
 		diff_y *= -1;
 	}
+
 	for (int i = 0; i < POINTS_COUNT; ++i){
 		points[i].x += diff_x;
 		points[i].y += diff_y;
 	} 
 }
-void SpaceShip::change_x(int diff){
-
+void SpaceShip::change_x(bool clockwise){
+	
+	float angel = M_PI / 6;
+	if (!clockwise) { angel *= -1; }
+	
 	int relative_x = 0;
 	int relative_y = 0;
 
@@ -37,11 +40,9 @@ void SpaceShip::change_x(int diff){
 	relative_x = relative_x/POINTS_COUNT;
 	relative_y = relative_y/POINTS_COUNT;
 	
-	float angel = M_PI / 6;
 	int tmp_x = 0;
 	int tmp_y = 0;
-	if (diff < 0)
-		angel *= -1;
+
 	for (int i = 0; i < POINTS_COUNT; ++i){
 		tmp_x = (points[i].x - relative_x) * cos(angel) - (points[i].y - relative_y) * sin(angel) + relative_x;
 		tmp_y = (points[i].x - relative_x) * sin(angel) + (points[i].y - relative_y) * cos(angel) + relative_y;

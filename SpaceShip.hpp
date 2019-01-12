@@ -31,11 +31,9 @@ private:
 public:
 	SpaceShip(SDL_Renderer*, int, int);
 	void display();
-	void change_x(int);
-	void change_y(int);
+	void change_x(bool);
+	void change_y(bool);
 
 };
-
-
 
 #endif

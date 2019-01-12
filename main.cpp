@@ -117,19 +117,19 @@ int main( int argc, char* args[] )
 						cout << "QUIT" << endl;
 						break;
 					case SDLK_UP:
-						my_ship->change_y(-1);
+						my_ship->change_y(false);
 						cout << "UP" << endl;
 						break;
 					case SDLK_DOWN:
-						my_ship->change_y(+1);
+						my_ship->change_y(true);
 						cout << "DOWN" << endl;
 						break;
 					case SDLK_LEFT:
-						my_ship->change_x(-1);
+						my_ship->change_x(false);
 						cout << "LEFT" << endl;
 						break;
 					case SDLK_RIGHT:
-						my_ship->change_x(+1);
+						my_ship->change_x(true);
 						cout << "RIGHT" << endl;
 						break;
 					case SDLK_SPACE:
