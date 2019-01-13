@@ -22,18 +22,27 @@ static SDL_Point points[POINTS_COUNT] = {
     {SCREEN_WIDTH/2, SCREEN_HEIGHT/2}
 };
 
-class SpaceShip{
-	
-private:
+class SpaceObject{
+protected:
 	SDL_Renderer *renderer;
 	int x, y;
-
 public:
-	SpaceShip(SDL_Renderer*, int, int);
+	SpaceObject(SDL_Renderer*, int, int);
 	void display();
 	void change_x(bool);
-	void change_y(bool);
-
+	void change_y(bool);	
 };
+
+class Projectile: public SpaceObject{
+public:
+	Projectile(SDL_Renderer*, int, int);
+};
+
+class SpaceShip: public SpaceObject{
+public:
+	SpaceShip(SDL_Renderer*, int, int);
+};
+
+
 
 #endif

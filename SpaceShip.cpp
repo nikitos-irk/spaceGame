@@ -1,12 +1,16 @@
-#include "SpaceShip.hpp" 
+#include "SpaceShip.hpp"
 
-SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y){
+SpaceObject::SpaceObject(SDL_Renderer *renderer, int x, int y){
 	this->renderer = renderer;
 	this->x = x;
 	this->y = y;
 }
 
-void SpaceShip::change_y(bool forward){
+Projectile::Projectile(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
+
+SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
+
+void SpaceObject::change_y(bool forward){
 	
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
@@ -24,9 +28,9 @@ void SpaceShip::change_y(bool forward){
 		points[i].y += diff_y;
 	} 
 }
-void SpaceShip::change_x(bool clockwise){
+void SpaceObject::change_x(bool clockwise){
 	
-	float angel = M_PI / 6;
+	float angel = M_PI / 12;
 	if (!clockwise) { angel *= -1; }
 	
 	int relative_x = 0;
@@ -52,7 +56,7 @@ void SpaceShip::change_x(bool clockwise){
 	}
 }
 
-void SpaceShip::display(){
+void SpaceObject::display(){
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
 }

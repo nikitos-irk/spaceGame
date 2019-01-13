@@ -15,8 +15,6 @@
 const int COEF = 5;
 const int CITIZEN_SIZE = 5 * COEF;
 const int CITIZEN_STEP = 5 * COEF;
-// const int SCREEN_WIDTH = CITIZEN_SIZE * 200 / COEF; //640;
-// const int SCREEN_HEIGHT = CITIZEN_SIZE * 140 / COEF; //480;
 
 using namespace std;
 
