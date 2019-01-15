@@ -87,49 +87,45 @@ void Projectile::display(){
 	SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 	
 	while (tmp_x >= tmp_y){
-			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy + tmp_y));
-			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy + tmp_x));
+		SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy + tmp_y));
+		SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy + tmp_x));
 
-			if (tmp_x != 0)
-			{
-				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy + tmp_y));
-				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy - tmp_x));
-			}
-
-			if (tmp_y != 0)
-			{
-				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy - tmp_y));
-				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy + tmp_x));
-			}
-
-			if (tmp_x != 0 && tmp_y != 0)
-			{
-				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy - tmp_y));
-				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy - tmp_x));
-			}
-
-			error += tmp_y;
-			++tmp_y;
-			error += tmp_y;
-
-			if (error >= 0)
-			{
-				--tmp_x;
-				error -= tmp_x;
-				error -= tmp_x;
-			}
+		if (tmp_x != 0){
+			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy + tmp_y));
+			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy - tmp_x));
 		}
-		for (double dy = 1; dy <= BLOCK_SIZE; dy += 1.0){
-				double dx = floor(sqrt((2.0 * BLOCK_SIZE * dy) - (dy * dy)));
-				double cx = this->x;
-				double cy = this->y;
-				int x = cx - dx;
-				SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
-				SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
+
+		if (tmp_y != 0){
+			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy - tmp_y));
+			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy + tmp_x));
 		}
-		if (this->time_delay < std::chrono::system_clock::now()){
-			this->x -= direction_x;
-			this->y -= direction_y;
-			time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+
+		if (tmp_x != 0 && tmp_y != 0){
+			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy - tmp_y));
+			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy - tmp_x));
+		}
+
+		error += tmp_y;
+		++tmp_y;
+		error += tmp_y;
+
+		if (error >= 0){
+			--tmp_x;
+			error -= tmp_x;
+			error -= tmp_x;
+		}
+	}
+	for (double dy = 1; dy <= BLOCK_SIZE; dy += 1.0){
+		double dx = floor(sqrt((2.0 * BLOCK_SIZE * dy) - (dy * dy)));
+		double cx = this->x;
+		double cy = this->y;
+		int x = cx - dx;
+		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
+		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
+	}
+	if (this->time_delay < std::chrono::system_clock::now()){
+		this->x -= direction_x;
+		this->y -= direction_y;
+		time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
 	}
 }
