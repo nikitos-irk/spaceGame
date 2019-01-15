@@ -7,6 +7,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <chrono>
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
@@ -26,6 +27,7 @@ class SpaceObject{
 protected:
 	SDL_Renderer *renderer;
 	int x, y;
+	std::chrono::time_point<std::chrono::system_clock> time_delay; 
 public:
 	SpaceObject(SDL_Renderer*, int, int);
 	void display();
@@ -34,13 +36,19 @@ public:
 };
 
 class Projectile: public SpaceObject{
+private:
+	int direction_x;
+	int direction_y;
 public:
-	Projectile(SDL_Renderer*, int, int);
+	Projectile(SDL_Renderer*, int, int, int, int);
+	void display();
 };
 
 class SpaceShip: public SpaceObject{
 public:
 	SpaceShip(SDL_Renderer*, int, int);
+	void shoot();
+	vector<Projectile*> projectiles;
 };
 
 

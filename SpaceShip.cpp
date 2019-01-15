@@ -4,9 +4,13 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int x, int y){
 	this->renderer = renderer;
 	this->x = x;
 	this->y = y;
+	time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
 }
 
-Projectile::Projectile(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
+Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, int direction_y): SpaceObject::SpaceObject(renderer, x, y){
+	this->direction_x = direction_x;
+	this->direction_y = direction_y;
+}
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
 
@@ -59,4 +63,65 @@ void SpaceObject::change_x(bool clockwise){
 void SpaceObject::display(){
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
+}
+
+void SpaceShip::shoot(){
+	int mediana_x = points[1].x/2 + points[2].x/2;
+	int mediana_y = points[1].y/2 + points[2].y/2;
+	int diff_x = (mediana_x - points[0].x)/5;
+	int diff_y = (mediana_y - points[0].y)/5;
+	
+	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
+	projectiles.push_back(projectile);
+}
+
+void Projectile::display(){
+
+	double error = (double) - BLOCK_SIZE;
+	double tmp_x = (double) BLOCK_SIZE - 0.5;
+	double tmp_y = (double)0.5;
+	
+	double cx = this->x - 0.5;
+	double cy = this->y - 0.5;
+	
+	SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+	
+	while (tmp_x >= tmp_y){
+			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy + tmp_y));
+			SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy + tmp_x));
+
+			if (tmp_x != 0)
+			{
+				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy + tmp_y));
+				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy - tmp_x));
+			}
+
+			if (tmp_y != 0)
+			{
+				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy - tmp_y));
+				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy + tmp_x));
+			}
+
+			if (tmp_x != 0 && tmp_y != 0)
+			{
+				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy - tmp_y));
+				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy - tmp_x));
+			}
+
+			error += tmp_y;
+			++tmp_y;
+			error += tmp_y;
+
+			if (error >= 0)
+			{
+				--tmp_x;
+				error -= tmp_x;
+				error -= tmp_x;
+			}
+		}
+		if (this->time_delay < std::chrono::system_clock::now()){
+			this->x -= direction_x;
+			this->y -= direction_y;
+			time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+	}
 }

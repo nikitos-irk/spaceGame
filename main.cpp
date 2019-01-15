@@ -131,7 +131,8 @@ int main( int argc, char* args[] )
 						cout << "RIGHT" << endl;
 						break;
 					case SDLK_SPACE:
-						
+						my_ship->shoot();
+						cout << "SPACE" << endl;
 						break;
 					default:
 						break;
@@ -140,6 +141,9 @@ int main( int argc, char* args[] )
 		}
 		fill_background(renderer);
 		my_ship->display();
+		for (auto projectile = my_ship->projectiles.begin(); projectile != my_ship->projectiles.end(); ++projectile){
+			(*projectile)->display();
+		}
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}
