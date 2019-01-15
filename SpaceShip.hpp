@@ -8,9 +8,11 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
+#include <time.h>
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
+#define ASTEROID_POINTS_COUNT 7
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
@@ -23,6 +25,12 @@ static SDL_Point points[POINTS_COUNT] = {
     {SCREEN_WIDTH/2, SCREEN_HEIGHT/2}
 };
 
+struct DirectionXY{
+	int x;
+	int y;
+	DirectionXY(int, int);
+};
+
 class SpaceObject{
 protected:
 	SDL_Renderer *renderer;
@@ -30,7 +38,8 @@ protected:
 	std::chrono::time_point<std::chrono::system_clock> time_delay; 
 public:
 	SpaceObject(SDL_Renderer*, int, int);
-	void display();
+	virtual void display();
+	virtual void change_position(DirectionXY);
 	void change_x(bool);
 	void change_y(bool);	
 };
@@ -47,10 +56,17 @@ public:
 class SpaceShip: public SpaceObject{
 public:
 	SpaceShip(SDL_Renderer*, int, int);
-	void shoot();
+	Projectile * shoot();
 	vector<Projectile*> projectiles;
+	DirectionXY get_direction();
 };
 
-
+class Asteroid: public SpaceObject{
+public:
+	void display();
+	Asteroid(SDL_Renderer*, int, int, int, int);
+	SDL_Point points[ASTEROID_POINTS_COUNT];
+	void change_position(DirectionXY);
+};
 
 #endif

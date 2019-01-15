@@ -71,9 +71,29 @@ void draw_grid(SDL_Renderer* renderer){
 		SDL_RenderDrawLine(renderer, i, 0, i, SCREEN_HEIGHT);
 }
 
+void displayObjects(vector<SpaceObject*> &spaceObjects){
+	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
+		(*spaceObject)->display();
+	}
+}
+
+void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
+	auto ship = spaceObjects.begin();
+	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
+	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+		if (direction){ (*spaceObject)->change_position(directionXY); }
+		else{
+			directionXY.x *= -1;
+			directionXY.y *= -1;
+			(*spaceObject)->change_position(directionXY);
+		}
+	}
+}
+
 int main( int argc, char* args[] )
 {
 	srand(unsigned(std::time(0)));
+	vector<SpaceObject*> spaceObjects;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init Error: ");
@@ -99,11 +119,19 @@ int main( int argc, char* args[] )
     SDL_Event e;
 	int quit = 1;
 
+	spaceObjects.push_back(my_ship);
+	for (int i = 0; i < 10; ++i){
+		int tmp_x = rand() % SCREEN_WIDTH;
+		int tmp_y = rand() % SCREEN_HEIGHT;
+		int direction_x = 5 - rand() % 10;
+		int direction_y = 5 - rand() % 10;
+		spaceObjects.push_back(new Asteroid(renderer, tmp_x, tmp_y, direction_x, direction_y));
+	}
+
 	fill_background(renderer);
-	my_ship->display();	
+	displayObjects(spaceObjects);
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
-	
 	while(quit) {
 		while( SDL_PollEvent( &e ) != 0 ) {
 			if( e.type == SDL_QUIT ){
@@ -112,27 +140,21 @@ int main( int argc, char* args[] )
 				switch(e.key.keysym.sym){
 			    	case SDL_QUIT:
 						quit = 0;
-						cout << "QUIT" << endl;
 						break;
 					case SDLK_UP:
-						my_ship->change_y(false);
-						cout << "UP" << endl;
+						changeObjectsPositions(spaceObjects, true);
 						break;
 					case SDLK_DOWN:
-						my_ship->change_y(true);
-						cout << "DOWN" << endl;
+						changeObjectsPositions(spaceObjects, false);
 						break;
 					case SDLK_LEFT:
 						my_ship->change_x(false);
-						cout << "LEFT" << endl;
 						break;
 					case SDLK_RIGHT:
 						my_ship->change_x(true);
-						cout << "RIGHT" << endl;
 						break;
 					case SDLK_SPACE:
-						my_ship->shoot();
-						cout << "SPACE" << endl;
+						spaceObjects.push_back(my_ship->shoot());
 						break;
 					default:
 						break;
@@ -140,10 +162,7 @@ int main( int argc, char* args[] )
 				}
 		}
 		fill_background(renderer);
-		my_ship->display();
-		for (auto projectile = my_ship->projectiles.begin(); projectile != my_ship->projectiles.end(); ++projectile){
-			(*projectile)->display();
-		}
+		displayObjects(spaceObjects);
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}

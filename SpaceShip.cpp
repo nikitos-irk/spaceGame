@@ -14,6 +14,24 @@ Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, in
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
 
+DirectionXY::DirectionXY(int x, int y){
+	this->x = x;
+	this->y = y;
+}
+
+DirectionXY SpaceShip::get_direction(){
+	int mediana_x = points[1].x/2 + points[2].x/2;
+	int mediana_y = points[1].y/2 + points[2].y/2;
+	int diff_x = (mediana_x - points[0].x)/5;
+	int diff_y = (mediana_y - points[0].y)/5;
+	return DirectionXY(diff_x, diff_y);
+}
+
+void SpaceObject::change_position(DirectionXY directionXY){
+	this->x += directionXY.x;
+	this->y += directionXY.y;
+}
+
 void SpaceObject::change_y(bool forward){
 	
 	int mediana_x = points[1].x/2 + points[2].x/2;
@@ -65,14 +83,15 @@ void SpaceObject::display(){
 	SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
 }
 
-void SpaceShip::shoot(){
+Projectile * SpaceShip::shoot(){
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
 	int diff_x = (mediana_x - points[0].x)/5;
 	int diff_y = (mediana_y - points[0].y)/5;
 	
 	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
-	projectiles.push_back(projectile);
+	// projectiles.push_back(projectile);
+	return projectile;
 }
 
 void Projectile::display(){
@@ -127,5 +146,34 @@ void Projectile::display(){
 		this->x -= direction_x;
 		this->y -= direction_y;
 		time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+	}
+}
+
+Asteroid::Asteroid(SDL_Renderer *renderer, int x, int y, int direction_x, int direction_y): SpaceObject::SpaceObject(renderer, x, y){
+	//TODO: think about direction_x;direction_y
+
+	int error_x = rand() % 10;
+	int error_y = rand() % 10;
+    
+	points[0] = {x + error_x, 			y + error_y};
+	points[1] = {x - 10 + rand() % 5, 	y + 10 + rand() % 5};
+	points[2] = {x + rand() % 5, 		y + 20 + rand() % 5};
+	points[3] = {x + 10 + rand() % 5, 	y + 20 + rand() % 5};
+	points[4] = {x + 20 + rand() % 5, 	y + 10 + rand() % 5};
+	points[5] = {x + 10 + rand() % 5, 	y + rand() % 5};
+	points[6] = {x + error_x, 			y + error_y};
+}
+
+void Asteroid::display(){
+	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+	SDL_RenderDrawLines(renderer, points, ASTEROID_POINTS_COUNT);
+}
+
+void Asteroid::change_position(DirectionXY directionXY){
+	this->x += directionXY.x;
+	this->y += directionXY.y;
+	for (int i = 0; i < ASTEROID_POINTS_COUNT; ++i){
+		this->points[i].x += directionXY.x;
+		this->points[i].y += directionXY.y;
 	}
 }
