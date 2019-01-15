@@ -99,7 +99,7 @@ void Projectile::display(){
 			if (tmp_y != 0)
 			{
 				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_x), (int)(cy - tmp_y));
-				SDL_RenderDrawPoint(renderer, (int)(cx + tmp_y), (int)(cy + tmp_x));
+				SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy + tmp_x));
 			}
 
 			if (tmp_x != 0 && tmp_y != 0)
@@ -118,6 +118,14 @@ void Projectile::display(){
 				error -= tmp_x;
 				error -= tmp_x;
 			}
+		}
+		for (double dy = 1; dy <= BLOCK_SIZE; dy += 1.0){
+				double dx = floor(sqrt((2.0 * BLOCK_SIZE * dy) - (dy * dy)));
+				double cx = this->x;
+				double cy = this->y;
+				int x = cx - dx;
+				SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
+				SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 		}
 		if (this->time_delay < std::chrono::system_clock::now()){
 			this->x -= direction_x;
