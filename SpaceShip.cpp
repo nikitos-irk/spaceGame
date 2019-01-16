@@ -12,7 +12,9 @@ Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, in
 	this->direction_y = direction_y;
 }
 
-SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){}
+SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){
+	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+}
 
 DirectionXY::DirectionXY(int x, int y){
 	this->x = x;
@@ -84,12 +86,15 @@ void SpaceObject::display(){
 }
 
 Projectile * SpaceShip::shoot(){
+	if (this->shoot_delay > std::chrono::system_clock::now()) { return nullptr; }
+
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
 	int diff_x = (mediana_x - points[0].x)/5;
 	int diff_y = (mediana_y - points[0].y)/5;
 	
 	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
+	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
 	// projectiles.push_back(projectile);
 	return projectile;
 }

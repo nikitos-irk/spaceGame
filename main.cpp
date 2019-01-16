@@ -137,6 +137,7 @@ int main( int argc, char* args[] )
 	displayObjects(spaceObjects);
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
+	SpaceObject *tmp_space_obj;
 	while(quit) {
 		while( SDL_PollEvent( &e ) != 0 ) {
 			if( e.type == SDL_QUIT ){
@@ -162,9 +163,13 @@ int main( int argc, char* args[] )
 						right_pushed = true;
 						my_ship->change_x(true);
 						break;
-					case SDLK_SPACE:
-						space_pushed = true;
-						spaceObjects.push_back(my_ship->shoot());
+					case SDLK_SPACE:{
+							space_pushed = true;
+							tmp_space_obj = my_ship->shoot();
+							if (nullptr != tmp_space_obj) {
+								spaceObjects.push_back(tmp_space_obj);
+							}
+						}
 						break;
 					default:
 						break;
@@ -197,7 +202,12 @@ int main( int argc, char* args[] )
 		if (up_pushed) 		{ changeObjectsPositions(spaceObjects, true); 	SDL_Delay(10); }
 		if (left_pushed) 	{ my_ship->change_x(false); 					SDL_Delay(10); }
 		if (right_pushed) 	{ my_ship->change_x(true); 						SDL_Delay(10); }
-		if (space_pushed) 	{ spaceObjects.push_back(my_ship->shoot()); 	SDL_Delay(10); }
+		if (space_pushed) 	{
+			tmp_space_obj = my_ship->shoot();
+			if (nullptr != tmp_space_obj) {
+				spaceObjects.push_back(tmp_space_obj);
+			}
+		}
 
 		fill_background(renderer);
 		displayObjects(spaceObjects);

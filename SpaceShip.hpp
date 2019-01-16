@@ -55,6 +55,8 @@ public:
 };
 
 class SpaceShip: public SpaceObject{
+private:
+	std::chrono::time_point<std::chrono::system_clock> shoot_delay; 
 public:
 	SpaceShip(SDL_Renderer*, int, int);
 	Projectile * shoot();
