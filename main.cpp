@@ -92,6 +92,11 @@ void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
 
 int main( int argc, char* args[] )
 {
+	bool space_pushed = false;
+	bool left_pushed = false;
+	bool right_pushed = false;
+	bool up_pushed = false;
+	bool down_pushed = false;
 	srand(unsigned(std::time(0)));
 	vector<SpaceObject*> spaceObjects;
 
@@ -142,25 +147,58 @@ int main( int argc, char* args[] )
 						quit = 0;
 						break;
 					case SDLK_UP:
+						up_pushed = true;
 						changeObjectsPositions(spaceObjects, true);
 						break;
 					case SDLK_DOWN:
+						down_pushed = true;
 						changeObjectsPositions(spaceObjects, false);
 						break;
 					case SDLK_LEFT:
+						left_pushed = true;
 						my_ship->change_x(false);
 						break;
 					case SDLK_RIGHT:
+						right_pushed = true;
 						my_ship->change_x(true);
 						break;
 					case SDLK_SPACE:
+						space_pushed = true;
 						spaceObjects.push_back(my_ship->shoot());
 						break;
 					default:
 						break;
 					}
+			} else if (e.type == SDL_KEYUP) {
+				switch(e.key.keysym.sym){
+					case SDLK_UP:
+						up_pushed = false;
+						break;
+					case SDLK_DOWN:
+						down_pushed = false;
+						break;
+					case SDLK_LEFT:
+						left_pushed = false;
+						break;
+					case SDLK_RIGHT:
+						right_pushed = false;
+						break;
+					case SDLK_SPACE:
+						space_pushed = false;
+						break;
+					default:
+						break;
+					}
 				}
+			
 		}
+
+		if (down_pushed) {changeObjectsPositions(spaceObjects, false); SDL_Delay(10);}
+		if (up_pushed) {changeObjectsPositions(spaceObjects, true); SDL_Delay(10);}
+		if (left_pushed) {my_ship->change_x(false); SDL_Delay(10);}
+		if (right_pushed) {my_ship->change_x(true); SDL_Delay(10);}
+		if (space_pushed) {spaceObjects.push_back(my_ship->shoot()); SDL_Delay(10);}
+
 		fill_background(renderer);
 		displayObjects(spaceObjects);
 		SDL_RenderPresent(renderer);
