@@ -193,11 +193,11 @@ int main( int argc, char* args[] )
 			
 		}
 
-		if (down_pushed) {changeObjectsPositions(spaceObjects, false); SDL_Delay(10);}
-		if (up_pushed) {changeObjectsPositions(spaceObjects, true); SDL_Delay(10);}
-		if (left_pushed) {my_ship->change_x(false); SDL_Delay(10);}
-		if (right_pushed) {my_ship->change_x(true); SDL_Delay(10);}
-		if (space_pushed) {spaceObjects.push_back(my_ship->shoot()); SDL_Delay(10);}
+		if (down_pushed) 	{ changeObjectsPositions(spaceObjects, false); 	SDL_Delay(10); }
+		if (up_pushed) 		{ changeObjectsPositions(spaceObjects, true); 	SDL_Delay(10); }
+		if (left_pushed) 	{ my_ship->change_x(false); 					SDL_Delay(10); }
+		if (right_pushed) 	{ my_ship->change_x(true); 						SDL_Delay(10); }
+		if (space_pushed) 	{ spaceObjects.push_back(my_ship->shoot()); 	SDL_Delay(10); }
 
 		fill_background(renderer);
 		displayObjects(spaceObjects);
