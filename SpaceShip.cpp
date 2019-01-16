@@ -170,10 +170,13 @@ void Asteroid::display(){
 }
 
 void Asteroid::change_position(DirectionXY directionXY){
-	this->x += directionXY.x;
-	this->y += directionXY.y;
 	for (int i = 0; i < ASTEROID_POINTS_COUNT; ++i){
 		this->points[i].x += directionXY.x;
 		this->points[i].y += directionXY.y;
 	}
+}
+
+void Projectile::change_position(DirectionXY directionXY){
+	this->x += directionXY.x;
+	this->y += directionXY.y;
 }

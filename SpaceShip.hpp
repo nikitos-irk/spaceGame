@@ -50,6 +50,7 @@ private:
 	int direction_y;
 public:
 	Projectile(SDL_Renderer*, int, int, int, int);
+	void change_position(DirectionXY);
 	void display();
 };
 

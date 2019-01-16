@@ -80,13 +80,13 @@ void displayObjects(vector<SpaceObject*> &spaceObjects){
 void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
 	auto ship = spaceObjects.begin();
 	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
+	
+	if (!direction){
+		directionXY.x *= -1;
+		directionXY.y *= -1;
+	}
 	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
-		if (direction){ (*spaceObject)->change_position(directionXY); }
-		else{
-			directionXY.x *= -1;
-			directionXY.y *= -1;
-			(*spaceObject)->change_position(directionXY);
-		}
+		(*spaceObject)->change_position(directionXY);
 	}
 }
 
