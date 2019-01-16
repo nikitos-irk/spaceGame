@@ -154,14 +154,15 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int x, int y, int direction_x, int di
 
 	int error_x = rand() % 10;
 	int error_y = rand() % 10;
+	int size = rand() % 20;
     
-	points[0] = {x + error_x, 			y + error_y};
-	points[1] = {x - 10 + rand() % 5, 	y + 10 + rand() % 5};
-	points[2] = {x + rand() % 5, 		y + 20 + rand() % 5};
-	points[3] = {x + 10 + rand() % 5, 	y + 20 + rand() % 5};
-	points[4] = {x + 20 + rand() % 5, 	y + 10 + rand() % 5};
-	points[5] = {x + 10 + rand() % 5, 	y + rand() % 5};
-	points[6] = {x + error_x, 			y + error_y};
+	points[0] = {x + error_x, 				y + error_y};
+	points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
+	points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
+	points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
+	points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
+	points[5] = {x + size + rand() % 5, 	y + rand() % 5};
+	points[6] = {x + error_x, 				y + error_y};
 }
 
 void Asteroid::display(){
