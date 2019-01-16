@@ -77,7 +77,11 @@ void displayObjects(vector<SpaceObject*> &spaceObjects){
 	}
 }
 
+auto change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 10;
+auto inertia_delay = (std::chrono::milliseconds) 100;
+
 void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
+
 	auto ship = spaceObjects.begin();
 	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
 	
@@ -85,8 +89,11 @@ void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
 		directionXY.x *= -1;
 		directionXY.y *= -1;
 	}
-	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
-		(*spaceObject)->change_position(directionXY);
+	if (change_position_delay < std::chrono::system_clock::now()){
+		for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+			(*spaceObject)->change_position(directionXY);
+		}
+		change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 10;
 	}
 }
 
@@ -125,7 +132,7 @@ int main( int argc, char* args[] )
 	int quit = 1;
 
 	spaceObjects.push_back(my_ship);
-	for (int i = 0; i < 10; ++i){
+	for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % SCREEN_WIDTH;
 		int tmp_y = rand() % SCREEN_HEIGHT;
 		int direction_x = 5 - rand() % 10;
@@ -169,11 +176,11 @@ int main( int argc, char* args[] )
 							if (nullptr != tmp_space_obj) {
 								spaceObjects.push_back(tmp_space_obj);
 							}
-						}
+					}
 						break;
 					default:
 						break;
-					}
+				}
 			} else if (e.type == SDL_KEYUP) {
 				switch(e.key.keysym.sym){
 					case SDLK_UP:
@@ -193,15 +200,14 @@ int main( int argc, char* args[] )
 						break;
 					default:
 						break;
-					}
 				}
-			
+			}
 		}
 
-		if (down_pushed) 	{ changeObjectsPositions(spaceObjects, false); 	SDL_Delay(10); }
-		if (up_pushed) 		{ changeObjectsPositions(spaceObjects, true); 	SDL_Delay(10); }
-		if (left_pushed) 	{ my_ship->change_x(false); 					SDL_Delay(10); }
-		if (right_pushed) 	{ my_ship->change_x(true); 						SDL_Delay(10); }
+		if (down_pushed) 	{ changeObjectsPositions(spaceObjects, false); }
+		if (up_pushed) 		{ changeObjectsPositions(spaceObjects, true); }
+		if (left_pushed) 	{ my_ship->change_x(false); }
+		if (right_pushed) 	{ my_ship->change_x(true); }
 		if (space_pushed) 	{
 			tmp_space_obj = my_ship->shoot();
 			if (nullptr != tmp_space_obj) {

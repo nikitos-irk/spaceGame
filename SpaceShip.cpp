@@ -4,7 +4,8 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int x, int y){
 	this->renderer = renderer;
 	this->x = x;
 	this->y = y;
-	time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+	display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
+	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
 }
 
 Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, int direction_y): SpaceObject::SpaceObject(renderer, x, y){
@@ -13,7 +14,7 @@ Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, in
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){
-	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) SHOOTING_DELAY;
 }
 
 DirectionXY::DirectionXY(int x, int y){
@@ -54,19 +55,36 @@ void SpaceObject::change_y(bool forward){
 }
 void SpaceObject::change_x(bool clockwise){
 	
+	if (rotation_delay > std::chrono::system_clock::now()) { return; }
+	
 	float angel = M_PI / 12;
 	if (!clockwise) { angel *= -1; }
 	
-	int relative_x = 0;
-	int relative_y = 0;
+	// int relative_x = 0;
+	// int relative_y = 0;
 
-	for (int i = 0; i < POINTS_COUNT; ++i){	
-		relative_x += points[i].x;
-		relative_y += points[i].y;
+	// for (int i = 0; i < POINTS_COUNT; ++i){
+	// 	relative_x += points[i].x;
+	// 	relative_y += points[i].y;
+	// }
+	//
+	// relative_x = relative_x/POINTS_COUNT;
+	// relative_y = relative_y/POINTS_COUNT;
+	
+	float p = 0;
+	for (int i = 0; i < POINTS_COUNT - 1; ++i){
+		cout << sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2)) << endl;
+		p += sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
 	}
-
-	relative_x = relative_x/POINTS_COUNT;
-	relative_y = relative_y/POINTS_COUNT;
+	p *= 0.5;
+	cout << "p = " << p << endl;
+	float tmp_multiplied_lines = 1;
+	for (int i = 0; i < POINTS_COUNT - 1; ++i){
+		tmp_multiplied_lines *= p - sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
+	}
+	float altitude = 2 * sqrt(p * tmp_multiplied_lines)/ sqrt(pow((points[2].x - points[3].x), 2) + pow((points[2].y - points[3].y), 2));
+	int relative_x = (SCREEN_WIDTH / 2);
+	int relative_y = (SCREEN_HEIGHT / 2) + altitude/2;
 	
 	int tmp_x = 0;
 	int tmp_y = 0;
@@ -78,6 +96,7 @@ void SpaceObject::change_x(bool clockwise){
 		points[i].y = tmp_y;
 		
 	}
+	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
 }
 
 void SpaceObject::display(){
@@ -94,7 +113,7 @@ Projectile * SpaceShip::shoot(){
 	int diff_y = (mediana_y - points[0].y)/5;
 	
 	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
-	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) SHOOTING_DELAY;
 	// projectiles.push_back(projectile);
 	return projectile;
 }
@@ -103,7 +122,7 @@ void Projectile::display(){
 
 	double error = (double) - BLOCK_SIZE;
 	double tmp_x = (double) BLOCK_SIZE - 0.5;
-	double tmp_y = (double)0.5;
+	double tmp_y = (double) 0.5;
 	
 	double cx = this->x - 0.5;
 	double cy = this->y - 0.5;
@@ -139,6 +158,7 @@ void Projectile::display(){
 			error -= tmp_x;
 		}
 	}
+	SDL_SetRenderDrawColor(renderer, 128, 0, 128, 255);
 	for (double dy = 1; dy <= BLOCK_SIZE; dy += 1.0){
 		double dx = floor(sqrt((2.0 * BLOCK_SIZE * dy) - (dy * dy)));
 		double cx = this->x;
@@ -147,10 +167,10 @@ void Projectile::display(){
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
-	if (this->time_delay < std::chrono::system_clock::now()){
+	if (this->display_delay < std::chrono::system_clock::now()){
 		this->x -= direction_x;
 		this->y -= direction_y;
-		time_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 100;
+		display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
 	}
 }
 

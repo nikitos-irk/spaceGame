@@ -13,6 +13,9 @@
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
 #define ASTEROID_POINTS_COUNT 7
+#define ROTATION_DELAY 60
+#define DISPLAY_DELAY 100
+#define SHOOTING_DELAY 30
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
@@ -35,7 +38,8 @@ class SpaceObject{
 protected:
 	SDL_Renderer *renderer;
 	int x, y;
-	std::chrono::time_point<std::chrono::system_clock> time_delay; 
+	std::chrono::time_point<std::chrono::system_clock> display_delay; 
+	std::chrono::time_point<std::chrono::system_clock> rotation_delay;
 public:
 	SpaceObject(SDL_Renderer*, int, int);
 	virtual void display();
