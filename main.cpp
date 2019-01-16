@@ -77,10 +77,13 @@ void displayObjects(vector<SpaceObject*> &spaceObjects){
 	}
 }
 
-auto change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 10;
-auto inertia_delay = (std::chrono::milliseconds) 100;
+std::chrono::time_point<std::chrono::system_clock> change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
+std::chrono::time_point<std::chrono::system_clock> inertia_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) INERTIA_DELAY;
 
 void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
+
+	auto now = std::chrono::system_clock::now();
+	if (change_position_delay >= now){ return; }
 
 	auto ship = spaceObjects.begin();
 	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
@@ -89,21 +92,50 @@ void changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
 		directionXY.x *= -1;
 		directionXY.y *= -1;
 	}
-	if (change_position_delay < std::chrono::system_clock::now()){
-		for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
-			(*spaceObject)->change_position(directionXY);
-		}
-		change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) 10;
+	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+		(*spaceObject)->change_position(directionXY);
 	}
+	change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
+}
+
+void changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, bool direction){
+
+	auto now = std::chrono::system_clock::now();
+	if (inertia_delay >= now){ return; }
+
+	auto ship = spaceObjects.begin();
+	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
+	
+	if (!direction){
+		directionXY.x *= -1;
+		directionXY.y *= -1;
+	}
+
+	directionXY.x = directionXY.x/2;
+	directionXY.y = directionXY.y/2;
+	
+	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+		(*spaceObject)->change_position(directionXY);
+	}
+	inertia_delay = now + (std::chrono::milliseconds) INERTIA_DELAY;
 }
 
 int main( int argc, char* args[] )
 {
-	bool space_pushed = false;
-	bool left_pushed = false;
-	bool right_pushed = false;
-	bool up_pushed = false;
-	bool down_pushed = false;
+	bool space_pushed 	= false;
+	bool left_pushed  	= false;
+	bool right_pushed 	= false;
+	bool up_pushed 		= false;
+	bool down_pushed 	= false;
+	
+	bool left_inertia  	= false;
+	bool right_inertia 	= false;
+	bool up_inertia		= false;
+	bool down_inertia 	= false;
+	
+	int inertia_counter_up = 0;
+	int inertia_counter_down = 0;
+	
 	srand(unsigned(std::time(0)));
 	vector<SpaceObject*> spaceObjects;
 
@@ -185,15 +217,21 @@ int main( int argc, char* args[] )
 				switch(e.key.keysym.sym){
 					case SDLK_UP:
 						up_pushed = false;
+						up_inertia = true;
+						inertia_counter_up = INERTIA_COUNTER;
 						break;
 					case SDLK_DOWN:
 						down_pushed = false;
+						down_inertia = true;
+						inertia_counter_down = INERTIA_COUNTER;
 						break;
 					case SDLK_LEFT:
 						left_pushed = false;
+						left_inertia = true;
 						break;
 					case SDLK_RIGHT:
 						right_pushed = false;
+						right_inertia = true;
 						break;
 					case SDLK_SPACE:
 						space_pushed = false;
@@ -214,6 +252,22 @@ int main( int argc, char* args[] )
 				spaceObjects.push_back(tmp_space_obj);
 			}
 		}
+		
+		if (down_inertia && inertia_counter_down) {
+			changeObjectsPositionsByInertia(spaceObjects, false);
+			inertia_counter_down--;
+		} else {
+			down_inertia = false;
+		}
+
+		if (up_inertia && inertia_counter_up) { 
+			changeObjectsPositionsByInertia(spaceObjects, true); 
+			inertia_counter_up--;
+		} else {
+			up_inertia = false;
+		}
+		// if (left_inertia) 	{ my_ship->change_x(false); }
+		// if (right_inertia) 	{ my_ship->change_x(true); }
 
 		fill_background(renderer);
 		displayObjects(spaceObjects);
