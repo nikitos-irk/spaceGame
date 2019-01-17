@@ -8,8 +8,8 @@ EXE = result
 all: $(EXE)
 
 
-$(EXE): main.o game.o spaceship.o
-	$(CXX) $(LDFLAGS) -o result spaceship.o game.o main.o #$< -o $@
+$(EXE): main.o game.o background.o spaceship.o
+	$(CXX) $(LDFLAGS) -o result spaceship.o background.o game.o main.o #$< -o $@
 
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) main.cpp #$< -c $@
@@ -19,6 +19,9 @@ spaceship.o: SpaceShip.cpp SpaceShip.hpp
 
 game.o: Game.cpp Game.hpp
 	$(CXX) $(CXXFLAGS) Game.cpp #$< -c $@
+
+background.o: Background.cpp Background.hpp
+	$(CXX) $(CXXFLAGS) Background.cpp #$< -c $@
 
 clean:
 	rm *.o && rm $(EXE)

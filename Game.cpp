@@ -1,11 +1,12 @@
 #include "Game.hpp"
 #include "SpaceShip.hpp"
+#include "Background.hpp"
 
-const int COEF = 5;
-const int CITIZEN_SIZE = 5 * COEF;
-const int CITIZEN_STEP = 5 * COEF;
 
 Game::Game(SDL_Renderer *renderer){
+	
+	// Hope I will think something more interesting background than it is now
+	my_background = new Background(renderer);
 
 	// Renderer
 	this->renderer = renderer;
@@ -14,7 +15,7 @@ Game::Game(SDL_Renderer *renderer){
 	my_ship = new SpaceShip(renderer, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
 	
 	// Create asteroids
-	spaceObjects.push_back(my_ship);
+	// spaceObjects.push_back(my_ship);
 	for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % SCREEN_WIDTH;
 		int tmp_y = rand() % SCREEN_HEIGHT;
@@ -45,6 +46,7 @@ Game::Game(SDL_Renderer *renderer){
 }
 
 void Game::displayObjects(vector<SpaceObject*> &spaceObjects){
+	my_ship->display();
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->display();
 	}
@@ -55,17 +57,16 @@ void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direc
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
 
-	auto ship = spaceObjects.begin();
-	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
+	DirectionXY directionXY = my_ship->get_direction();
 	
 	if (!direction){
 		directionXY.x *= -1;
 		directionXY.y *= -1;
 	}
-	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
-	change_position_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
+	change_position_delay = now + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
 }
 
 void Game::changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, bool direction){
@@ -84,64 +85,15 @@ void Game::changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, b
 	directionXY.x = directionXY.x/2;
 	directionXY.y = directionXY.y/2;
 	
-	for (auto spaceObject = spaceObjects.begin() + 1; spaceObject != spaceObjects.end(); ++spaceObject){
+	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
 	inertia_delay = now + (std::chrono::milliseconds) INERTIA_DELAY;
 }
 
-void Game::fill_background(){
-	int gradient_size = 1;
-	int steps = 1 + (SCREEN_HEIGHT / (CITIZEN_SIZE * gradient_size));
-
-	SDL_Rect rect;
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = SCREEN_WIDTH;
-	rect.h = CITIZEN_SIZE * 10;
-
-	double r_start = 100;
-	double g_start = 100;
-	double b_start = 100;
-	
-	double r_finish = 0;
-	double g_finish = 0;
-	double b_finish = 60;
-
-	double r = r_start;
-	double g = g_start;
-	double b = b_start;
-	
-	double r_step = abs(r_finish - r_start) / steps;
-	double g_step = abs(g_finish - g_start) / steps;
-	double b_step = abs(b_finish - b_start) / steps;
-	
-	while (rect.y < SCREEN_HEIGHT) {
-		r = (r_start < r_finish) ? r + r_step : r - r_step;
-		g = (g_start < g_finish) ? g + g_step : g - g_step;
-		b = (b_start < b_finish) ? b + b_step : b - b_step;
-
-		SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-		SDL_RenderFillRect(renderer, &rect);
-		rect.x = 0;
-		rect.y += CITIZEN_SIZE * gradient_size;
-	}
-}
-
-void Game::draw_grid(){
-	
-	SDL_SetRenderDrawColor(renderer, 192, 192, 192, 255);
-	
-	for (int i = 0; i < SCREEN_HEIGHT; i = i + CITIZEN_SIZE)
-		SDL_RenderDrawLine(renderer, 0, i, SCREEN_WIDTH, i);
-
-	for (int i = 0; i < SCREEN_WIDTH; i = i + CITIZEN_SIZE)
-		SDL_RenderDrawLine(renderer, i, 0, i, SCREEN_HEIGHT);
-}
-
 void Game::run(){
 	
-	fill_background();
+	my_background->fill_background();
 	displayObjects(spaceObjects);
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
@@ -242,7 +194,7 @@ void Game::run(){
 		// if (left_inertia) 	{ my_ship->change_x(false); }
 		// if (right_inertia) 	{ my_ship->change_x(true); }
 
-		fill_background();
+		my_background->fill_background();
 		displayObjects(spaceObjects);
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);

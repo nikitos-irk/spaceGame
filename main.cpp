@@ -13,10 +13,6 @@
 // #include "SpaceShip.hpp"
 #include "Game.hpp"
 
-const int COEF = 5;
-const int CITIZEN_SIZE = 5 * COEF;
-const int CITIZEN_STEP = 5 * COEF;
-
 using namespace std;
 
 void logSDLError(std::ostream &os, const std::string &msg){
