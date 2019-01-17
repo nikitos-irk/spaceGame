@@ -1,5 +1,5 @@
-#ifndef HERBIVOR_H
-#define HERBIVOR_H
+#ifndef SPACESHIP_H
+#define SPACESHIP_H
 
 #include "SDL2/SDL.h"
 #include <utility>
