@@ -8,9 +8,6 @@
 #include <utility>
 #include <functional>
 #include <random>
-#include <list>
-#include <set>
-// #include "SpaceShip.hpp"
 #include "Game.hpp"
 
 using namespace std;
@@ -44,7 +41,8 @@ int main( int argc, char* args[] )
 
 	Game *space_game = new Game(renderer);
 	space_game->run();
-
+	
+	SDL_CreateRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
