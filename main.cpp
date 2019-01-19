@@ -42,7 +42,7 @@ int main( int argc, char* args[] )
 	Game *space_game = new Game(renderer);
 	space_game->run();
 	
-	SDL_CreateRenderer(renderer);
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }

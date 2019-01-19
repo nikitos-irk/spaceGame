@@ -6,8 +6,10 @@
 const int COEF = 5;
 const int CITIZEN_SIZE = 5 * COEF;
 const int CITIZEN_STEP = 5 * COEF;
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+// extern const int SCREEN_WIDTH = 640;
+// extern const int SCREEN_HEIGHT = 480;
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
 class Background{
 private:

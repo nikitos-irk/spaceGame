@@ -20,8 +20,10 @@
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 
-extern const int SCREEN_WIDTH = 640;
-extern const int SCREEN_HEIGHT = 480;
+// const int SCREEN_WIDTH = 640;
+// const int SCREEN_HEIGHT = 480;
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
 using namespace std;
 
@@ -36,6 +38,13 @@ struct DirectionXY{
 	int x;
 	int y;
 	DirectionXY(int, int);
+	
+	DirectionXY& operator *=(int value){
+    	x *= value;
+		y *= value;
+    	return *this;
+	}
+	DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
 };
 
 class SpaceObject{

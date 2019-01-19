@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include "vector"
+#include "list"
 #include "SpaceShip.hpp"
 #include <random>
 #include <cstdlib>
@@ -8,6 +9,7 @@
 #include "SDL2/SDL.h"
 #include "iostream"
 #include "Background.hpp"
+#include "Inertia.hpp"
 
 using namespace std;
 
@@ -18,6 +20,9 @@ private:
 
 	// Background class
 	Background *my_background;
+	
+	// Inertia vector
+	list<Inertia*> inertias;
 
 	// For event handling
 	SDL_Event e;

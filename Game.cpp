@@ -15,7 +15,6 @@ Game::Game(SDL_Renderer *renderer){
 	my_ship = new SpaceShip(renderer, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
 	
 	// Create asteroids
-	// spaceObjects.push_back(my_ship);
 	for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % SCREEN_WIDTH;
 		int tmp_y = rand() % SCREEN_HEIGHT;
@@ -142,13 +141,11 @@ void Game::run(){
 				switch(e.key.keysym.sym){
 					case SDLK_UP:
 						up_pushed = false;
-						up_inertia = true;
-						inertia_counter_up = INERTIA_COUNTER;
+						inertias.push_back(new InertiaUpDown(my_ship, spaceObjects, true));
 						break;
 					case SDLK_DOWN:
 						down_pushed = false;
-						down_inertia = true;
-						inertia_counter_down = INERTIA_COUNTER;
+						inertias.push_back(new InertiaUpDown(my_ship, spaceObjects, false));
 						break;
 					case SDLK_LEFT:
 						left_pushed = false;
@@ -177,22 +174,17 @@ void Game::run(){
 				spaceObjects.push_back(tmp_space_obj);
 			}
 		}
-		
-		if (down_inertia && inertia_counter_down) {
-			changeObjectsPositionsByInertia(spaceObjects, false);
-			inertia_counter_down--;
-		} else {
-			down_inertia = false;
+		auto iter = inertias.begin();
+		while (iter != inertias.end()){
+		    bool isAlive = (*iter)->isAlive();
+		    if (!isAlive){
+		        inertias.erase(iter++);
+		    }
+		    else{
+		        (*iter)->run();
+		        ++iter;
+		    }
 		}
-
-		if (up_inertia && inertia_counter_up) { 
-			changeObjectsPositionsByInertia(spaceObjects, true); 
-			inertia_counter_up--;
-		} else {
-			up_inertia = false;
-		}
-		// if (left_inertia) 	{ my_ship->change_x(false); }
-		// if (right_inertia) 	{ my_ship->change_x(true); }
 
 		my_background->fill_background();
 		displayObjects(spaceObjects);
