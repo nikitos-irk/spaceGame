@@ -2,6 +2,7 @@
 #define INERTIA_H
 
 #include "SpaceShip.hpp"
+#include <cmath>
 
 #define INERTIA_DELAY 10
 
@@ -9,8 +10,10 @@ class Inertia{
 protected:
 	bool alive;
 	int persantage;
+	long direction_v;
 	DirectionXY directionXY;
 	std::chrono::time_point<std::chrono::system_clock> inertia_delay;
+	std::chrono::time_point<std::chrono::system_clock> inertia_duration;
 public:
 	Inertia(SpaceShip*, vector<SpaceObject*> &);
 	vector<SpaceObject*>& spaceObjects;

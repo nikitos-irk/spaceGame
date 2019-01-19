@@ -2,25 +2,27 @@
 #include "SpaceShip.hpp"
 #include "Background.hpp"
 
-
-Game::Game(SDL_Renderer *renderer){
+Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
+	
+	this->screen_width = screen_width;
+	this->screen_height = screen_height;
 	
 	// Hope I will think something more interesting background than it is now
-	my_background = new Background(renderer);
+	my_background = new Background(renderer, screen_width, screen_height);
 
 	// Renderer
 	this->renderer = renderer;
 
 	// Create ship
-	my_ship = new SpaceShip(renderer, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+	my_ship = new SpaceShip(renderer, screen_width, screen_height);
 	
 	// Create asteroids
 	for (int i = 0; i < 10; ++i) {
-		int tmp_x = rand() % SCREEN_WIDTH;
-		int tmp_y = rand() % SCREEN_HEIGHT;
+		int tmp_x = rand() % this->screen_width;
+		int tmp_y = rand() % this->screen_height;
 		int direction_x = 5 - rand() % 10;
 		int direction_y = 5 - rand() % 10;
-		spaceObjects.push_back(new Asteroid(renderer, tmp_x, tmp_y, direction_x, direction_y));
+		spaceObjects.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 	}
 	
 	// Initiating delays

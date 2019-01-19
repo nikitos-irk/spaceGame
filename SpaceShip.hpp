@@ -20,24 +20,13 @@
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 
-// const int SCREEN_WIDTH = 640;
-// const int SCREEN_HEIGHT = 480;
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-
 using namespace std;
 
-static SDL_Point points[POINTS_COUNT] = {
-    {SCREEN_WIDTH/2, SCREEN_HEIGHT/2},
-    {SCREEN_WIDTH/2 - 10, SCREEN_HEIGHT/2 + SCREEN_HEIGHT / 10},
-    {SCREEN_WIDTH/2 + 10, SCREEN_HEIGHT/2 + SCREEN_HEIGHT / 10},
-    {SCREEN_WIDTH/2, SCREEN_HEIGHT/2}
-};
-
 struct DirectionXY{
-	int x;
-	int y;
-	DirectionXY(int, int);
+	float x;
+	float y;
+	DirectionXY(float, float);
+	DirectionXY();
 	
 	DirectionXY& operator *=(int value){
     	x *= value;
@@ -51,14 +40,14 @@ class SpaceObject{
 protected:
 	SDL_Renderer *renderer;
 	int x, y;
+	int screen_width;
+	int screen_height;
 	std::chrono::time_point<std::chrono::system_clock> display_delay; 
 	std::chrono::time_point<std::chrono::system_clock> rotation_delay;
 public:
-	SpaceObject(SDL_Renderer*, int, int);
-	virtual void display();
+	SpaceObject(SDL_Renderer*, int, int, int, int);
+	virtual void display() = 0;
 	virtual void change_position(DirectionXY);
-	void change_x(bool);
-	void change_y(bool);	
 };
 
 class Projectile: public SpaceObject{
@@ -73,12 +62,16 @@ public:
 
 class SpaceShip: public SpaceObject{
 private:
+	SDL_Point points[POINTS_COUNT];
 	std::chrono::time_point<std::chrono::system_clock> shoot_delay; 
 public:
 	SpaceShip(SDL_Renderer*, int, int);
 	Projectile * shoot();
 	vector<Projectile*> projectiles;
 	DirectionXY get_direction();
+	void display();
+	void change_x(bool);
+	void change_y(bool);
 };
 
 class Asteroid: public SpaceObject{

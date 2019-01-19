@@ -1,10 +1,11 @@
 #include "Inertia.hpp"
 
-Inertia::Inertia(SpaceShip* spaceShip, vector<SpaceObject*> &spaceObjects): spaceObjects(spaceObjects), directionXY(0, 0){
+Inertia::Inertia(SpaceShip* spaceShip, vector<SpaceObject*> &spaceObjects): spaceObjects(spaceObjects), directionXY(){
 	this->spaceObjects = spaceObjects;
 	this->directionXY = spaceShip->get_direction();
 	this->alive = true;
 	this->persantage = 100;
+	this->direction_v = 0;
 }
 
 bool Inertia::isAlive(){ return alive; }
@@ -24,20 +25,17 @@ InertiaRotation::~InertiaRotation(){}
 
 void InertiaUpDown::run(){
 	auto now = std::chrono::system_clock::now();
-	if (inertia_delay >= now){ return; }
-
-	if (abs(directionXY.x) <= 0 && abs(directionXY.y) <= 0 ){
-		cout << "directionXY = " << directionXY.x << " " << directionXY.y << endl;
-		return;
-	}
-
-	if (!forwardDirection){
-		directionXY.x *= -1;
-		directionXY.y *= -1;
-	}
+	if (inertia_delay >= now && direction_v <= 0){ return; }
 	
-	directionXY.x -= pow(directionXY.x, 1/4);
-	directionXY.y -= pow(directionXY.y, 1/4);
+	long d = sqrt(pow(directionXY.x, 2) + pow(directionXY.y, 2));
+	d -= pow(directionXY.x, 3);
+	
+	//angel between directional vector and base axis offset
+	float x_0 = directionXY.x, x_1 = directionXY.x;
+	float y_0 = directionXY.y, y_1 = directionXY.y;
+	
+	directionXY.x = pow(directionXY.x, 2/3);
+	directionXY.y = pow(directionXY.y, 2/3);
 	cout << "persantage = " << persantage << endl;
 	cout << "directionXY = " << directionXY.x << " " << directionXY.y << endl;
 	persantage -= 5;

@@ -12,6 +12,9 @@
 
 using namespace std;
 
+const int screen_width  = 640;
+const int screen_height = 480;
+
 void logSDLError(std::ostream &os, const std::string &msg){
 	os << msg << " error: " << SDL_GetError() << std::endl;
 }
@@ -19,6 +22,7 @@ void logSDLError(std::ostream &os, const std::string &msg){
 int main( int argc, char* args[] )
 {
 	srand(unsigned(std::time(0)));
+
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init Error: ");
@@ -39,7 +43,7 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
-	Game *space_game = new Game(renderer);
+	Game *space_game = new Game(renderer, screen_width, screen_height);
 	space_game->run();
 	
 	SDL_DestroyRenderer(renderer);

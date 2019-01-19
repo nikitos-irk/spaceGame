@@ -1,32 +1,48 @@
 #include "SpaceShip.hpp"
 
-SpaceObject::SpaceObject(SDL_Renderer *renderer, int x, int y){
+SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y){
 	this->renderer = renderer;
 	this->x = x;
 	this->y = y;
+	this->screen_width = screen_width;
+	this->screen_height = screen_height;
 	display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
 	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
 }
 
-Projectile::Projectile(SDL_Renderer *renderer, int x, int y, int direction_x, int direction_y): SpaceObject::SpaceObject(renderer, x, y){
+Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
 	this->direction_x = direction_x;
 	this->direction_y = direction_y;
 }
 
-SpaceShip::SpaceShip(SDL_Renderer *renderer, int x, int y): SpaceObject::SpaceObject(renderer, x, y){
+SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
 	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) SHOOTING_DELAY;
+	
+	// space ship coordination
+	this->points[0] = {screen_width/2, screen_height/2};
+	this->points[1] = {screen_width/2 - 10, screen_height/2 + screen_height / 10};
+	this->points[2] = {screen_width/2 + 10, screen_height/2 + screen_height / 10};
+	this->points[3] = {screen_width/2, screen_height/2};
+
 }
 
-DirectionXY::DirectionXY(int x, int y){
+DirectionXY::DirectionXY(float x, float y){
 	this->x = x;
 	this->y = y;
+}
+
+DirectionXY::DirectionXY(){
+	this->x = 0;
+	this->y = 0;
 }
 
 DirectionXY SpaceShip::get_direction(){
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
+
 	int diff_x = (mediana_x - points[0].x)/5;
 	int diff_y = (mediana_y - points[0].y)/5;
+	
 	return DirectionXY(diff_x, diff_y);
 }
 
@@ -35,13 +51,16 @@ void SpaceObject::change_position(DirectionXY directionXY){
 	this->y += directionXY.y;
 }
 
-void SpaceObject::change_y(bool forward){
+void SpaceShip::change_y(bool forward){
 	
 	int mediana_x = points[1].x/2 + points[2].x/2;
 	int mediana_y = points[1].y/2 + points[2].y/2;
 
-	int diff_x = (mediana_x - points[0].x)/5;
-	int diff_y = (mediana_y - points[0].y)/5;
+	int diff_x = (mediana_x - points[0].x) / 5;
+	int diff_y = (mediana_y - points[0].y) / 5;
+
+	cout << "diff_x = " << diff_x << endl;
+	cout << "diff_y = " << diff_y << endl;
 
 	if (!forward){
 		diff_x *= -1;
@@ -51,9 +70,9 @@ void SpaceObject::change_y(bool forward){
 	for (int i = 0; i < POINTS_COUNT; ++i){
 		points[i].x += diff_x;
 		points[i].y += diff_y;
-	} 
+	}
 }
-void SpaceObject::change_x(bool clockwise){
+void SpaceShip::change_x(bool clockwise){
 	
 	if (rotation_delay > std::chrono::system_clock::now()) { return; }
 	
@@ -83,8 +102,8 @@ void SpaceObject::change_x(bool clockwise){
 		tmp_multiplied_lines *= p - sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
 	}
 	float altitude = 2 * sqrt(p * tmp_multiplied_lines)/ sqrt(pow((points[2].x - points[3].x), 2) + pow((points[2].y - points[3].y), 2));
-	int relative_x = (SCREEN_WIDTH / 2);
-	int relative_y = (SCREEN_HEIGHT / 2) + altitude/2;
+	int relative_x = (screen_width / 2);
+	int relative_y = (screen_height / 2) + altitude/2;
 	
 	int tmp_x = 0;
 	int tmp_y = 0;
@@ -99,7 +118,7 @@ void SpaceObject::change_x(bool clockwise){
 	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
 }
 
-void SpaceObject::display(){
+void SpaceShip::display(){
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
 }
@@ -174,7 +193,7 @@ void Projectile::display(){
 	}
 }
 
-Asteroid::Asteroid(SDL_Renderer *renderer, int x, int y, int direction_x, int direction_y): SpaceObject::SpaceObject(renderer, x, y){
+Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y): SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
 	//TODO: think about direction_x;direction_y
 
 	int error_x = rand() % 10;

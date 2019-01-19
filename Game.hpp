@@ -15,6 +15,8 @@ using namespace std;
 
 class Game{
 private:
+	int screen_width;
+	int screen_height;
 	std::chrono::time_point<std::chrono::system_clock> change_position_delay;
 	std::chrono::time_point<std::chrono::system_clock> inertia_delay;
 
@@ -52,7 +54,7 @@ private:
 	void changeObjectsPositionsByInertia(vector<SpaceObject*>&, bool);
 
 public:
-	Game(SDL_Renderer *);
+	Game(SDL_Renderer *, int, int);
 	
 	void run();
 };
