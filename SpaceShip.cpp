@@ -6,17 +6,43 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_he
 	this->y = y;
 	this->screen_width = screen_width;
 	this->screen_height = screen_height;
-	display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
-	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
+    display_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (DISPLAY_DELAY);
+    rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
+}
+
+SpaceObject::~SpaceObject(){
+    cout << "SpaceObject destructor" << endl;
 }
 
 Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
-	this->direction_x = direction_x;
-	this->direction_y = direction_y;
+}
+
+Projectile::~Projectile(){
+    cout << "Projectile destructor" << endl;
+}
+
+Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y): SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
+    //TODO: think about direction_x;direction_y
+
+    int error_x = rand() % 10;
+    int error_y = rand() % 10;
+    int size = rand() % 20;
+
+    points[0] = {x + error_x, 				y + error_y};
+    points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
+    points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
+    points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
+    points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
+    points[5] = {x + size + rand() % 5, 	y + rand() % 5};
+    points[6] = {x + error_x, 				y + error_y};
+}
+
+Asteroid::~Asteroid(){
+    cout << "Asteroid destructor" << endl;
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
-	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) SHOOTING_DELAY;
+    shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	
 	// space ship coordination
 	this->points[0] = {screen_width/2, screen_height/2};
@@ -24,6 +50,10 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
 	this->points[2] = {screen_width/2 + 10, screen_height/2 + screen_height / 10};
 	this->points[3] = {screen_width/2, screen_height/2};
 
+}
+
+SpaceShip::~SpaceShip(){
+    cout << "SpaceShip destructor" << endl;
 }
 
 DirectionXY::DirectionXY(float x, float y){
@@ -76,7 +106,7 @@ void SpaceShip::change_x(bool clockwise){
 	
 	if (rotation_delay > std::chrono::system_clock::now()) { return; }
 	
-	float angel = M_PI / 12;
+    double angel = M_PI / 12;
 	if (!clockwise) { angel *= -1; }
 	
 	// int relative_x = 0;
@@ -90,20 +120,20 @@ void SpaceShip::change_x(bool clockwise){
 	// relative_x = relative_x/POINTS_COUNT;
 	// relative_y = relative_y/POINTS_COUNT;
 	
-	float p = 0;
+    double p = 0;
 	for (int i = 0; i < POINTS_COUNT - 1; ++i){
 		cout << sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2)) << endl;
 		p += sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
 	}
 	p *= 0.5;
 	cout << "p = " << p << endl;
-	float tmp_multiplied_lines = 1;
+    double tmp_multiplied_lines = 1;
 	for (int i = 0; i < POINTS_COUNT - 1; ++i){
 		tmp_multiplied_lines *= p - sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
 	}
-	float altitude = 2 * sqrt(p * tmp_multiplied_lines)/ sqrt(pow((points[2].x - points[3].x), 2) + pow((points[2].y - points[3].y), 2));
-	int relative_x = (screen_width / 2);
-	int relative_y = (screen_height / 2) + altitude/2;
+    double altitude = 2 * sqrt(p * tmp_multiplied_lines)/ sqrt(pow((points[2].x - points[3].x), 2) + pow((points[2].y - points[3].y), 2));
+    double relative_x = (screen_width / 2);
+    double relative_y = (screen_height / 2) + altitude/2;
 	
 	int tmp_x = 0;
 	int tmp_y = 0;
@@ -115,7 +145,7 @@ void SpaceShip::change_x(bool clockwise){
 		points[i].y = tmp_y;
 		
 	}
-	rotation_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) ROTATION_DELAY;
+    rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
 void SpaceShip::display(){
@@ -132,7 +162,7 @@ Projectile * SpaceShip::shoot(){
 	int diff_y = (mediana_y - points[0].y)/5;
 	
 	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
-	shoot_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) SHOOTING_DELAY;
+    shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	// projectiles.push_back(projectile);
 	return projectile;
 }
@@ -162,7 +192,7 @@ void Projectile::display(){
 			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy + tmp_x));
 		}
 
-		if (tmp_x != 0 && tmp_y != 0){
+        if (tmp_x != 0 && tmp_y != 0){
 			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_x), (int)(cy - tmp_y));
 			SDL_RenderDrawPoint(renderer, (int)(cx - tmp_y), (int)(cy - tmp_x));
 		}
@@ -182,7 +212,6 @@ void Projectile::display(){
 		double dx = floor(sqrt((2.0 * BLOCK_SIZE * dy) - (dy * dy)));
 		double cx = this->x;
 		double cy = this->y;
-		int x = cx - dx;
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
@@ -191,22 +220,6 @@ void Projectile::display(){
 		this->y -= direction_y;
 		display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
 	}
-}
-
-Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y): SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
-	//TODO: think about direction_x;direction_y
-
-	int error_x = rand() % 10;
-	int error_y = rand() % 10;
-	int size = rand() % 20;
-    
-	points[0] = {x + error_x, 				y + error_y};
-	points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
-	points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
-	points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
-	points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
-	points[5] = {x + size + rand() % 5, 	y + rand() % 5};
-	points[6] = {x + error_x, 				y + error_y};
 }
 
 void Asteroid::display(){

@@ -48,6 +48,7 @@ public:
 	SpaceObject(SDL_Renderer*, int, int, int, int);
 	virtual void display() = 0;
 	virtual void change_position(DirectionXY);
+    virtual ~SpaceObject();
 };
 
 class Projectile: public SpaceObject{
@@ -57,7 +58,8 @@ private:
 public:
 	Projectile(SDL_Renderer*, int, int, int, int);
 	void change_position(DirectionXY);
-	void display();
+    void display();
+    ~Projectile();
 };
 
 class SpaceShip: public SpaceObject{
@@ -72,6 +74,7 @@ public:
 	void display();
 	void change_x(bool);
 	void change_y(bool);
+    ~SpaceShip();
 };
 
 class Asteroid: public SpaceObject{
@@ -80,6 +83,7 @@ public:
 	Asteroid(SDL_Renderer*, int, int, int, int);
 	SDL_Point points[ASTEROID_POINTS_COUNT];
 	void change_position(DirectionXY);
+    ~Asteroid();
 };
 
 #endif

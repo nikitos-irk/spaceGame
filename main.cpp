@@ -29,7 +29,7 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
-	SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_SHOWN);
 	if (window == nullptr){
 		logSDLError(std::cout, "CreateWindow");
 		SDL_Quit();
