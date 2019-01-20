@@ -52,6 +52,24 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
 
 }
 
+DirectionalVector::DirectionalVector(){
+    this->p1 = DirectionXY();
+    this->p2 = DirectionXY();
+}
+
+DirectionalVector::DirectionalVector(DirectionXY p1, DirectionXY p2){
+    this->p1 = p1;
+    this->p2 = p2;
+}
+
+DirectionalVector SpaceShip::getDerectionalVector(){
+    int mediana_x = points[1].x/2 + points[2].x/2;
+    int mediana_y = points[1].y/2 + points[2].y/2;
+
+    return DirectionalVector(DirectionXY(mediana_x, mediana_y),
+                             DirectionXY(points[0].x, points[0].y));
+}
+
 SpaceShip::~SpaceShip(){
     cout << "SpaceShip destructor" << endl;
 }
@@ -89,8 +107,8 @@ void SpaceShip::change_y(bool forward){
 	int diff_x = (mediana_x - points[0].x) / 5;
 	int diff_y = (mediana_y - points[0].y) / 5;
 
-	cout << "diff_x = " << diff_x << endl;
-	cout << "diff_y = " << diff_y << endl;
+//	cout << "diff_x = " << diff_x << endl;
+//	cout << "diff_y = " << diff_y << endl;
 
 	if (!forward){
 		diff_x *= -1;
@@ -122,11 +140,11 @@ void SpaceShip::change_x(bool clockwise){
 	
     double p = 0;
 	for (int i = 0; i < POINTS_COUNT - 1; ++i){
-		cout << sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2)) << endl;
+//		cout << sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2)) << endl;
 		p += sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
 	}
 	p *= 0.5;
-	cout << "p = " << p << endl;
+//	cout << "p = " << p << endl;
     double tmp_multiplied_lines = 1;
 	for (int i = 0; i < POINTS_COUNT - 1; ++i){
 		tmp_multiplied_lines *= p - sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));

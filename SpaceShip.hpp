@@ -16,7 +16,7 @@
 #define ROTATION_DELAY 60
 #define DISPLAY_DELAY 100
 #define SHOOTING_DELAY 30
-#define CHANGE_POSITION_DELAY 10
+#define CHANGE_POSITION_DELAY 100
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 
@@ -34,6 +34,12 @@ struct DirectionXY{
     	return *this;
 	}
 	DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
+};
+
+struct DirectionalVector{
+    DirectionXY p1, p2;
+    DirectionalVector();
+    DirectionalVector(DirectionXY, DirectionXY);
 };
 
 class SpaceObject{
@@ -74,6 +80,7 @@ public:
 	void display();
 	void change_x(bool);
 	void change_y(bool);
+    DirectionalVector getDerectionalVector();
     ~SpaceShip();
 };
 

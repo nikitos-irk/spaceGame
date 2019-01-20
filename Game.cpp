@@ -2,13 +2,17 @@
 #include "SpaceShip.hpp"
 #include "Background.hpp"
 
+
 Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
-	
+
 	this->screen_width = screen_width;
 	this->screen_height = screen_height;
 	
 	// Hope I will think something more interesting background than it is now
 	my_background = new Background(renderer, screen_width, screen_height);
+
+    // Speed
+    sp = new Speed(10);
 
 	// Renderer
 	this->renderer = renderer;
@@ -20,15 +24,13 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % this->screen_width;
 		int tmp_y = rand() % this->screen_height;
-		int direction_x = 5 - rand() % 10;
-		int direction_y = 5 - rand() % 10;
 		spaceObjects.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 	}
 	
 	// Initiating delays
 	auto now = std::chrono::system_clock::now();
-	change_position_delay = now + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
-	inertia_delay = now + (std::chrono::milliseconds) INERTIA_DELAY;
+    change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
+    inertia_delay = now + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
 	
 	space_pushed 	= false;
 	left_pushed  	= false;
@@ -58,16 +60,18 @@ void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direc
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
 
-	DirectionXY directionXY = my_ship->get_direction();
+//	DirectionXY directionXY = my_ship->get_direction();
+//    DirectionalVector dv = my_ship->getDerectionalVector();
 	
-	if (!direction){
-		directionXY.x *= -1;
-		directionXY.y *= -1;
-	}
+    DirectionXY directionXY = sp->getOffsetXY(my_ship->getDerectionalVector());
+    if (!direction){
+        directionXY.x *= -1;
+        directionXY.y *= -1;
+    }
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
-	change_position_delay = now + (std::chrono::milliseconds) CHANGE_POSITION_DELAY;
+    change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
 }
 
 void Game::changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, bool direction){
@@ -89,7 +93,7 @@ void Game::changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, b
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
-	inertia_delay = now + (std::chrono::milliseconds) INERTIA_DELAY;
+    inertia_delay = now + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
 }
 
 void Game::run(){
@@ -115,9 +119,11 @@ void Game::run(){
 					case SDLK_UP:
 						up_pushed = true;
 						changeObjectsPositions(spaceObjects, true);
+                        sp->accelarate();
 						break;
 					case SDLK_DOWN:
 						down_pushed = true;
+                        sp->slowdown();
 						changeObjectsPositions(spaceObjects, false);
 						break;
 					case SDLK_LEFT:
@@ -166,8 +172,8 @@ void Game::run(){
 			}
 		}
 
-		if (down_pushed) 	{ changeObjectsPositions(spaceObjects, false); }
-		if (up_pushed) 		{ changeObjectsPositions(spaceObjects, true); }
+        if (down_pushed) 	{ sp->accelarate(); changeObjectsPositions(spaceObjects, false); }
+        if (up_pushed) 		{ sp->accelarate(); changeObjectsPositions(spaceObjects, true); }
 		if (left_pushed) 	{ my_ship->change_x(false); }
 		if (right_pushed) 	{ my_ship->change_x(true); }
 		if (space_pushed) 	{
@@ -176,17 +182,17 @@ void Game::run(){
 				spaceObjects.push_back(tmp_space_obj);
 			}
 		}
-		auto iter = inertias.begin();
-		while (iter != inertias.end()){
-		    bool isAlive = (*iter)->isAlive();
-		    if (!isAlive){
-		        inertias.erase(iter++);
-		    }
-		    else{
-		        (*iter)->run();
-		        ++iter;
-		    }
-		}
+//		auto iter = inertias.begin();
+//		while (iter != inertias.end()){
+//		    bool isAlive = (*iter)->isAlive();
+//		    if (!isAlive){
+//		        inertias.erase(iter++);
+//		    }
+//		    else{
+//		        (*iter)->run();
+//		        ++iter;
+//		    }
+//		}
 
 		my_background->fill_background();
 		displayObjects(spaceObjects);
