@@ -60,9 +60,6 @@ void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direc
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
 
-//	DirectionXY directionXY = my_ship->get_direction();
-//    DirectionalVector dv = my_ship->getDerectionalVector();
-	
     DirectionXY directionXY = sp->getOffsetXY(my_ship->getDerectionalVector());
     if (!direction){
         directionXY.x *= -1;
@@ -118,8 +115,8 @@ void Game::run(){
 						break;
 					case SDLK_UP:
 						up_pushed = true;
-						changeObjectsPositions(spaceObjects, true);
                         sp->accelarate();
+						changeObjectsPositions(spaceObjects, true);
 						break;
 					case SDLK_DOWN:
 						down_pushed = true;

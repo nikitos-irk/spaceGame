@@ -179,9 +179,8 @@ Projectile * SpaceShip::shoot(){
 	int diff_x = (mediana_x - points[0].x)/5;
 	int diff_y = (mediana_y - points[0].y)/5;
 	
-	Projectile *projectile = new Projectile(this->renderer, points[0].x - diff_x, points[0].y - diff_y, diff_x, diff_y);
+    Projectile *projectile = new Projectile(this->renderer, 0, 0, points[0].x - diff_x, points[0].y - diff_y);
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
-	// projectiles.push_back(projectile);
 	return projectile;
 }
 
