@@ -109,11 +109,9 @@ void Game::run(){
 						break;
 					case SDLK_LEFT:
 						left_pushed = true;
-						my_ship->change_x(false);
 						break;
 					case SDLK_RIGHT:
 						right_pushed = true;
-						my_ship->change_x(true);
 						break;
 					case SDLK_SPACE:{
 							space_pushed = true;
@@ -137,8 +135,10 @@ void Game::run(){
                         down_unpushed = true;
 						break;
                     case SDLK_LEFT:
+                        left_pushed = false;
 						break;
                     case SDLK_RIGHT:
+                        right_pushed = false;
 						break;
                     case SDLK_SPACE:
 						break;
