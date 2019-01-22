@@ -41,15 +41,34 @@ Asteroid::~Asteroid(){
     cout << "Asteroid destructor" << endl;
 }
 
-SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
+SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
+
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
-	
-	// space ship coordination
+    speed = new Speed(max_speed);
+
+    // spaceship coordination
 	this->points[0] = {screen_width/2, screen_height/2};
 	this->points[1] = {screen_width/2 - 10, screen_height/2 + screen_height / 10};
 	this->points[2] = {screen_width/2 + 10, screen_height/2 + screen_height / 10};
 	this->points[3] = {screen_width/2, screen_height/2};
 
+}
+
+void SpaceShip::slowdown(){
+    speed->slowdown();
+}
+void SpaceShip::accelarate(){
+    speed->accelarate();
+}
+void SpaceShip::backward_slowdown(){
+    speed->backward_slowdown();
+}
+void SpaceShip::backward_accelarate(){
+    speed->backward_accelarate();
+}
+
+DirectionXY SpaceShip::get_offset(){
+    return speed->getOffsetXY(getDerectionalVector());
 }
 
 DirectionalVector::DirectionalVector(){

@@ -5,10 +5,10 @@
 #include <utility>
 #include <functional>
 #include <vector>
-#include <cmath>
 #include <iostream>
 #include <chrono>
 #include <time.h>
+#include "speed.hpp"
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
@@ -21,26 +21,6 @@
 #define INERTIA_COUNTER 500
 
 using namespace std;
-
-struct DirectionXY{
-	float x;
-	float y;
-	DirectionXY(float, float);
-	DirectionXY();
-	
-	DirectionXY& operator *=(int value){
-    	x *= value;
-		y *= value;
-    	return *this;
-	}
-	DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
-};
-
-struct DirectionalVector{
-    DirectionXY p1, p2;
-    DirectionalVector();
-    DirectionalVector(DirectionXY, DirectionXY);
-};
 
 class SpaceObject{
 protected:
@@ -73,10 +53,16 @@ private:
 	SDL_Point points[POINTS_COUNT];
 	std::chrono::time_point<std::chrono::system_clock> shoot_delay; 
 public:
-	SpaceShip(SDL_Renderer*, int, int);
+    Speed *speed;
+    void slowdown();
+    void accelarate();
+    void backward_slowdown();
+    void backward_accelarate();
+    SpaceShip(SDL_Renderer*, int, int, int);
 	Projectile * shoot();
 	vector<Projectile*> projectiles;
 	DirectionXY get_direction();
+    DirectionXY get_offset();
 	void display();
 	void change_x(bool);
 	void change_y(bool);

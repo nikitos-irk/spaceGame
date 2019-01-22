@@ -1,7 +1,27 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-#include "SpaceShip.hpp"
+#include <cmath>
+
+struct DirectionXY{
+    float x;
+    float y;
+    DirectionXY(float, float);
+    DirectionXY();
+
+    DirectionXY& operator *=(int value){
+        x *= value;
+        y *= value;
+        return *this;
+    }
+    DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
+};
+
+struct DirectionalVector{
+    DirectionXY p1, p2;
+    DirectionalVector();
+    DirectionalVector(DirectionXY, DirectionXY);
+};
 
 class Speed{
 

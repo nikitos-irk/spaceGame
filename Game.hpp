@@ -10,13 +10,12 @@
 #include "iostream"
 #include "Background.hpp"
 #include "Inertia.hpp"
-#include "speed.hpp"
+//#include "speed.hpp"
 
 using namespace std;
 
 class Game{
 private:
-    Speed *sp;
 	int screen_width;
 	int screen_height;
 	std::chrono::time_point<std::chrono::system_clock> change_position_delay;

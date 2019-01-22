@@ -11,14 +11,11 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	// Hope I will think something more interesting background than it is now
 	my_background = new Background(renderer, screen_width, screen_height);
 
-    // Speed
-    sp = new Speed(50);
-
 	// Renderer
 	this->renderer = renderer;
 
 	// Create ship
-	my_ship = new SpaceShip(renderer, screen_width, screen_height);
+    my_ship = new SpaceShip(renderer, screen_width, screen_height, 50);
 	
 	// Create asteroids
 	for (int i = 0; i < 10; ++i) {
@@ -52,11 +49,9 @@ void Game::displayObjects(vector<SpaceObject*> &spaceObjects){
 }
 
 void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects){
-
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
-
-    DirectionXY directionXY = sp->getOffsetXY(my_ship->getDerectionalVector());
+    DirectionXY directionXY = my_ship->get_offset();
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
@@ -152,9 +147,8 @@ void Game::run(){
 				}
 			}
 		}
-
-        if (up_pushed) 	{ sp->backward_accelarate(); sp->slowdown(); } else if (up_unpushed) {sp->backward_slowdown();}
-        if (down_pushed) { sp->accelarate(); sp->backward_slowdown(); } else if (down_unpushed) {sp->slowdown();}
+        if (up_pushed) 	{ my_ship->backward_accelarate(); my_ship->slowdown(); } else if (up_unpushed) {my_ship->backward_slowdown();}
+        if (down_pushed) { my_ship->accelarate(); my_ship->backward_slowdown(); } else if (down_unpushed) {my_ship->slowdown();}
 
         if (left_pushed) 	{ my_ship->change_x(false); }
 		if (right_pushed) 	{ my_ship->change_x(true); }

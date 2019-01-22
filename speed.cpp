@@ -1,6 +1,8 @@
 #include "speed.hpp"
+#include "iostream"
 #define ACCELERATION 100
 
+using namespace std;
 Speed::Speed(int maxOffset){
     this->maxOffset = maxOffset;
     negativeOffset = 0.0;
@@ -20,7 +22,6 @@ DirectionXY Speed::getOffsetXY(DirectionalVector dv){
 }
 
 void Speed::accelarate(){
-
     if (forwardOffset <= 0.0){
         forwardOffset = 1;
     }
