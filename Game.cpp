@@ -12,7 +12,7 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	my_background = new Background(renderer, screen_width, screen_height);
 
     // Speed
-    sp = new Speed(10);
+    sp = new Speed(50);
 
 	// Renderer
 	this->renderer = renderer;
@@ -37,12 +37,8 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	right_pushed 	= false;
 	up_pushed 		= false;
 	down_pushed 	= false;
-
-	// Inertia flags after continuous buttom pushing is over
-	left_inertia  	= false;
-	right_inertia 	= false;
-	up_inertia		= false;
-	down_inertia 	= false;
+    up_unpushed     = false;
+    down_unpushed   = false;
 
 	inertia_counter_up = 0;
 	inertia_counter_down = 0;
@@ -55,16 +51,12 @@ void Game::displayObjects(vector<SpaceObject*> &spaceObjects){
 	}
 }
 
-void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects, bool direction){
+void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects){
 
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
 
     DirectionXY directionXY = sp->getOffsetXY(my_ship->getDerectionalVector());
-    if (!direction){
-        directionXY.x *= -1;
-        directionXY.y *= -1;
-    }
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
@@ -101,7 +93,6 @@ void Game::run(){
 	SDL_RenderClear(renderer);
 	
 	int quit = 1;
-
 	SpaceObject *tmp_space_obj;
 
 	while(quit) {
@@ -113,15 +104,13 @@ void Game::run(){
 			    	case SDL_QUIT:
 						quit = 0;
 						break;
-					case SDLK_UP:
-						up_pushed = true;
-                        sp->accelarate();
-						changeObjectsPositions(spaceObjects, true);
+                    case SDLK_UP:
+                        up_pushed = true;
+                        up_unpushed = false;
 						break;
-					case SDLK_DOWN:
-						down_pushed = true;
-                        sp->slowdown();
-						changeObjectsPositions(spaceObjects, false);
+                    case SDLK_DOWN:
+                        down_pushed = true;
+                        down_unpushed = false;
 						break;
 					case SDLK_LEFT:
 						left_pushed = true;
@@ -144,24 +133,19 @@ void Game::run(){
 				}
 			} else if (e.type == SDL_KEYUP) {
 				switch(e.key.keysym.sym){
-					case SDLK_UP:
-						up_pushed = false;
-						inertias.push_back(new InertiaUpDown(my_ship, spaceObjects, true));
+                    case SDLK_UP:
+                        up_pushed = false;
+                        up_unpushed = true;
 						break;
-					case SDLK_DOWN:
-						down_pushed = false;
-						inertias.push_back(new InertiaUpDown(my_ship, spaceObjects, false));
+                    case SDLK_DOWN:
+                        down_pushed = false;
+                        down_unpushed = true;
 						break;
-					case SDLK_LEFT:
-						left_pushed = false;
-						left_inertia = true;
+                    case SDLK_LEFT:
 						break;
-					case SDLK_RIGHT:
-						right_pushed = false;
-						right_inertia = true;
+                    case SDLK_RIGHT:
 						break;
-					case SDLK_SPACE:
-						space_pushed = false;
+                    case SDLK_SPACE:
 						break;
 					default:
 						break;
@@ -169,9 +153,10 @@ void Game::run(){
 			}
 		}
 
-        if (down_pushed) 	{ sp->accelarate(); changeObjectsPositions(spaceObjects, false); }
-        if (up_pushed) 		{ sp->accelarate(); changeObjectsPositions(spaceObjects, true); }
-		if (left_pushed) 	{ my_ship->change_x(false); }
+        if (up_pushed) 	{ sp->backward_accelarate(); sp->slowdown(); } else if (up_unpushed) {sp->backward_slowdown();}
+        if (down_pushed) { sp->accelarate(); sp->backward_slowdown(); } else if (down_unpushed) {sp->slowdown();}
+
+        if (left_pushed) 	{ my_ship->change_x(false); }
 		if (right_pushed) 	{ my_ship->change_x(true); }
 		if (space_pushed) 	{
 			tmp_space_obj = my_ship->shoot();
@@ -179,17 +164,7 @@ void Game::run(){
 				spaceObjects.push_back(tmp_space_obj);
 			}
 		}
-//		auto iter = inertias.begin();
-//		while (iter != inertias.end()){
-//		    bool isAlive = (*iter)->isAlive();
-//		    if (!isAlive){
-//		        inertias.erase(iter++);
-//		    }
-//		    else{
-//		        (*iter)->run();
-//		        ++iter;
-//		    }
-//		}
+        changeObjectsPositions(spaceObjects);
 
 		my_background->fill_background();
 		displayObjects(spaceObjects);

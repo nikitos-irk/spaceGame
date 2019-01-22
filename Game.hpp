@@ -39,20 +39,14 @@ private:
 	bool space_pushed;
 	bool left_pushed;
 	bool right_pushed;
-	bool up_pushed;
-	bool down_pushed;
-
-	// Inertia flags after continuous buttom pushing is over
-	bool left_inertia;
-	bool right_inertia;
-	bool up_inertia;
-	bool down_inertia;
+    bool up_pushed, up_unpushed;
+    bool down_pushed, down_unpushed;
 
 	int inertia_counter_up;
 	int inertia_counter_down;
 
 	void displayObjects(vector<SpaceObject*>&);
-	void changeObjectsPositions(vector<SpaceObject*>&, bool);
+    void changeObjectsPositions(vector<SpaceObject*>&);
 	void changeObjectsPositionsByInertia(vector<SpaceObject*>&, bool);
 
 public:
