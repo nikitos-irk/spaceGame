@@ -139,49 +139,36 @@ void SpaceShip::change_y(bool forward){
 		points[i].y += diff_y;
 	}
 }
+
 void SpaceShip::change_x(bool clockwise){
 	
 	if (rotation_delay > std::chrono::system_clock::now()) { return; }
 	
-    double angel = M_PI / 12;
+    float angel = M_PI / 12;
 	if (!clockwise) { angel *= -1; }
-	
-	// int relative_x = 0;
-	// int relative_y = 0;
 
-	// for (int i = 0; i < POINTS_COUNT; ++i){
-	// 	relative_x += points[i].x;
-	// 	relative_y += points[i].y;
-	// }
-	//
-	// relative_x = relative_x/POINTS_COUNT;
-	// relative_y = relative_y/POINTS_COUNT;
-	
-    double p = 0;
-	for (int i = 0; i < POINTS_COUNT - 1; ++i){
-//		cout << sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2)) << endl;
-		p += sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
-	}
-	p *= 0.5;
-//	cout << "p = " << p << endl;
-    double tmp_multiplied_lines = 1;
-	for (int i = 0; i < POINTS_COUNT - 1; ++i){
-		tmp_multiplied_lines *= p - sqrt(pow((points[i].x - points[i+1].x), 2) + pow((points[i].y - points[i+1].y), 2));
-	}
-    double altitude = 2 * sqrt(p * tmp_multiplied_lines)/ sqrt(pow((points[2].x - points[3].x), 2) + pow((points[2].y - points[3].y), 2));
-    double relative_x = (screen_width / 2);
-    double relative_y = (screen_height / 2) + altitude/2;
-	
-	int tmp_x = 0;
-	int tmp_y = 0;
+    float x1 = points[2].x;
+    float y1 = points[2].y;
+    float x2 = (points[0].x + points[1].x)/2;
+    float y2 = (points[0].y + points[1].y)/2;
 
-	for (int i = 0; i < POINTS_COUNT; ++i){
-		tmp_x = (points[i].x - relative_x) * cos(angel) - (points[i].y - relative_y) * sin(angel) + relative_x;
-		tmp_y = (points[i].x - relative_x) * sin(angel) + (points[i].y - relative_y) * cos(angel) + relative_y;
-		points[i].x = tmp_x;
-		points[i].y = tmp_y;
-		
+    float x3 = points[3].x;
+    float y3 = points[3].y;
+    float x4 = (points[1].x + points[2].x)/2;
+    float y4 = (points[1].y + points[2].y)/2;
+
+    float px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    float py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+
+    float s = sin(angel);
+    float c = cos(angel);
+
+    for (int i = 0; i < POINTS_COUNT - 1; ++i){
+        points[i].x = c * (points[i].x - px) - s * (points[i].y - py) + px;
+        points[i].y = s * (points[i].x - px) + c * (points[i].y - py) + py;
 	}
+    points[POINTS_COUNT - 1].x = points[0].x;
+    points[POINTS_COUNT - 1].y = points[0].y;
     rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
