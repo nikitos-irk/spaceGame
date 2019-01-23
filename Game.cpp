@@ -141,6 +141,7 @@ void Game::run(){
                         right_pushed = false;
 						break;
                     case SDLK_SPACE:
+                        space_pushed = false;
 						break;
 					default:
 						break;

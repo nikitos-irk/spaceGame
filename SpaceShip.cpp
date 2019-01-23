@@ -14,7 +14,11 @@ SpaceObject::~SpaceObject(){
     cout << "SpaceObject destructor" << endl;
 }
 
-Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
+Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height, int offset_x, int offset_y, int x, int y) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
+    direction_x = offset_x;
+    direction_y = offset_y;
+    this->x = x;
+    this->y = y;
 }
 
 Projectile::~Projectile(){
@@ -185,7 +189,7 @@ Projectile * SpaceShip::shoot(){
 	int diff_x = (mediana_x - points[0].x)/5;
 	int diff_y = (mediana_y - points[0].y)/5;
 	
-    Projectile *projectile = new Projectile(this->renderer, 0, 0, points[0].x - diff_x, points[0].y - diff_y);
+    Projectile *projectile = new Projectile(this->renderer, 0, 0, diff_x, diff_y, points[0].x - diff_x, points[0].y - diff_y);
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	return projectile;
 }
@@ -258,6 +262,6 @@ void Asteroid::change_position(DirectionXY directionXY){
 }
 
 void Projectile::change_position(DirectionXY directionXY){
-	this->x += directionXY.x;
-	this->y += directionXY.y;
+    this->x += directionXY.x;
+    this->y += directionXY.y;
 }

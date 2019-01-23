@@ -15,7 +15,7 @@
 #define ASTEROID_POINTS_COUNT 7
 #define ROTATION_DELAY 60
 #define DISPLAY_DELAY 100
-#define SHOOTING_DELAY 30
+#define SHOOTING_DELAY 500
 #define CHANGE_POSITION_DELAY 100
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
@@ -42,7 +42,7 @@ private:
 	int direction_x;
 	int direction_y;
 public:
-	Projectile(SDL_Renderer*, int, int, int, int);
+    Projectile(SDL_Renderer*, int, int, int, int, int, int);
 	void change_position(DirectionXY);
     void display();
     ~Projectile();
