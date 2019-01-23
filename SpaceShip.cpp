@@ -168,8 +168,10 @@ void SpaceShip::change_x(bool clockwise){
     float c = cos(angel);
 
     for (int i = 0; i < POINTS_COUNT - 1; ++i){
-        points[i].x = c * (points[i].x - px) - s * (points[i].y - py) + px;
-        points[i].y = s * (points[i].x - px) + c * (points[i].y - py) + py;
+        int tmp_x = c * (points[i].x - px) - s * (points[i].y - py) + px;
+        int tmp_y = s * (points[i].x - px) + c * (points[i].y - py) + py;
+        points[i].x = tmp_x;
+        points[i].y = tmp_y;
 	}
     points[POINTS_COUNT - 1].x = points[0].x;
     points[POINTS_COUNT - 1].y = points[0].y;
