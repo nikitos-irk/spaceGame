@@ -51,7 +51,9 @@ public:
 class SpaceShip: public SpaceObject{
 private:
 	SDL_Point points[POINTS_COUNT];
-	std::chrono::time_point<std::chrono::system_clock> shoot_delay; 
+    std::chrono::time_point<std::chrono::system_clock> shoot_delay;
+    double px;
+    double py;
 public:
     Speed *speed;
     void slowdown();

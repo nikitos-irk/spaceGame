@@ -1,4 +1,6 @@
 #include "SpaceShip.hpp"
+#include <complex>
+typedef complex<double> point;
 
 SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y){
 	this->renderer = renderer;
@@ -45,6 +47,12 @@ Asteroid::~Asteroid(){
     cout << "Asteroid destructor" << endl;
 }
 
+int get_index(int i){
+    return (i > 2) ? i - 3 : i;
+}
+void out(float x, float y){
+    cout << x << ":" << y << endl;
+}
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
 
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
@@ -56,6 +64,18 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
 	this->points[2] = {screen_width/2 + 10, screen_height/2 + screen_height / 10};
 	this->points[3] = {screen_width/2, screen_height/2};
 
+    double x1 = points[2].x;
+    double y1 = points[2].y;
+    double x2 = (points[0].x + points[1].x)/2;
+    double y2 = (points[0].y + points[1].y)/2;
+
+    double x3 = points[0].x;
+    double y3 = points[0].y;
+    double x4 = (points[1].x + points[2].x)/2;
+    double y4 = (points[1].y + points[2].y)/2;
+
+    px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
 }
 
 void SpaceShip::slowdown(){
@@ -130,9 +150,6 @@ void SpaceShip::change_y(bool forward){
 	int diff_x = (mediana_x - points[0].x) / 5;
 	int diff_y = (mediana_y - points[0].y) / 5;
 
-//	cout << "diff_x = " << diff_x << endl;
-//	cout << "diff_y = " << diff_y << endl;
-
 	if (!forward){
 		diff_x *= -1;
 		diff_y *= -1;
@@ -144,35 +161,31 @@ void SpaceShip::change_y(bool forward){
 	}
 }
 
+point rotate(point P, point Q, double theta)
+{
+    return (P-Q) * polar(1.0, theta) +  Q;
+}
+
 void SpaceShip::change_x(bool clockwise){
 	
 	if (rotation_delay > std::chrono::system_clock::now()) { return; }
 	
-    float angel = M_PI / 12;
-	if (!clockwise) { angel *= -1; }
+    double angel = M_PI_4;
 
-    float x1 = points[2].x;
-    float y1 = points[2].y;
-    float x2 = (points[0].x + points[1].x)/2;
-    float y2 = (points[0].y + points[1].y)/2;
+    if (!clockwise){
+        angel *= -1;
+    }
 
-    float x3 = points[3].x;
-    float y3 = points[3].y;
-    float x4 = (points[1].x + points[2].x)/2;
-    float y4 = (points[1].y + points[2].y)/2;
-
-    float px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    float py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-
-    float s = sin(angel);
-    float c = cos(angel);
-
+    double tmp_x, tmp_y;
     for (int i = 0; i < POINTS_COUNT - 1; ++i){
-        int tmp_x = c * (points[i].x - px) - s * (points[i].y - py) + px;
-        int tmp_y = s * (points[i].x - px) + c * (points[i].y - py) + py;
-        points[i].x = tmp_x;
-        points[i].y = tmp_y;
-	}
+        point P(points[i].x, points[i].y);
+        point Q(px, py);
+        double theta = M_PI_4;
+        point P_rotated = rotate(P, Q, angel);
+        points[i].x = P_rotated.real(); // real part of the complex number
+        points[i].y = P_rotated.imag(); // imaginary part of the complex number
+    }
+
     points[POINTS_COUNT - 1].x = points[0].x;
     points[POINTS_COUNT - 1].y = points[0].y;
     rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
