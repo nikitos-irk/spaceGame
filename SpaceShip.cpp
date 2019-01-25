@@ -50,32 +50,36 @@ Asteroid::~Asteroid(){
 int get_index(int i){
     return (i > 2) ? i - 3 : i;
 }
-void out(float x, float y){
+void out(double x, double y){
     cout << x << ":" << y << endl;
 }
+
+Point SpaceShip::getMedianIntersaction(){
+    double x1 = pp[0].x;
+    double y1 = pp[0].y;
+    double x2 = (pp[2].x + pp[1].x)/2;
+    double y2 = (pp[2].y + pp[1].y)/2;
+
+    double x3 = pp[1].x;
+    double y3 = pp[1].y;
+    double x4 = (pp[0].x + pp[2].x)/2;
+    double y4 = (pp[0].y + pp[2].y)/2;
+
+    double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    return Point(px, py);
+}
+
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
 
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
     speed = new Speed(max_speed);
 
     // spaceship coordination
-	this->points[0] = {screen_width/2, screen_height/2};
-	this->points[1] = {screen_width/2 - 10, screen_height/2 + screen_height / 10};
-	this->points[2] = {screen_width/2 + 10, screen_height/2 + screen_height / 10};
-	this->points[3] = {screen_width/2, screen_height/2};
-
-    double x1 = points[2].x;
-    double y1 = points[2].y;
-    double x2 = (points[0].x + points[1].x)/2;
-    double y2 = (points[0].y + points[1].y)/2;
-
-    double x3 = points[0].x;
-    double y3 = points[0].y;
-    double x4 = (points[1].x + points[2].x)/2;
-    double y4 = (points[1].y + points[2].y)/2;
-
-    px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    pp.push_back(Point(screen_width/2, screen_height/2));
+    pp.push_back(Point(screen_width/2 - 10, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 + 10, screen_height/2 + screen_height / 10));
+    initialMedianIntersection = getMedianIntersaction();
 }
 
 void SpaceShip::slowdown(){
@@ -106,18 +110,19 @@ DirectionalVector::DirectionalVector(DirectionXY p1, DirectionXY p2){
 }
 
 DirectionalVector SpaceShip::getDerectionalVector(){
-    int mediana_x = points[1].x/2 + points[2].x/2;
-    int mediana_y = points[1].y/2 + points[2].y/2;
+
+    double mediana_x = pp[1].x/2 + pp[2].x/2;
+    double mediana_y = pp[1].y/2 + pp[2].y/2;
 
     return DirectionalVector(DirectionXY(mediana_x, mediana_y),
-                             DirectionXY(points[0].x, points[0].y));
+                             DirectionXY(pp[0].x, pp[0].y));
 }
 
 SpaceShip::~SpaceShip(){
     cout << "SpaceShip destructor" << endl;
 }
 
-DirectionXY::DirectionXY(float x, float y){
+DirectionXY::DirectionXY(double x, double y){
 	this->x = x;
 	this->y = y;
 }
@@ -128,83 +133,78 @@ DirectionXY::DirectionXY(){
 }
 
 DirectionXY SpaceShip::get_direction(){
-	int mediana_x = points[1].x/2 + points[2].x/2;
-	int mediana_y = points[1].y/2 + points[2].y/2;
+    double mediana_x = pp[1].x/2 + pp[2].x/2;
+    double mediana_y = pp[1].y/2 + pp[2].y/2;
 
-	int diff_x = (mediana_x - points[0].x)/5;
-	int diff_y = (mediana_y - points[0].y)/5;
+    double diff_x = (mediana_x - pp[0].x)/5;
+    double diff_y = (mediana_y - pp[0].y)/5;
 	
 	return DirectionXY(diff_x, diff_y);
 }
 
 void SpaceObject::change_position(DirectionXY directionXY){
-	this->x += directionXY.x;
-	this->y += directionXY.y;
 }
 
 void SpaceShip::change_y(bool forward){
-	
-	int mediana_x = points[1].x/2 + points[2].x/2;
-	int mediana_y = points[1].y/2 + points[2].y/2;
+    double mediana_x = pp[1].x/2 + pp[2].x/2;
+    double mediana_y = pp[1].y/2 + pp[2].y/2;
 
-	int diff_x = (mediana_x - points[0].x) / 5;
-	int diff_y = (mediana_y - points[0].y) / 5;
+    double diff_x = (mediana_x - pp[0].x) / 5;
+    double diff_y = (mediana_y - pp[0].y) / 5;
 
 	if (!forward){
 		diff_x *= -1;
 		diff_y *= -1;
-	}
+    }
 
-	for (int i = 0; i < POINTS_COUNT; ++i){
-		points[i].x += diff_x;
-		points[i].y += diff_y;
+    for (auto iter = pp.begin(); iter != pp.end(); ++iter){
+        iter->x += diff_x;
+        iter->y += diff_y;
 	}
 }
 
 point rotate(point P, point Q, double theta)
 {
-    return (P-Q) * polar(1.0, theta) +  Q;
+    return (P-Q) * polar(1.0, theta) + Q;
 }
 
 void SpaceShip::change_x(bool clockwise){
 	
 	if (rotation_delay > std::chrono::system_clock::now()) { return; }
 	
-    double angel = M_PI_4;
+    double angel = M_PI/10;
 
     if (!clockwise){
-        angel *= -1;
+        angel = -angel;
     }
-
-    double tmp_x, tmp_y;
-    for (int i = 0; i < POINTS_COUNT - 1; ++i){
-        point P(points[i].x, points[i].y);
-        point Q(px, py);
-        double theta = M_PI_4;
+    for (auto iter = pp.begin(); iter != pp.end(); ++iter){
+        point P(iter->x, iter->y);
+        point Q(initialMedianIntersection.x, initialMedianIntersection.y);
         point P_rotated = rotate(P, Q, angel);
-        points[i].x = P_rotated.real(); // real part of the complex number
-        points[i].y = P_rotated.imag(); // imaginary part of the complex number
+        iter->x = P_rotated.real();
+        iter->y = P_rotated.imag();
     }
-
-    points[POINTS_COUNT - 1].x = points[0].x;
-    points[POINTS_COUNT - 1].y = points[0].y;
     rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
 void SpaceShip::display(){
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    auto iter = pp.begin();
+    for (; iter != pp.end() - 1; ++iter){
+        SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
+    }
+    SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
 }
 
 Projectile * SpaceShip::shoot(){
 	if (this->shoot_delay > std::chrono::system_clock::now()) { return nullptr; }
 
-	int mediana_x = points[1].x/2 + points[2].x/2;
-	int mediana_y = points[1].y/2 + points[2].y/2;
-	int diff_x = (mediana_x - points[0].x)/5;
-	int diff_y = (mediana_y - points[0].y)/5;
+    double mediana_x = pp[1].x/2 + pp[2].x/2;
+    double mediana_y = pp[1].y/2 + pp[2].y/2;
+    double diff_x = (mediana_x - pp[0].x)/5;
+    double diff_y = (mediana_y - pp[0].y)/5;
 	
-    Projectile *projectile = new Projectile(this->renderer, 0, 0, diff_x, diff_y, points[0].x - diff_x, points[0].y - diff_y);
+    Projectile *projectile = new Projectile(this->renderer, 0, 0, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
     shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	return projectile;
 }
@@ -244,7 +244,7 @@ void Projectile::display(){
 		error += tmp_y;
 
 		if (error >= 0){
-			--tmp_x;
+            --tmp_x;
 			error -= tmp_x;
 			error -= tmp_x;
 		}

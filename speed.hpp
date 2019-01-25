@@ -4,9 +4,9 @@
 #include <cmath>
 
 struct DirectionXY{
-    float x;
-    float y;
-    DirectionXY(float, float);
+    double x;
+    double y;
+    DirectionXY(double, double);
     DirectionXY();
 
     DirectionXY& operator *=(int value){

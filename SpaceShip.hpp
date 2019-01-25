@@ -14,13 +14,38 @@
 #define POINTS_COUNT 4
 #define ASTEROID_POINTS_COUNT 7
 #define ROTATION_DELAY 60
-#define DISPLAY_DELAY 100
-#define SHOOTING_DELAY 500
+#define DISPLAY_DELAY 50
+#define SHOOTING_DELAY 100
 #define CHANGE_POSITION_DELAY 100
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 
 using namespace std;
+
+struct Point{
+private:
+    bool double_equals(double a, double b, double epsilon = 0.000000001)
+    {
+        return std::abs(a - b) < epsilon;
+    }
+public:
+    double x;
+    double y;
+    Point(double x, double y){
+        this->x = x;
+        this->y = y;
+    }
+    Point(){
+        this->x = 0.0;
+        this->y = 0.0;
+    }
+    bool operator==(const Point& p){
+        return double_equals(x, p.x) && double_equals(y, p.y);
+    }
+    bool operator!=(const Point& p){
+        return double_equals(x, p.x) || double_equals(y, p.y);
+    }
+};
 
 class SpaceObject{
 protected:
@@ -51,10 +76,13 @@ public:
 class SpaceShip: public SpaceObject{
 private:
 	SDL_Point points[POINTS_COUNT];
+    vector<Point> pp;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     double px;
     double py;
+    Point initialMedianIntersection;
 public:
+    Point getMedianIntersaction();
     Speed *speed;
     void slowdown();
     void accelarate();
