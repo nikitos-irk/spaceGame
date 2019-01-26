@@ -34,13 +34,19 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, 
     int error_y = rand() % 10;
     int size = rand() % 20;
 
-    points[0] = {x + error_x, 				y + error_y};
-    points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
-    points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
-    points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
-    points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
-    points[5] = {x + size + rand() % 5, 	y + rand() % 5};
-    points[6] = {x + error_x, 				y + error_y};
+//    points[0] = {x + error_x, 				y + error_y};
+//    points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
+//    points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
+//    points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
+//    points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
+//    points[5] = {x + size + rand() % 5, 	y + rand() % 5};
+//    points[6] = {x + error_x, 				y + error_y};
+    pp.push_back(new Point(x + error_x,                 y + error_y));
+    pp.push_back(new Point(x - size + rand() % 5,       y + size + rand() % 5));
+    pp.push_back(new Point(x + rand() % 5,              y + size * 2 + rand() % 5));
+    pp.push_back(new Point(x + size + rand() % 5,       y + size * 2 + rand() % 5));
+    pp.push_back(new Point(x + size * 2 + rand() % 5,   y + size + rand() % 5));
+    pp.push_back(new Point(x + size + rand() % 5,       y + rand() % 5));
 }
 
 Asteroid::~Asteroid(){
@@ -265,15 +271,26 @@ void Projectile::display(){
 }
 
 void Asteroid::display(){
-	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	SDL_RenderDrawLines(renderer, points, ASTEROID_POINTS_COUNT);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    auto iter = pp.begin();
+    Point *p1;
+    Point *p2;
+    for (; iter != pp.end()-1; ++iter){
+        p1 = *iter;
+        p2 = *(iter+1);
+        SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
+    }
+    p1 = *pp.begin();
+    SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
 }
 
 void Asteroid::change_position(DirectionXY directionXY){
-	for (int i = 0; i < ASTEROID_POINTS_COUNT; ++i){
-		this->points[i].x += directionXY.x;
-		this->points[i].y += directionXY.y;
-	}
+    Point *p1;
+    for (auto iter = pp.begin(); iter != pp.end(); ++iter){
+        p1 = *iter;
+        p1->x += directionXY.x;
+        p1->y += directionXY.y;
+    }
 }
 
 void Projectile::change_position(DirectionXY directionXY){

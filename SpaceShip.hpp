@@ -75,7 +75,6 @@ public:
 
 class SpaceShip: public SpaceObject{
 private:
-	SDL_Point points[POINTS_COUNT];
     vector<Point> pp;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     double px;
@@ -101,6 +100,8 @@ public:
 };
 
 class Asteroid: public SpaceObject{
+private:
+    vector<Point*> pp;
 public:
 	void display();
 	Asteroid(SDL_Renderer*, int, int, int, int);

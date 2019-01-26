@@ -31,6 +31,7 @@ private:
 	SDL_Event e;
 	
 	vector<SpaceObject*> spaceObjects;
+    vector<SpaceObject*> asteroids;
 	SDL_Renderer *renderer;
 	SpaceShip *my_ship;
 
@@ -44,9 +45,8 @@ private:
 	int inertia_counter_up;
 	int inertia_counter_down;
 
-	void displayObjects(vector<SpaceObject*>&);
-    void changeObjectsPositions(vector<SpaceObject*>&);
-	void changeObjectsPositionsByInertia(vector<SpaceObject*>&, bool);
+    void displayObjects();
+    void changeObjectsPositions();
 
 public:
 	Game(SDL_Renderer *, int, int);

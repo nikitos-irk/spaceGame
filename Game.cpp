@@ -21,7 +21,8 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % this->screen_width;
 		int tmp_y = rand() % this->screen_height;
-		spaceObjects.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
+        asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
+//		spaceObjects.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 	}
 	
 	// Initiating delays
@@ -41,49 +42,34 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 	inertia_counter_down = 0;
 }
 
-void Game::displayObjects(vector<SpaceObject*> &spaceObjects){
+void Game::displayObjects(){
 	my_ship->display();
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->display();
 	}
+    for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
+//        (static_cast<Asteroid*>(*spaceObject))->display();
+        (*spaceObject)->display();
+    }
 }
 
-void Game::changeObjectsPositions(vector<SpaceObject*> &spaceObjects){
+void Game::changeObjectsPositions(){
 	auto now = std::chrono::system_clock::now();
 	if (change_position_delay >= now){ return; }
     DirectionXY directionXY = my_ship->get_offset();
 	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
 		(*spaceObject)->change_position(directionXY);
 	}
+    for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
+        (static_cast<Asteroid*>(*spaceObject))->change_position(directionXY);
+    }
     change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
-}
-
-void Game::changeObjectsPositionsByInertia(vector<SpaceObject*> &spaceObjects, bool direction){
-
-	auto now = std::chrono::system_clock::now();
-	if (inertia_delay >= now){ return; }
-
-	auto ship = spaceObjects.begin();
-	DirectionXY directionXY = (dynamic_cast<SpaceShip*> (*ship))->get_direction();
-	
-	if (!direction){
-		directionXY.x *= -1;
-		directionXY.y *= -1;
-	}
-
-	directionXY.x = directionXY.x/2;
-	directionXY.y = directionXY.y/2;
-	
-	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
-		(*spaceObject)->change_position(directionXY);
-	}
-    inertia_delay = now + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
 }
 
 void Game::run(){
 	
 	my_background->fill_background();
-	displayObjects(spaceObjects);
+    displayObjects();
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
 	
@@ -159,10 +145,10 @@ void Game::run(){
 				spaceObjects.push_back(tmp_space_obj);
 			}
 		}
-        changeObjectsPositions(spaceObjects);
+        changeObjectsPositions();
 
 		my_background->fill_background();
-		displayObjects(spaceObjects);
+        displayObjects();
 		SDL_RenderPresent(renderer);
 		SDL_RenderClear(renderer);
 	}
