@@ -1,7 +1,4 @@
 #include "Game.hpp"
-#include "SpaceShip.hpp"
-#include "Background.hpp"
-
 
 Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 
@@ -22,7 +19,6 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 		int tmp_x = rand() % this->screen_width;
 		int tmp_y = rand() % this->screen_height;
         asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
-//		spaceObjects.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 	}
 	
 	// Initiating delays
@@ -40,6 +36,21 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 
 	inertia_counter_up = 0;
 	inertia_counter_down = 0;
+}
+
+void Game::create_asteroid(){
+    double theta = (rand() % 360)/M_PI;
+    Point ship_center = my_ship->getMedianIntersaction();
+    double tmp_x = (rand() % this->screen_width) + this->screen_width;
+    double tmp_y = ship_center.y;
+
+    point P(tmp_x, tmp_y);
+    point Q(ship_center.x, ship_center.y);
+    point P_rotated = (P-Q) * polar(1.0, theta) + Q;
+    tmp_x = P_rotated.real();
+    tmp_y = P_rotated.imag();
+
+    asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 }
 
 void Game::displayObjects(){
@@ -146,6 +157,10 @@ void Game::run(){
 			}
 		}
         changeObjectsPositions();
+
+        if (asteroids.size() <= 100){
+            create_asteroid();
+        }
 
 		my_background->fill_background();
         displayObjects();

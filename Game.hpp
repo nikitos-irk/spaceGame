@@ -9,8 +9,7 @@
 #include "SDL2/SDL.h"
 #include "iostream"
 #include "Background.hpp"
-#include "Inertia.hpp"
-//#include "speed.hpp"
+#include "Background.hpp"
 
 using namespace std;
 
@@ -23,9 +22,6 @@ private:
 
 	// Background class
 	Background *my_background;
-	
-	// Inertia vector
-	list<Inertia*> inertias;
 
 	// For event handling
 	SDL_Event e;
@@ -47,6 +43,9 @@ private:
 
     void displayObjects();
     void changeObjectsPositions();
+
+    void create_asteroid();
+    void update_asteroids();
 
 public:
 	Game(SDL_Renderer *, int, int);

@@ -1,6 +1,4 @@
 #include "SpaceShip.hpp"
-#include <complex>
-typedef complex<double> point;
 
 SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y){
 	this->renderer = renderer;
@@ -34,13 +32,6 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, 
     int error_y = rand() % 10;
     int size = rand() % 20;
 
-//    points[0] = {x + error_x, 				y + error_y};
-//    points[1] = {x - size + rand() % 5, 	y + size + rand() % 5};
-//    points[2] = {x + rand() % 5, 			y + size * 2 + rand() % 5};
-//    points[3] = {x + size + rand() % 5, 	y + size * 2 + rand() % 5};
-//    points[4] = {x + size * 2 + rand() % 5, y + size + rand() % 5};
-//    points[5] = {x + size + rand() % 5, 	y + rand() % 5};
-//    points[6] = {x + error_x, 				y + error_y};
     pp.push_back(new Point(x + error_x,                 y + error_y));
     pp.push_back(new Point(x - size + rand() % 5,       y + size + rand() % 5));
     pp.push_back(new Point(x + rand() % 5,              y + size * 2 + rand() % 5));

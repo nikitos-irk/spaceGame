@@ -9,6 +9,7 @@
 #include <chrono>
 #include <time.h>
 #include "speed.hpp"
+#include <complex>
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
@@ -21,6 +22,7 @@
 #define INERTIA_COUNTER 500
 
 using namespace std;
+typedef complex<double> point;
 
 struct Point{
 private:
