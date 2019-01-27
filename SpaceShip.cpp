@@ -6,8 +6,8 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_he
 	this->y = y;
 	this->screen_width = screen_width;
 	this->screen_height = screen_height;
-    display_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (DISPLAY_DELAY);
-    rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
+    display_delay = NOW + static_cast<std::chrono::milliseconds> (DISPLAY_DELAY);
+    rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
 SpaceObject::~SpaceObject(){
@@ -69,7 +69,7 @@ Point SpaceShip::getMedianIntersaction(){
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
 
-    shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
+    shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
     speed = new Speed(max_speed);
 
     // spaceship coordination
@@ -167,7 +167,7 @@ point rotate(point P, point Q, double theta)
 
 void SpaceShip::change_x(bool clockwise){
 	
-	if (rotation_delay > std::chrono::system_clock::now()) { return; }
+    if (rotation_delay > NOW) { return; }
 	
     double angel = M_PI/10;
 
@@ -181,7 +181,7 @@ void SpaceShip::change_x(bool clockwise){
         iter->x = P_rotated.real();
         iter->y = P_rotated.imag();
     }
-    rotation_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
+    rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
 void SpaceShip::display(){
@@ -194,7 +194,7 @@ void SpaceShip::display(){
 }
 
 Projectile * SpaceShip::shoot(){
-	if (this->shoot_delay > std::chrono::system_clock::now()) { return nullptr; }
+    if (this->shoot_delay > NOW) { return nullptr; }
 
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
@@ -202,7 +202,7 @@ Projectile * SpaceShip::shoot(){
     double diff_y = (mediana_y - pp[0].y)/5;
 	
     Projectile *projectile = new Projectile(this->renderer, 0, 0, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
-    shoot_delay = std::chrono::system_clock::now() + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
+    shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	return projectile;
 }
 
@@ -254,10 +254,10 @@ void Projectile::display(){
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
-	if (this->display_delay < std::chrono::system_clock::now()){
+    if (this->display_delay < NOW){
 		this->x -= direction_x;
 		this->y -= direction_y;
-		display_delay = std::chrono::system_clock::now() + (std::chrono::milliseconds) DISPLAY_DELAY;
+        display_delay = NOW + (std::chrono::milliseconds) DISPLAY_DELAY;
 	}
 }
 

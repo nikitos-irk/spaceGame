@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#define NOW std::chrono::system_clock::now()
 
 Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 

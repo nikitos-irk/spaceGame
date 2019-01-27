@@ -27,16 +27,10 @@ class Speed{
 
 private:
     double maxOffset;
-
     double forwardOffset;
     double backwardOffset;
-
     double negativeOffset;
     double positiveOffset;
-
-    double backward_currentOffset;
-    double backward_negativeOffset;
-    double backward_positiveOffset;
 public:
     Speed(int);
     void slowdown();

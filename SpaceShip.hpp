@@ -20,6 +20,7 @@
 #define CHANGE_POSITION_DELAY 100
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
+#define NOW std::chrono::system_clock::now()
 
 using namespace std;
 typedef complex<double> point;
@@ -79,8 +80,6 @@ class SpaceShip: public SpaceObject{
 private:
     vector<Point> pp;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
-    double px;
-    double py;
     Point initialMedianIntersection;
 public:
     Point getMedianIntersaction();
