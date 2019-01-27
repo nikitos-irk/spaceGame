@@ -15,7 +15,7 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
     my_ship = new SpaceShip(renderer, screen_width, screen_height, 50);
 	
 	// Create asteroids
-	for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i) {
 		int tmp_x = rand() % this->screen_width;
 		int tmp_y = rand() % this->screen_height;
         asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
@@ -88,6 +88,53 @@ void Game::update_projectiles(){
         } else {
             ++iter;
         }
+    }
+}
+
+bool dot_on_line(Point *p1, Point *p2, Point *px)
+{
+    double k = (p2->y - p1->y) / (p2->x - p1->x);
+    double c = p1->y - k * p1->x;
+    return abs(px->y - (px->x * k + c)) < 0.1;
+}
+
+void Game::check_hits(){
+
+    vector<Point*> tmpPoints;
+    bool hitStatus;
+
+    auto pr = projectiles.begin();
+    while (pr != projectiles.end()){
+        auto ast = asteroids.begin();
+        hitStatus = false;
+        while (ast != asteroids.end()){
+
+            tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
+            Point *p1, *p2, *px;
+
+            for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
+                p1 = *p;
+                p2 = *(p+1);
+                if (tmpPoints.end() == p){
+                    p2 = *tmpPoints.begin();
+                } else {
+                    p2 = *(p + 1);
+                }
+                px = dynamic_cast<Projectile*>(*pr)->getXY();
+                bool status = dot_on_line(p1, p2, px);
+                delete px;
+                if ( status ){
+                    hitStatus = true;
+                    delete *ast;
+                    delete *pr;
+                    asteroids.erase(ast++);
+                    projectiles.erase(pr++);
+                    break;
+                }
+            }
+            if (!hitStatus) {++ast;} else { break; }
+        }
+        if (!hitStatus) {++pr;}
     }
 }
 
@@ -203,7 +250,8 @@ void Game::run(){
         changeObjectsPositions();
         update_asteroids();
         update_projectiles();
-        if (asteroids.size() <= 100){
+        check_hits();
+        if (asteroids.size() <= 20){
             create_asteroid();
         }
 

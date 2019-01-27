@@ -22,6 +22,8 @@ Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_heig
     life_time = NOW + static_cast<std::chrono::milliseconds> (PROJ_LIFETIME);
 }
 
+Point* Projectile::getXY(){ return new Point(x, y); }
+
 Projectile::~Projectile(){
     cout << "Projectile destructor" << endl;
 }
@@ -40,6 +42,8 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, 
     pp.push_back(new Point(x + size * 2 + rand() % 5,   y + size + rand() % 5));
     pp.push_back(new Point(x + size + rand() % 5,       y + rand() % 5));
 }
+
+vector<Point*>& Asteroid::getPoints(){ return pp; }
 
 Asteroid::~Asteroid(){
     cout << "Asteroid destructor" << endl;

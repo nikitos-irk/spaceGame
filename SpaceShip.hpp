@@ -75,6 +75,7 @@ public:
     Projectile(SDL_Renderer*, int, int, int, int, int, int);
 	void change_position(DirectionXY);
     void display();
+    Point* getXY();
     std::chrono::time_point<std::chrono::system_clock> getLifeTime();
     ~Projectile();
 };
@@ -108,6 +109,7 @@ private:
     vector<Point*> pp;
 public:
 	void display();
+    vector<Point*>& getPoints();
 	Asteroid(SDL_Renderer*, int, int, int, int);
 	void change_position(DirectionXY);
     Point* getFirstPoint();

@@ -50,10 +50,10 @@ private:
     void create_asteroid();
     void update_asteroids();
     void update_projectiles();
+    void check_hits();
 
 public:
 	Game(SDL_Renderer *, int, int);
-	
 	void run();
 };
 
