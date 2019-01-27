@@ -30,6 +30,7 @@ private:
 	
 	vector<SpaceObject*> spaceObjects;
     list<SpaceObject*> asteroids;
+    list<SpaceObject*> projectiles;
 	SDL_Renderer *renderer;
 	SpaceShip *my_ship;
 
@@ -48,6 +49,7 @@ private:
 
     void create_asteroid();
     void update_asteroids();
+    void update_projectiles();
 
 public:
 	Game(SDL_Renderer *, int, int);

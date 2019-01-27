@@ -40,6 +40,7 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 }
 
 void Game::create_asteroid(){
+    cout << "CREATE ASTEROID"<<endl;
     double theta = (rand() % 360)/M_PI;
     Point ship_center = my_ship->getMedianIntersaction();
     double tmp_x = (rand() % this->screen_width) + this->screen_width;
@@ -57,11 +58,10 @@ void Game::create_asteroid(){
 void Game::update_asteroids(){
     if (update_asteroids_delay >= NOW){ return; }
     Point tmp_p = my_ship->getMedianIntersaction();
-    auto iter = asteroids.begin();
-    cout << "BEFORE asteroids size = " << asteroids.size() << endl;
     Point *ap = nullptr;
     double distance;
     double diagonal = sqrt(pow(this->screen_width, 2) + pow(this->screen_height, 2));
+    auto iter = asteroids.begin();
     while (iter != asteroids.end())
     {
         ap = dynamic_cast<Asteroid*>(*iter)->getFirstPoint();
@@ -74,8 +74,21 @@ void Game::update_asteroids(){
             ++iter;
         }
     }
-    cout << "AFTER asteroids size = " << asteroids.size() << endl;
     update_asteroids_delay = NOW + static_cast<std::chrono::milliseconds> (ASTEROIDS_REMOVING_DELAY);
+}
+
+void Game::update_projectiles(){
+    auto iter = projectiles.begin();
+    while (iter != projectiles.end())
+    {
+        if (dynamic_cast<Projectile*>(*iter)->getLifeTime() < NOW){
+            SpaceObject *tmp = *iter;
+            asteroids.erase(iter++);
+            delete tmp;
+        } else {
+            ++iter;
+        }
+    }
 }
 
 void Game::displayObjects(){
@@ -84,6 +97,9 @@ void Game::displayObjects(){
 		(*spaceObject)->display();
 	}
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
+        (*spaceObject)->display();
+    }
+    for (auto spaceObject = projectiles.begin(); spaceObject != projectiles.end(); ++spaceObject){
         (*spaceObject)->display();
     }
 }
@@ -97,6 +113,9 @@ void Game::changeObjectsPositions(){
 		(*spaceObject)->change_position(directionXY);
 	}
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
+        (*spaceObject)->change_position(directionXY);
+    }
+    for (auto spaceObject = projectiles.begin(); spaceObject != projectiles.end(); ++spaceObject){
         (*spaceObject)->change_position(directionXY);
     }
     change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
@@ -138,8 +157,8 @@ void Game::run(){
 					case SDLK_SPACE:{
 							space_pushed = true;
 							tmp_space_obj = my_ship->shoot();
-							if (nullptr != tmp_space_obj) {
-								spaceObjects.push_back(tmp_space_obj);
+                            if (nullptr != tmp_space_obj) {
+                                projectiles.push_back(tmp_space_obj);
 							}
 					}
 						break;
@@ -178,11 +197,12 @@ void Game::run(){
 		if (space_pushed) 	{
 			tmp_space_obj = my_ship->shoot();
 			if (nullptr != tmp_space_obj) {
-				spaceObjects.push_back(tmp_space_obj);
+                projectiles.push_back(tmp_space_obj);
 			}
 		}
         changeObjectsPositions();
         update_asteroids();
+        update_projectiles();
         if (asteroids.size() <= 100){
             create_asteroid();
         }

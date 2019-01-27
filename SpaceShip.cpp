@@ -19,6 +19,7 @@ Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_heig
     direction_y = offset_y;
     this->x = x;
     this->y = y;
+    life_time = NOW + static_cast<std::chrono::milliseconds> (PROJ_LIFETIME);
 }
 
 Projectile::~Projectile(){
@@ -193,6 +194,8 @@ void SpaceShip::display(){
     SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
 }
 
+std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ return life_time; }
+
 Projectile * SpaceShip::shoot(){
     if (this->shoot_delay > NOW) { return nullptr; }
 
@@ -207,7 +210,6 @@ Projectile * SpaceShip::shoot(){
 }
 
 void Projectile::display(){
-
 	double error = (double) - BLOCK_SIZE;
 	double tmp_x = (double) BLOCK_SIZE - 0.5;
 	double tmp_y = (double) 0.5;

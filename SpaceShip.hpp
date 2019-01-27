@@ -20,6 +20,7 @@
 #define CHANGE_POSITION_DELAY 100
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
+#define PROJ_LIFETIME 5000
 #define NOW std::chrono::system_clock::now()
 
 using namespace std;
@@ -69,10 +70,12 @@ class Projectile: public SpaceObject{
 private:
 	int direction_x;
 	int direction_y;
+    std::chrono::time_point<std::chrono::system_clock> life_time;
 public:
     Projectile(SDL_Renderer*, int, int, int, int, int, int);
 	void change_position(DirectionXY);
     void display();
+    std::chrono::time_point<std::chrono::system_clock> getLifeTime();
     ~Projectile();
 };
 
