@@ -284,6 +284,10 @@ void Asteroid::change_position(DirectionXY directionXY){
     }
 }
 
+Point* Asteroid::getFirstPoint(){
+    return pp[0];
+}
+
 void Projectile::change_position(DirectionXY directionXY){
     this->x += directionXY.x;
     this->y += directionXY.y;

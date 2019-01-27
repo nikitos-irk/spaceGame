@@ -11,6 +11,7 @@
 #include "Background.hpp"
 #include "Background.hpp"
 
+#define ASTEROIDS_REMOVING_DELAY 10000 // 10 seconds
 using namespace std;
 
 class Game{
@@ -19,6 +20,7 @@ private:
 	int screen_height;
 	std::chrono::time_point<std::chrono::system_clock> change_position_delay;
 	std::chrono::time_point<std::chrono::system_clock> inertia_delay;
+    std::chrono::time_point<std::chrono::system_clock> update_asteroids_delay;
 
 	// Background class
 	Background *my_background;
@@ -27,7 +29,7 @@ private:
 	SDL_Event e;
 	
 	vector<SpaceObject*> spaceObjects;
-    vector<SpaceObject*> asteroids;
+    list<SpaceObject*> asteroids;
 	SDL_Renderer *renderer;
 	SpaceShip *my_ship;
 

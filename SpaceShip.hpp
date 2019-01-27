@@ -107,8 +107,8 @@ private:
 public:
 	void display();
 	Asteroid(SDL_Renderer*, int, int, int, int);
-	SDL_Point points[ASTEROID_POINTS_COUNT];
 	void change_position(DirectionXY);
+    Point* getFirstPoint();
     ~Asteroid();
 };
 
