@@ -40,7 +40,6 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
 }
 
 void Game::create_asteroid(){
-    cout << "CREATE ASTEROID"<<endl;
     double theta = (rand() % 360)/M_PI;
     Point ship_center = my_ship->getMedianIntersaction();
     double tmp_x = (rand() % this->screen_width) + this->screen_width;
@@ -98,43 +97,86 @@ bool dot_on_line(Point *p1, Point *p2, Point *px)
     return abs(px->y - (px->x * k + c)) < 0.1;
 }
 
-void Game::check_hits(){
+inline int det (int a, int b, int c, int d) {
+    return a * d - b * c;
+}
 
+inline bool between (int a, int b, double c) {
+    double epsilon = 1E-9;
+    return min(a,b) <= c + epsilon && c <= max(a,b) + epsilon;
+}
+
+inline bool intersect_1 (int a, int b, int c, int d) {
+    if (a > b)  swap (a, b);
+    if (c > d)  swap (c, d);
+    return max(a,c) <= min(b,d);
+}
+
+
+bool intersect (Point a, Point b, Point c, Point d) {
+    int A1 = a.y-b.y,  B1 = b.x-a.x,  C1 = -A1*a.x - B1*a.y;
+    int A2 = c.y-d.y,  B2 = d.x-c.x,  C2 = -A2*c.x - B2*c.y;
+    int zn = det (A1, B1, A2, B2);
+    if (zn != 0) {
+        double x = - det (C1, B1, C2, B2) * 1. / zn;
+        double y = - det (A1, C1, A2, C2) * 1. / zn;
+        return between (a.x, b.x, x) && between (a.y, b.y, y)
+            && between (c.x, d.x, x) && between (c.y, d.y, y);
+    }
+    else
+        return det (A1, C1, A2, C2) == 0 && det (B1, C1, B2, C2) == 0
+            && intersect_1 (a.x, b.x, c.x, d.x)
+            && intersect_1 (a.y, b.y, c.y, d.y);
+}
+
+void Game::check_hits(){
     vector<Point*> tmpPoints;
     bool hitStatus;
+    while (true)
+    {
+        projectiles_mutex.lock();
+        asteroids_mutex.lock();
+        auto pr = projectiles.begin();
+        while (pr != projectiles.end()){
+            auto ast = asteroids.begin();
+            hitStatus = false;
+            while (ast != asteroids.end()){
 
-    auto pr = projectiles.begin();
-    while (pr != projectiles.end()){
-        auto ast = asteroids.begin();
-        hitStatus = false;
-        while (ast != asteroids.end()){
+                tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
+                Point *p1, *p2, *px;
 
-            tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
-            Point *p1, *p2, *px;
+                for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
+                    p1 = *p;
+                    p2 = *(p+1);
+                    if (tmpPoints.end() == p){
+                        p2 = *tmpPoints.begin();
+                    } else {
+                        p2 = *(p + 1);
+                    }
 
-            for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
-                p1 = *p;
-                p2 = *(p+1);
-                if (tmpPoints.end() == p){
-                    p2 = *tmpPoints.begin();
-                } else {
-                    p2 = *(p + 1);
+                    px = dynamic_cast<Projectile*>(*pr)->getXY();
+                    pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+
+                    bool status = intersect(*p1, *p2, pLine.first, pLine.second);
+                    delete px;
+                    if ( status ){
+                        hitStatus = true;
+                        (*ast)->markAsDead();
+                        (*pr)->markAsDead();
+                        delete *ast;
+                        delete *pr;
+                        asteroids.erase(ast++);
+                        projectiles.erase(pr++);
+                        break;
+                    }
                 }
-                px = dynamic_cast<Projectile*>(*pr)->getXY();
-                bool status = dot_on_line(p1, p2, px);
-                delete px;
-                if ( status ){
-                    hitStatus = true;
-                    delete *ast;
-                    delete *pr;
-                    asteroids.erase(ast++);
-                    projectiles.erase(pr++);
-                    break;
-                }
+                if (!hitStatus) {++ast;} else { break; }
             }
-            if (!hitStatus) {++ast;} else { break; }
+            if (!hitStatus) {++pr;}
         }
-        if (!hitStatus) {++pr;}
+        asteroids_mutex.unlock();
+        projectiles_mutex.unlock();
+        usleep(100);
     }
 }
 
@@ -144,10 +186,14 @@ void Game::displayObjects(){
 		(*spaceObject)->display();
 	}
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
-        (*spaceObject)->display();
+        if ((*spaceObject)->isAlive()){
+            (*spaceObject)->display();
+        }
     }
     for (auto spaceObject = projectiles.begin(); spaceObject != projectiles.end(); ++spaceObject){
-        (*spaceObject)->display();
+        if ((*spaceObject)->isAlive()){
+            (*spaceObject)->display();
+        }
     }
 }
 
@@ -169,95 +215,105 @@ void Game::changeObjectsPositions(){
 }
 
 void Game::run(){
-	
+
 	my_background->fill_background();
     displayObjects();
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
-	
-	int quit = 1;
-	SpaceObject *tmp_space_obj;
 
-	while(quit) {
-		while( SDL_PollEvent( &e ) != 0 ) {
-			if( e.type == SDL_QUIT ){
-				quit = 0;
-			} else if (e.type == SDL_KEYDOWN) {
-				switch(e.key.keysym.sym){
-			    	case SDL_QUIT:
-						quit = 0;
-						break;
+//    thread thUpdating(&Game::update, this);
+    thread thHitsMonitoring(&Game::check_hits, this);
+
+//    thUpdating.join();
+    thHitsMonitoring.detach();
+    int quit = 1;
+    SpaceObject *tmp_space_obj;
+    while(quit) {
+        projectiles_mutex.lock();
+        asteroids_mutex.lock();
+        while( SDL_PollEvent( &e ) != 0 ) {
+            if( e.type == SDL_QUIT ){
+                quit = 0;
+            } else if (e.type == SDL_KEYDOWN) {
+                switch(e.key.keysym.sym){
+                    case SDL_QUIT:
+                        quit = 0;
+                        break;
                     case SDLK_UP:
                         up_pushed = true;
                         up_unpushed = false;
-						break;
+                        break;
                     case SDLK_DOWN:
                         down_pushed = true;
                         down_unpushed = false;
-						break;
-					case SDLK_LEFT:
-						left_pushed = true;
-						break;
-					case SDLK_RIGHT:
-						right_pushed = true;
-						break;
-					case SDLK_SPACE:{
-							space_pushed = true;
-							tmp_space_obj = my_ship->shoot();
+                        break;
+                    case SDLK_LEFT:
+                        left_pushed = true;
+                        break;
+                    case SDLK_RIGHT:
+                        right_pushed = true;
+                        break;
+                    case SDLK_SPACE:{
+                            space_pushed = true;
+                            tmp_space_obj = my_ship->shoot();
                             if (nullptr != tmp_space_obj) {
                                 projectiles.push_back(tmp_space_obj);
-							}
-					}
-						break;
-					default:
-						break;
-				}
-			} else if (e.type == SDL_KEYUP) {
-				switch(e.key.keysym.sym){
+                            }
+                    }
+                        break;
+                    default:
+                        break;
+                }
+            } else if (e.type == SDL_KEYUP) {
+                switch(e.key.keysym.sym){
                     case SDLK_UP:
                         up_pushed = false;
                         up_unpushed = true;
-						break;
+                        break;
                     case SDLK_DOWN:
                         down_pushed = false;
                         down_unpushed = true;
-						break;
+                        break;
                     case SDLK_LEFT:
                         left_pushed = false;
-						break;
+                        break;
                     case SDLK_RIGHT:
                         right_pushed = false;
-						break;
+                        break;
                     case SDLK_SPACE:
                         space_pushed = false;
-						break;
-					default:
-						break;
-				}
-			}
-		}
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         if (up_pushed) 	{ my_ship->backward_accelarate(); my_ship->slowdown(); } else if (up_unpushed) {my_ship->backward_slowdown();}
         if (down_pushed) { my_ship->accelarate(); my_ship->backward_slowdown(); } else if (down_unpushed) {my_ship->slowdown();}
 
         if (left_pushed) 	{ my_ship->change_x(false); }
-		if (right_pushed) 	{ my_ship->change_x(true); }
-		if (space_pushed) 	{
-			tmp_space_obj = my_ship->shoot();
-			if (nullptr != tmp_space_obj) {
+        if (right_pushed) 	{ my_ship->change_x(true); }
+        {
+        if (space_pushed) 	{
+            tmp_space_obj = my_ship->shoot();
+            if (nullptr != tmp_space_obj) {
                 projectiles.push_back(tmp_space_obj);
-			}
-		}
+            }
+        }
         changeObjectsPositions();
         update_asteroids();
         update_projectiles();
-        check_hits();
         if (asteroids.size() <= 20){
             create_asteroid();
         }
+        }
+        projectiles_mutex.unlock();
+        asteroids_mutex.unlock();
 
-		my_background->fill_background();
+        my_background->fill_background();
         displayObjects();
-		SDL_RenderPresent(renderer);
-		SDL_RenderClear(renderer);
-	}
+        SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
+    }
+
 }

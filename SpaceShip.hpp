@@ -10,14 +10,15 @@
 #include <time.h>
 #include "speed.hpp"
 #include <complex>
+#include <utility>
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
 #define ASTEROID_POINTS_COUNT 7
 #define ROTATION_DELAY 60
-#define DISPLAY_DELAY 50
+#define DISPLAY_DELAY 10
 #define SHOOTING_DELAY 100
-#define CHANGE_POSITION_DELAY 100
+#define CHANGE_POSITION_DELAY 50
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 #define PROJ_LIFETIME 5000
@@ -59,23 +60,29 @@ protected:
 	int screen_height;
 	std::chrono::time_point<std::chrono::system_clock> display_delay; 
 	std::chrono::time_point<std::chrono::system_clock> rotation_delay;
+    bool alive;
 public:
 	SpaceObject(SDL_Renderer*, int, int, int, int);
 	virtual void display() = 0;
 	virtual void change_position(DirectionXY);
     virtual ~SpaceObject();
+    bool isAlive();
+    void markAsDead();
 };
 
 class Projectile: public SpaceObject{
 private:
 	int direction_x;
 	int direction_y;
+    double x_previous;
+    double y_previous;
     std::chrono::time_point<std::chrono::system_clock> life_time;
 public:
     Projectile(SDL_Renderer*, int, int, int, int, int, int);
 	void change_position(DirectionXY);
     void display();
     Point* getXY();
+    pair<Point, Point> getLine();
     std::chrono::time_point<std::chrono::system_clock> getLifeTime();
     ~Projectile();
 };

@@ -6,21 +6,28 @@
 #include <random>
 #include <cstdlib>
 #include <ctime>
+#include <unistd.h>
 #include "SDL2/SDL.h"
 #include "iostream"
 #include "Background.hpp"
 #include "Background.hpp"
+#include "thread"
 
 #define ASTEROIDS_REMOVING_DELAY 10000 // 10 seconds
 using namespace std;
 
 class Game{
 private:
-	int screen_width;
+
+    int screen_width;
 	int screen_height;
+
 	std::chrono::time_point<std::chrono::system_clock> change_position_delay;
 	std::chrono::time_point<std::chrono::system_clock> inertia_delay;
     std::chrono::time_point<std::chrono::system_clock> update_asteroids_delay;
+
+    std::mutex asteroids_mutex;
+    std::mutex projectiles_mutex;
 
 	// Background class
 	Background *my_background;
@@ -51,7 +58,7 @@ private:
     void update_asteroids();
     void update_projectiles();
     void check_hits();
-
+    void update();
 public:
 	Game(SDL_Renderer *, int, int);
 	void run();

@@ -8,11 +8,15 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_he
 	this->screen_height = screen_height;
     display_delay = NOW + static_cast<std::chrono::milliseconds> (DISPLAY_DELAY);
     rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
+    alive = true;
 }
 
 SpaceObject::~SpaceObject(){
     cout << "SpaceObject destructor" << endl;
 }
+
+bool SpaceObject::isAlive(){ return alive; }
+void SpaceObject::markAsDead() { alive = false; }
 
 Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height, int offset_x, int offset_y, int x, int y) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
     direction_x = offset_x;
@@ -23,6 +27,7 @@ Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_heig
 }
 
 Point* Projectile::getXY(){ return new Point(x, y); }
+pair<Point, Point> Projectile::getLine(){return make_pair(Point(x, y), Point(x_previous, y_previous));}
 
 Projectile::~Projectile(){
     cout << "Projectile destructor" << endl;
@@ -174,7 +179,7 @@ void SpaceShip::change_x(bool clockwise){
 	
     if (rotation_delay > NOW) { return; }
 	
-    double angel = M_PI/10;
+    double angel = M_PI/15;
 
     if (!clockwise){
         angel = -angel;
@@ -295,6 +300,8 @@ Point* Asteroid::getFirstPoint(){
 }
 
 void Projectile::change_position(DirectionXY directionXY){
+    this->x_previous = x;
+    this->y_previous = y;
     this->x += directionXY.x;
     this->y += directionXY.y;
 }
