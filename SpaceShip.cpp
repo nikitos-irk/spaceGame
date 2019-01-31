@@ -194,6 +194,24 @@ void SpaceShip::change_x(bool clockwise){
     rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
+double SpaceShip::getTiltAngel(){
+    double angle;
+    Point centerTmp = *pp.begin(); // x1, x3
+    Point tmp(centerTmp.x, centerTmp.y - 10); // x2
+    Point middle((*(pp.begin()+1)).x/2 + (*(pp.begin()+2)).x/2, (*(pp.begin()+1)).y/2 + (*(pp.begin()+2)).y/2); // x4
+
+    double x1 = centerTmp.x;
+    double y1 = centerTmp.y;
+    double x2 = centerTmp.x;
+    double y2 = centerTmp.y - 10;
+    double x3 = centerTmp.x;
+    double y3 = centerTmp.y;
+    double x4 = middle.x;
+    double y4 = middle.y;
+
+    return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
+}
+
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     auto iter = pp.begin();
@@ -201,6 +219,28 @@ void SpaceShip::display(){
         SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
     }
     SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
+
+    Point tmp = *pp.begin();
+    Point centerTmp = *pp.begin();
+    vector<Point> littleSqare;
+    tmp.y -= 5;
+    for (int i = 0; i < 4; ++i){
+        double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
+        point P(tmp.x, tmp.y);
+        point Q(centerTmp.x, centerTmp.y);
+        point P_rotated = (P-Q) * polar(1.0, theta) + Q;
+        littleSqare.push_back(Point(P_rotated.real(), P_rotated.imag()));
+    }
+    auto iter2 = littleSqare.begin();
+    for (; iter2 != littleSqare.end() - 1; ++iter2){
+
+        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, centerTmp.x, centerTmp.y);
+        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
+    }
+    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, centerTmp.x, centerTmp.y);
+    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
+
+
 }
 
 std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ return life_time; }

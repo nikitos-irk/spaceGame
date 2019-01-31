@@ -92,6 +92,7 @@ private:
     vector<Point> pp;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     Point initialMedianIntersection;
+    double getTiltAngel();
 public:
     Point getMedianIntersaction();
     Speed *speed;
