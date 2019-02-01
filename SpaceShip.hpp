@@ -90,9 +90,12 @@ public:
 class SpaceShip: public SpaceObject{
 private:
     vector<Point> pp;
+    vector<Point> skeleton;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     Point initialMedianIntersection;
     double getTiltAngel();
+    void putSquareOnPoint(Point, double);
+    void updateSkeleton();
 public:
     Point getMedianIntersaction();
     Speed *speed;

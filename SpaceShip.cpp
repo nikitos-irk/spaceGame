@@ -195,9 +195,8 @@ void SpaceShip::change_x(bool clockwise){
 }
 
 double SpaceShip::getTiltAngel(){
-    double angle;
-    Point centerTmp = *pp.begin(); // x1, x3
-    Point tmp(centerTmp.x, centerTmp.y - 10); // x2
+    Point centerTmp = *pp.begin();
+    Point tmp(centerTmp.x, centerTmp.y - 10);
     Point middle((*(pp.begin()+1)).x/2 + (*(pp.begin()+2)).x/2, (*(pp.begin()+1)).y/2 + (*(pp.begin()+2)).y/2); // x4
 
     double x1 = centerTmp.x;
@@ -212,6 +211,57 @@ double SpaceShip::getTiltAngel(){
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
 }
 
+void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
+    vector<Point> littleSqare;
+    Point tmp = centerPoint;
+    tmp.y -= blockHypotenuse;
+    for (int i = 0; i < 4; ++i){
+        double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
+        point P(tmp.x, tmp.y);
+        point Q(centerPoint.x, centerPoint.y);
+        point P_rotated = (P-Q) * polar(1.0, theta) + Q;
+        littleSqare.push_back(Point(P_rotated.real(), P_rotated.imag()));
+    }
+    auto iter2 = littleSqare.begin();
+    for (; iter2 != littleSqare.end() - 1; ++iter2){
+        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
+    }
+    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
+}
+
+void SpaceShip::updateSkeleton(){
+
+    double blockHypotenuse = 3;
+    double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
+    Point upPoint = pp[0];
+    Point downPoint = Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2);
+    double length = sqrt(pow(upPoint.x - downPoint.x, 2) + pow(upPoint.y - downPoint.y, 2));
+    double Cx, Cy;
+    Cx = (upPoint.x - downPoint.x)/ (length/(blockSize*2));
+    Cy = (upPoint.y - downPoint.y)/ (length/(blockSize*2));
+
+    double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
+    int index = 0;
+    while (length >= 0){
+        putSquareOnPoint(Point(upPoint.x - Cx*index, upPoint.y - Cy*index), blockHypotenuse);
+        length -= littleHypotenuse;
+        ++index;
+    }
+//    putSquareOnPoint(Point(upPoint.x - Cx, upPoint.y - Cy));
+//    putSquareOnPoint(Point(upPoint.x - Cx*2.5, upPoint.y - Cy*2.5));
+//    while (le)
+
+//    Cx = (upPoint.x + length * downPoint.x)/ (1 + length);
+//    Cy = (upPoint.y + length * downPoint.y)/ (1 + length);
+//    while (length >= 0){
+//        Cx = (upPoint.x + length * downPoint.x)/ (1 + length);
+//        Cy = (upPoint.y + length * downPoint.y)/ (1 + length);
+//        length -= localDistance;
+//        putSquareOnPoint(Point(Cx, Cy));
+//    }
+//    putSquareOnPoint(Point(Cx, Cy));
+}
+
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     auto iter = pp.begin();
@@ -220,27 +270,8 @@ void SpaceShip::display(){
     }
     SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
 
-    Point tmp = *pp.begin();
-    Point centerTmp = *pp.begin();
-    vector<Point> littleSqare;
-    tmp.y -= 5;
-    for (int i = 0; i < 4; ++i){
-        double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
-        point P(tmp.x, tmp.y);
-        point Q(centerTmp.x, centerTmp.y);
-        point P_rotated = (P-Q) * polar(1.0, theta) + Q;
-        littleSqare.push_back(Point(P_rotated.real(), P_rotated.imag()));
-    }
-    auto iter2 = littleSqare.begin();
-    for (; iter2 != littleSqare.end() - 1; ++iter2){
-
-        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, centerTmp.x, centerTmp.y);
-        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
-    }
-    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, centerTmp.x, centerTmp.y);
-    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
-
-
+//    putSquareOnPoint(*pp.begin());
+    updateSkeleton();
 }
 
 std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ return life_time; }
