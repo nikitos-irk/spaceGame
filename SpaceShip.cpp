@@ -54,11 +54,27 @@ Asteroid::~Asteroid(){
     cout << "Asteroid destructor" << endl;
 }
 
-int get_index(int i){
-    return (i > 2) ? i - 3 : i;
-}
 void out(double x, double y){
     cout << x << ":" << y << endl;
+}
+
+Point SpaceShip::getTwoLinesIntersaction(Point p1, Point p2, Point p3, Point p4){
+    double x1 = p1.x;
+    double y1 = p1.y;
+
+    double x2 = p2.x;
+    double y2 = p2.y;
+
+    double x3 = p3.x;
+    double y3 = p3.y;
+
+    double x4 = p4.x;
+    double y4 = p4.y;
+
+    double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+    double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+
+    return Point(px, py);
 }
 
 Point SpaceShip::getMedianIntersaction(){
@@ -72,9 +88,7 @@ Point SpaceShip::getMedianIntersaction(){
     double x4 = (pp[0].x + pp[2].x)/2;
     double y4 = (pp[0].y + pp[2].y)/2;
 
-    double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    return Point(px, py);
+    return getTwoLinesIntersaction(Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4));
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
@@ -229,37 +243,64 @@ void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
     SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
 }
 
+inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
+
+// Length of base of the SpaceShip
+double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
+
+pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px){
+    point topComplexPoint(pp[0].x, pp[0].y);
+    point baseComplexPoint(px.x, px.y);
+    double angle = M_PI_2;
+    point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
+    Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
+
+    Point pz = getTwoLinesIntersaction(px, px2, pp[0], pp[2]);
+    return make_pair(px, pz);
+}
+
+pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double offsetLength){
+    double length = getLengthOfVector(px1, px2);
+    double Cx = (px1.x - px2.x) / (length/(offsetLength*2));
+    double Cy = (px1.y - px2.y) / (length/(offsetLength*2));
+    return make_pair(Cx, Cy);
+}
+
 void SpaceShip::updateSkeleton(){
 
     double blockHypotenuse = 3;
     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
-    Point upPoint = pp[0];
+    Point topPoint = pp[0];
     Point downPoint = Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2);
-    double length = sqrt(pow(upPoint.x - downPoint.x, 2) + pow(upPoint.y - downPoint.y, 2));
+    double length = getLengthOfVector(topPoint, downPoint);
     double Cx, Cy;
-    Cx = (upPoint.x - downPoint.x)/ (length/(blockSize*2));
-    Cy = (upPoint.y - downPoint.y)/ (length/(blockSize*2));
+    tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
 
     double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
     int index = 0;
+    Point px1, px2;
+    double Vx, Vy;
+    double ribLength;
     while (length >= 0){
-        putSquareOnPoint(Point(upPoint.x - Cx*index, upPoint.y - Cy*index), blockHypotenuse);
+        Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
+        putSquareOnPoint(vertebra, blockHypotenuse);
         length -= littleHypotenuse;
         ++index;
-    }
-//    putSquareOnPoint(Point(upPoint.x - Cx, upPoint.y - Cy));
-//    putSquareOnPoint(Point(upPoint.x - Cx*2.5, upPoint.y - Cy*2.5));
-//    while (le)
 
-//    Cx = (upPoint.x + length * downPoint.x)/ (1 + length);
-//    Cy = (upPoint.y + length * downPoint.y)/ (1 + length);
-//    while (length >= 0){
-//        Cx = (upPoint.x + length * downPoint.x)/ (1 + length);
-//        Cy = (upPoint.y + length * downPoint.y)/ (1 + length);
-//        length -= localDistance;
-//        putSquareOnPoint(Point(Cx, Cy));
-//    }
-//    putSquareOnPoint(Point(Cx, Cy));
+        tie(px1, px2) = getPerpendicularLineByPoint(vertebra);
+        tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
+        ribLength = getLengthOfVector(px1, px2);
+        int vIndex = 1;
+        while (ribLength >= 0){
+            Point tmpVertebraLeft(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
+            Point tmpVertebraRight(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
+            putSquareOnPoint(tmpVertebraLeft, blockHypotenuse);
+            putSquareOnPoint(tmpVertebraRight, blockHypotenuse);
+            ribLength -= littleHypotenuse;
+            ++vIndex;
+        }
+
+    }
 }
 
 void SpaceShip::display(){
