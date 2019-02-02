@@ -96,10 +96,12 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
     speed = new Speed(max_speed);
 
+    int width = 30;
+
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
-    pp.push_back(Point(screen_width/2 - 10, screen_height/2 + screen_height / 10));
-    pp.push_back(Point(screen_width/2 + 10, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + screen_height / 10));
     initialMedianIntersection = getMedianIntersaction();
 }
 
@@ -249,13 +251,17 @@ inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - 
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
 pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px){
-    point topComplexPoint(pp[0].x, pp[0].y);
-    point baseComplexPoint(px.x, px.y);
+    double Cx, Cy;
     double angle = M_PI_2;
-    point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
-    Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
+    tie(Cx, Cy) = getXYOffsetOnVector(px, pp[0], getLengthOfBase()); // to make sure pz will be found
 
+    point topComplexPoint(pp[0].x - Cx, pp[0].y - Cy);
+    point baseComplexPoint(px.x, px.y);
+    point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
+
+    Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
     Point pz = getTwoLinesIntersaction(px, px2, pp[0], pp[2]);
+
     return make_pair(px, pz);
 }
 
@@ -268,7 +274,7 @@ pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double
 
 void SpaceShip::updateSkeleton(){
 
-    double blockHypotenuse = 3;
+    double blockHypotenuse = 4;
     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
     Point topPoint = pp[0];
     Point downPoint = Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2);
@@ -305,13 +311,11 @@ void SpaceShip::updateSkeleton(){
 
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    auto iter = pp.begin();
-    for (; iter != pp.end() - 1; ++iter){
-        SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
-    }
-    SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
-
-//    putSquareOnPoint(*pp.begin());
+//    auto iter = pp.begin();
+//    for (; iter != pp.end() - 1; ++iter){
+//        SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
+//    }
+//    SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
     updateSkeleton();
 }
 
