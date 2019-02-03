@@ -97,11 +97,23 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     speed = new Speed(max_speed);
 
     int width = 30;
+    int nozzleHeight = 25;
+    int nozzleWidth = 8;
 
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
     pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
     pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + screen_height / 10));
+
+    // left nozzle
+    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + (screen_height / 10) + nozzleHeight));
+    pp.push_back(Point(screen_width/2 + width/2 - nozzleWidth, screen_height/2 + screen_height / 10));
+
+    // right nozzle
+    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + (screen_height / 10) + nozzleHeight));
+    pp.push_back(Point(screen_width/2 - width/2 + nozzleWidth, screen_height/2 + screen_height / 10));
     initialMedianIntersection = getMedianIntersaction();
 }
 
@@ -227,6 +239,26 @@ double SpaceShip::getTiltAngel(){
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
 }
 
+inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
+
+void SpaceShip::fillRect(Point a, Point b, Point c){
+    double Cx_ab, Cy_ab;
+    double step = 1;
+    double sideLength = getLengthOfVector(a, b);
+    tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
+    int index = 1;
+//    for (int i = a.x; i <= a.x + sideLength; ++i){
+//        for (int j = a.y; j <= a.y + sideLength; ++j){
+//            SDL_RenderDrawPoint(renderer, i, j);
+//        }
+//    }
+    while (sideLength >= 0){
+        SDL_RenderDrawLine(renderer, a.x - Cx_ab*index, a.y - Cy_ab*index, c.x - Cx_ab*index, c.y - Cy_ab*index);
+        sideLength -= step;
+        ++index;
+    }
+}
+
 void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
     vector<Point> littleSqare;
     Point tmp = centerPoint;
@@ -243,24 +275,23 @@ void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
         SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
     }
     SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
+//    fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
 }
-
-inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
 
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
-pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px){
+pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, Point tp2){
     double Cx, Cy;
     double angle = M_PI_2;
-    tie(Cx, Cy) = getXYOffsetOnVector(px, pp[0], getLengthOfBase()); // to make sure pz will be found
+    tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, getLengthOfBase()); // to make sure pz will be found
 
-    point topComplexPoint(pp[0].x - Cx, pp[0].y - Cy);
+    point topComplexPoint(tp1.x - Cx, tp1.y - Cy);
     point baseComplexPoint(px.x, px.y);
     point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
 
     Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
-    Point pz = getTwoLinesIntersaction(px, px2, pp[0], pp[2]);
+    Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
 
     return make_pair(px, pz);
 }
@@ -272,12 +303,9 @@ pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double
     return make_pair(Cx, Cy);
 }
 
-void SpaceShip::updateSkeleton(){
+void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical){
 
-    double blockHypotenuse = 4;
     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
-    Point topPoint = pp[0];
-    Point downPoint = Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2);
     double length = getLengthOfVector(topPoint, downPoint);
     double Cx, Cy;
     tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
@@ -290,33 +318,43 @@ void SpaceShip::updateSkeleton(){
     while (length >= 0){
         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
         putSquareOnPoint(vertebra, blockHypotenuse);
+
         length -= littleHypotenuse;
         ++index;
 
-        tie(px1, px2) = getPerpendicularLineByPoint(vertebra);
+        tie(px1, px2) = getPerpendicularLineByPoint(vertebra, topPoint, pz);
         tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
+
         ribLength = getLengthOfVector(px1, px2);
         int vIndex = 1;
         while (ribLength >= 0){
-            Point tmpVertebraLeft(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
             Point tmpVertebraRight(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
-            putSquareOnPoint(tmpVertebraLeft, blockHypotenuse);
             putSquareOnPoint(tmpVertebraRight, blockHypotenuse);
+            if (symmetrical){
+                Point tmpVertebraLeft(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
+                putSquareOnPoint(tmpVertebraLeft, blockHypotenuse);
+            }
             ribLength -= littleHypotenuse;
             ++vIndex;
         }
-
     }
 }
 
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-//    auto iter = pp.begin();
-//    for (; iter != pp.end() - 1; ++iter){
-//        SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
+    int i = 0;
+//    for (; i < 2; ++i){
+//        SDL_RenderDrawLine(renderer, pp[i].x, pp[i].y, pp[i + 1].x, pp[i + 1].y);
+//        SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[i + 1 + 3].x, pp[i + 1 + 3].y);
+//        SDL_RenderDrawLine(renderer, pp[i + 6].x, pp[i + 6].y, pp[i + 1 + 6].x, pp[i + 1 + 6].y);
 //    }
-//    SDL_RenderDrawLine(renderer, iter->x, iter->y, pp.begin()->x, pp.begin()->y);
-    updateSkeleton();
+//    SDL_RenderDrawLine(renderer, pp[3].x, pp[3].y, pp[0].x, pp[0].y);
+//    SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[3].x, pp[3].y);
+//    SDL_RenderDrawLine(renderer, pp[i + 6].x, pp[i + 6].y, pp[6].x, pp[6].y);
+
+    updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true);
+    updateSkeleton(pp[4], pp[3], pp[5], 3, false);
+    updateSkeleton(pp[7], pp[6], pp[8], 3, false);
 }
 
 std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ return life_time; }

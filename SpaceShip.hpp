@@ -95,11 +95,12 @@ private:
     Point initialMedianIntersection;
     double getTiltAngel();
     void putSquareOnPoint(Point, double);
-    void updateSkeleton();
-    pair<Point, Point> getPerpendicularLineByPoint(Point);
+    void updateSkeleton(Point, Point, Point, double, bool);
+    pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point);
     double getLengthOfBase();
     Point getTwoLinesIntersaction(Point, Point, Point, Point);
     pair<double, double> getXYOffsetOnVector(Point, Point, double);
+    void fillRect(Point, Point, Point);
 public:
     Point getMedianIntersaction();
     Speed *speed;
