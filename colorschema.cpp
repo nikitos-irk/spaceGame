@@ -2,24 +2,27 @@
 
 void ColorSchema::update(){
     auto now = std::chrono::system_clock::now();
-    if (now >= change_colorchema_delay) { return; }
+    if (now <= change_colorchema_delay) { return; }
     change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
 
-    if(r > 0 && b == 0){
-        r--;
-        g++;
-      }
-      if(g > 0 && r == 0){
-        g--;
-        b++;
-      }
-      if(b > 0 && g == 0){
-        r++;
-        b--;
-      }
+    cout << r << ":" << g << ":" << b << endl;
+    if (flag){
+        if (r < 255) { ++r; return;}
+        if (g < 255) { ++g; return;}
+        if (b < 255) { ++b; return;} else {flag = !flag; return;}
+    } else {
+        if (r > 0) { --r; return;}
+        if (g > 0) { --g; return;}
+        if (b > 0) { --b; return;} else { flag = !flag; return;}
+
+    }
 }
 
 ColorSchema::ColorSchema(int r, int g, int b){
+    this->r = r;
+    this->g = g;
+    this->b = b;
+    flag = false;
     auto now = std::chrono::system_clock::now();
     change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
 }

@@ -1,17 +1,15 @@
 #ifndef COLORSCHEMA_H
 #define COLORSCHEMA_H
 
-//#include <cstdlib>
-//#include <ctime>
-//#include <unistd.h>
-//#include "SDL2/SDL.h"
 #include "iostream"
-#define COLOR_MODIFICATION_DELAY 1000
+#include <complex>
+#define COLOR_MODIFICATION_DELAY 10
 
 using namespace std;
 
 class ColorSchema{
     int r, g, b;
+    bool flag;
     std::chrono::time_point<std::chrono::system_clock> change_colorchema_delay;
 public:
     ColorSchema(int, int, int);
