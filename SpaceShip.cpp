@@ -100,6 +100,8 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     int nozzleHeight = 25;
     int nozzleWidth = 8;
 
+    cs = new ColorSchema(192, 192, 192);
+
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
     pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
@@ -275,7 +277,7 @@ void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
         SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
     }
     SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
-//    fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
+    fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
 }
 
 // Length of base of the SpaceShip
@@ -328,10 +330,10 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
         ribLength = getLengthOfVector(px1, px2);
         int vIndex = 1;
         while (ribLength >= 0){
-            Point tmpVertebraRight(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
+            Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
             putSquareOnPoint(tmpVertebraRight, blockHypotenuse);
             if (symmetrical){
-                Point tmpVertebraLeft(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
+                Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
                 putSquareOnPoint(tmpVertebraLeft, blockHypotenuse);
             }
             ribLength -= littleHypotenuse;
@@ -342,7 +344,10 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
 
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    int i = 0;
+
+    SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
+    cs->update();
+//    int i = 0;
 //    for (; i < 2; ++i){
 //        SDL_RenderDrawLine(renderer, pp[i].x, pp[i].y, pp[i + 1].x, pp[i + 1].y);
 //        SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[i + 1 + 3].x, pp[i + 1 + 3].y);
@@ -351,10 +356,11 @@ void SpaceShip::display(){
 //    SDL_RenderDrawLine(renderer, pp[3].x, pp[3].y, pp[0].x, pp[0].y);
 //    SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[3].x, pp[3].y);
 //    SDL_RenderDrawLine(renderer, pp[i + 6].x, pp[i + 6].y, pp[6].x, pp[6].y);
-
     updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true);
-    updateSkeleton(pp[4], pp[3], pp[5], 3, false);
-    updateSkeleton(pp[7], pp[6], pp[8], 3, false);
+    updateSkeleton(pp[4], pp[3], pp[5], 2, false);
+    updateSkeleton(pp[7], pp[6], pp[8], 2, false);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }
 
 std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ return life_time; }

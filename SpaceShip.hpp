@@ -11,6 +11,7 @@
 #include "speed.hpp"
 #include <complex>
 #include <utility>
+#include "colorschema.hpp"
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4
@@ -89,6 +90,7 @@ public:
 
 class SpaceShip: public SpaceObject{
 private:
+    ColorSchema *cs;
     vector<Point> pp;
     vector<Point> skeleton;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
