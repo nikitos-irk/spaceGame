@@ -96,7 +96,8 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
     speed = new Speed(max_speed);
 
-    int width = 30;
+    int spaceWidth = 30;
+    int spaceHeight = screen_height / 8;
     int nozzleHeight = 25;
     int nozzleWidth = 8;
 
@@ -104,18 +105,18 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
 
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
-    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
-    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2, screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
 
     // left nozzle
-    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + screen_height / 10));
-    pp.push_back(Point(screen_width/2 + width/2, screen_height/2 + (screen_height / 10) + nozzleHeight));
-    pp.push_back(Point(screen_width/2 + width/2 - nozzleWidth, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth, screen_height/2 + spaceHeight));
 
     // right nozzle
-    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + screen_height / 10));
-    pp.push_back(Point(screen_width/2 - width/2, screen_height/2 + (screen_height / 10) + nozzleHeight));
-    pp.push_back(Point(screen_width/2 - width/2 + nozzleWidth, screen_height/2 + screen_height / 10));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2, screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2, screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth, screen_height/2 + spaceHeight));
     initialMedianIntersection = getMedianIntersaction();
 }
 
