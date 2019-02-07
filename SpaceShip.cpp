@@ -101,7 +101,8 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     int nozzleHeight = 25;
     int nozzleWidth = 8;
 
-    cs = new ColorSchema(192, 192, 192);
+//    cs = new ColorSchema(192, 192, 192);
+    cs = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
 
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
