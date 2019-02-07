@@ -5,7 +5,6 @@ void ColorSchema::update(){
     if (now <= change_colorchema_delay) { return; }
     change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
 
-    cout << r << ":" << g << ":" << b << endl;
     if (flag){
         if (r < 255) { ++r; return;}
         if (g < 255) { ++g; return;}

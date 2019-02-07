@@ -109,14 +109,14 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
 
     // left nozzle
-    pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight + nozzleHeight));
-    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth, screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
 
     // right nozzle
-    pp.push_back(Point(screen_width/2 - spaceWidth/2, screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 - spaceWidth/2, screen_height/2 + spaceHeight + nozzleHeight));
-    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth, screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
     initialMedianIntersection = getMedianIntersaction();
 }
 
