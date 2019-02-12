@@ -53,6 +53,11 @@ public:
     }
 };
 
+struct Nozzle{
+    Point a, b, c;
+    Nozzle(Point, Point, Point);
+};
+
 class SpaceObject{
 protected:
 	SDL_Renderer *renderer;
@@ -103,7 +108,14 @@ private:
     Point getTwoLinesIntersaction(Point, Point, Point, Point);
     pair<double, double> getXYOffsetOnVector(Point, Point, double);
     void fillRect(Point, Point, Point);
+    void updateNozzles();
+    int spaceWidth;
+    int spaceHeight;
+    int nozzleMinHeight;
+    int nozzleMaxHeight;
+    int nozzleWidth;
 public:
+    double getCurrentA();
     Point getMedianIntersaction();
     Speed *speed;
     void slowdown();

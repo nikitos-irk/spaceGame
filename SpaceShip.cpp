@@ -96,10 +96,11 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
     speed = new Speed(max_speed);
 
-    int spaceWidth = 30;
-    int spaceHeight = screen_height / 8;
-    int nozzleHeight = 25;
-    int nozzleWidth = 8;
+    spaceWidth = 30;
+    spaceHeight = screen_height / 8;
+    nozzleMinHeight = 2.5;
+    nozzleMaxHeight = 25;
+    nozzleWidth = 8;
 
 //    cs = new ColorSchema(192, 192, 192);
     cs = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
@@ -110,14 +111,14 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
 
     // left nozzle
-    pp.push_back(Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleMinHeight));
     pp.push_back(Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
 
     // right nozzle
-    pp.push_back(Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
     pp.push_back(Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleHeight));
+    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
     initialMedianIntersection = getMedianIntersaction();
 }
 
@@ -132,6 +133,9 @@ void SpaceShip::backward_slowdown(){
 }
 void SpaceShip::backward_accelarate(){
     speed->backward_accelarate();
+}
+double SpaceShip::getCurrentA(){
+    return speed->getCurrentA();
 }
 
 DirectionXY SpaceShip::get_offset(){
@@ -344,23 +348,41 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
     }
 }
 
+void SpaceShip::updateNozzles(){
+    double a = getCurrentA();
+    if (a < 0.1) { a = 0.1; }
+
+    double Cx_left, Cy_left;
+    double Cx_right, Cy_right;
+
+    tie(Cx_left,  Cy_left)  = getXYOffsetOnVector(pp[7], pp[6], a * nozzleMaxHeight);
+    pp[6].y = screen_height/2 + spaceHeight + abs(Cy_left);
+    tie(Cx_left,  Cy_left)  = getXYOffsetOnVector(pp[7], pp[8], a * nozzleMaxHeight);
+    pp[8].y = screen_height/2 + spaceHeight + abs(Cy_left);
+
+    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[3], a * nozzleMaxHeight);
+    pp[3].y = screen_height/2 + spaceHeight + abs(Cy_right);
+    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[5], a * nozzleMaxHeight);
+    pp[5].y = screen_height/2 + spaceHeight + abs(Cy_right);
+}
+
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
     SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
     cs->update();
-//    int i = 0;
-//    for (; i < 2; ++i){
-//        SDL_RenderDrawLine(renderer, pp[i].x, pp[i].y, pp[i + 1].x, pp[i + 1].y);
-//        SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[i + 1 + 3].x, pp[i + 1 + 3].y);
-//        SDL_RenderDrawLine(renderer, pp[i + 6].x, pp[i + 6].y, pp[i + 1 + 6].x, pp[i + 1 + 6].y);
+//    for (int k = 0; k < 3; ++k){
+//        int i = 0;
+//        int kIndex = k*3;
+//        for (; i < 2; ++i){
+//            SDL_RenderDrawLine(renderer, pp[i + kIndex].x, pp[i + kIndex].y, pp[i + kIndex + 1].x, pp[i + kIndex + 1].y);
+//        }
+//        SDL_RenderDrawLine(renderer, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
 //    }
-//    SDL_RenderDrawLine(renderer, pp[3].x, pp[3].y, pp[0].x, pp[0].y);
-//    SDL_RenderDrawLine(renderer, pp[i + 3].x, pp[i + 3].y, pp[3].x, pp[3].y);
-//    SDL_RenderDrawLine(renderer, pp[i + 6].x, pp[i + 6].y, pp[6].x, pp[6].y);
+
+    updateNozzles();
     updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true);
-    updateSkeleton(pp[4], pp[3], pp[5], 2, false);
-    updateSkeleton(pp[7], pp[6], pp[8], 2, false);
+    updateSkeleton(pp[7], Point(pp[6].x/2 + pp[8].x/2, pp[6].y/2 + pp[8].y/2), pp[6], 2, true);
+    updateSkeleton(pp[4], Point(pp[3].x/2 + pp[5].x/2, pp[3].y/2 + pp[5].y/2), pp[3], 2, true);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }

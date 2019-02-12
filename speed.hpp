@@ -31,6 +31,7 @@ private:
     double backwardOffset;
     double negativeOffset;
     double positiveOffset;
+    double currentA;
 public:
     Speed(int);
     void slowdown();
@@ -38,6 +39,7 @@ public:
     void backward_slowdown();
     void backward_accelarate();
     DirectionXY getOffsetXY(DirectionalVector);
+    double getCurrentA();
 };
 
 #endif // SPEED_H
