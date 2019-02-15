@@ -98,7 +98,7 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
 
     spaceWidth = 30;
     spaceHeight = screen_height / 8;
-    nozzleMinHeight = 2.5;
+    nozzleMinHeight = 25;
     nozzleMaxHeight = 25;
     nozzleWidth = 8;
 
@@ -111,14 +111,25 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     pp.push_back(Point(screen_width/2 + spaceWidth/2, screen_height/2 + spaceHeight));
 
     // left nozzle
-    pp.push_back(Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleMinHeight));
-    pp.push_back(Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
-
+//    pp.push_back(Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleMinHeight));
+//    pp.push_back(Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight));
+//    pp.push_back(Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
     // right nozzle
-    pp.push_back(Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
-    pp.push_back(Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight));
-    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
+//    pp.push_back(Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
+//    pp.push_back(Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight));
+//    pp.push_back(Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight));
+    leftNozzle = new Nozzle(
+                renderer,
+                Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleMinHeight),
+                Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight),
+                Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight)
+    );
+    rightNozzle = new Nozzle(
+                renderer,
+                Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight),
+                Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight),
+                Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight)
+    );
     initialMedianIntersection = getMedianIntersaction();
 }
 
@@ -211,22 +222,29 @@ point rotate(point P, point Q, double theta)
     return (P-Q) * polar(1.0, theta) + Q;
 }
 
-void SpaceShip::change_x(bool clockwise){
-	
-    if (rotation_delay > NOW) { return; }
-	
-    double angel = M_PI/15;
-
-    if (!clockwise){
-        angel = -angel;
-    }
-    for (auto iter = pp.begin(); iter != pp.end(); ++iter){
+void rotatePointsInVector(vector<Point> &vPoints, Point initialMedianIntersection, double angle){
+    for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
         point P(iter->x, iter->y);
         point Q(initialMedianIntersection.x, initialMedianIntersection.y);
-        point P_rotated = rotate(P, Q, angel);
+        point P_rotated = rotate(P, Q, angle);
         iter->x = P_rotated.real();
         iter->y = P_rotated.imag();
     }
+}
+
+void SpaceShip::change_x(bool clockwise){
+
+    if (rotation_delay > NOW) { return; }
+    double angle = M_PI/15;
+
+    if (!clockwise){
+        angle = -angle;
+    }
+    rotatePointsInVector(pp, initialMedianIntersection, angle);
+    rotatePointsInVector(leftNozzle->points, initialMedianIntersection, angle);
+    leftNozzle->update(getCurrentA());
+    rotatePointsInVector(rightNozzle->points, initialMedianIntersection, angle);
+    rightNozzle->update(getCurrentA());
     rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
@@ -356,33 +374,47 @@ void SpaceShip::updateNozzles(){
     double Cx_right, Cy_right;
 
     tie(Cx_left,  Cy_left)  = getXYOffsetOnVector(pp[7], pp[6], a * nozzleMaxHeight);
-    pp[6].y = screen_height/2 + spaceHeight + abs(Cy_left);
-    tie(Cx_left,  Cy_left)  = getXYOffsetOnVector(pp[7], pp[8], a * nozzleMaxHeight);
-    pp[8].y = screen_height/2 + spaceHeight + abs(Cy_left);
+//    pp[6].y = screen_height/2 + spaceHeight + (Cy_left);
+//    pp[6].x = screen_width/2 - spaceWidth/2 - nozzleWidth + Cx_left;
+//    pp[6].y += (Cy_left);
 
-    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[3], a * nozzleMaxHeight);
-    pp[3].y = screen_height/2 + spaceHeight + abs(Cy_right);
-    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[5], a * nozzleMaxHeight);
-    pp[5].y = screen_height/2 + spaceHeight + abs(Cy_right);
+    tie(Cx_left,  Cy_left)  = getXYOffsetOnVector(pp[7], pp[8], a * nozzleMaxHeight);
+//    pp[8].y += (Cy_left);
+//    pp[8].y = screen_height/2 + spaceHeight + (Cy_left);
+//    pp[8].x = screen_width/2 - spaceWidth/2 + nozzleWidth - (Cx_left);
+
+//    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[3], a * nozzleMaxHeight);
+//    pp[3].y = screen_height/2 + spaceHeight + abs(Cy_right);
+//    tie(Cx_right,  Cy_right)  = getXYOffsetOnVector(pp[4], pp[5], a * nozzleMaxHeight);
+//    pp[5].y = screen_height/2 + spaceHeight + abs(Cy_right);
 }
 
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
     cs->update();
-//    for (int k = 0; k < 3; ++k){
-//        int i = 0;
-//        int kIndex = k*3;
-//        for (; i < 2; ++i){
-//            SDL_RenderDrawLine(renderer, pp[i + kIndex].x, pp[i + kIndex].y, pp[i + kIndex + 1].x, pp[i + kIndex + 1].y);
-//        }
-//        SDL_RenderDrawLine(renderer, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
-//    }
+    for (int k = 0; k < 1/*3*/; ++k){
+        int i = 0;
+        int kIndex = k*3;
+        for (; i < 2; ++i){
+            SDL_RenderDrawLine(renderer, pp[i + kIndex].x, pp[i + kIndex].y, pp[i + kIndex + 1].x, pp[i + kIndex + 1].y);
+        }
+        SDL_RenderDrawLine(renderer, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
+    }
+    leftNozzle->display();
+    rightNozzle->display();
 
-    updateNozzles();
+//    updateNozzles();
     updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true);
-    updateSkeleton(pp[7], Point(pp[6].x/2 + pp[8].x/2, pp[6].y/2 + pp[8].y/2), pp[6], 2, true);
-    updateSkeleton(pp[4], Point(pp[3].x/2 + pp[5].x/2, pp[3].y/2 + pp[5].y/2), pp[3], 2, true);
+    Point a,b,c;
+    a = leftNozzle->points[0];
+    b = leftNozzle->points[1];
+    c = leftNozzle->points[2];
+//    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true);
+    a = rightNozzle->points[0];
+    b = rightNozzle->points[1];
+    c = rightNozzle->points[2];
+//    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }

@@ -54,13 +54,45 @@ public:
 };
 
 struct Nozzle{
-    Point a, b, c;
-    Nozzle(Point, Point, Point);
+    vector <Point> points;
+    SDL_Renderer* renderer;
+    double lastAValue;
+    Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c){
+        points.push_back(a);
+        points.push_back(b);
+        points.push_back(c);
+        this->renderer = renderer;
+        lastAValue = 0.0;
+    }
+    void display(){
+        SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[1].x, points[1].y);
+        SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[2].x, points[2].y);
+        SDL_RenderDrawLine(renderer, points[1].x, points[1].y, points[2].x, points[2].y);
+    }
+
+    void update(double offsetLength){
+        if (offsetLength < 0.001) {return;}
+
+        double Cx = (points[0].x - points[1].x) / (offsetLength * 100);
+        double Cy = (points[0].y - points[1].y) / (offsetLength * 100);
+//        if (offsetLength < lastAValue){ Cx = -Cx; Cy = -Cy; lastAValue = offsetLength; }
+
+        double Cx2 = (points[0].x - points[2].x) / (offsetLength * 100);
+        double Cy2 = (points[0].y - points[2].y) / (offsetLength * 100);
+//        if (offsetLength < lastAValue){ Cx2 = -Cx2; Cy2 = -Cy2; lastAValue = offsetLength; }
+
+        points[0].x += Cx;
+        points[0].y += Cy;
+
+        points[2].x -= Cx2;
+        points[2].y += Cy2;
+//        points[2].x += Cx2; points[2].y += Cy2;
+    }
 };
 
 class SpaceObject{
 protected:
-	SDL_Renderer *renderer;
+    SDL_Renderer *renderer;
 	int x, y;
 	int screen_width;
 	int screen_height;
@@ -108,13 +140,15 @@ private:
     Point getTwoLinesIntersaction(Point, Point, Point, Point);
     pair<double, double> getXYOffsetOnVector(Point, Point, double);
     void fillRect(Point, Point, Point);
-    void updateNozzles();
     int spaceWidth;
     int spaceHeight;
     int nozzleMinHeight;
     int nozzleMaxHeight;
     int nozzleWidth;
+    Nozzle *leftNozzle;
+    Nozzle *rightNozzle;
 public:
+    void updateNozzles();
     double getCurrentA();
     Point getMedianIntersaction();
     Speed *speed;

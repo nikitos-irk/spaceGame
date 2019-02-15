@@ -288,6 +288,7 @@ void Game::run(){
                 }
             }
         }
+//        my_ship->updateNozzles();
         if (up_pushed) 	{ my_ship->backward_accelarate(); my_ship->slowdown(); } else if (up_unpushed) {my_ship->backward_slowdown();}
         if (down_pushed) { my_ship->accelarate(); my_ship->backward_slowdown(); } else if (down_unpushed) {my_ship->slowdown();}
 
