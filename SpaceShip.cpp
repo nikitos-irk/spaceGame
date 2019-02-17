@@ -126,6 +126,13 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
                 speed
     );
     initialMedianIntersection = getMedianIntersaction();
+
+    availableColors.push_back(Color(220,220,220));
+    availableColors.push_back(Color(192,192,192));
+    availableColors.push_back(Color(105,105,105));
+    availableColors.push_back(Color(211,211,211));
+    availableColors.push_back(Color(119,136,153));
+    colorIter = availableColors.end();
 }
 
 void SpaceShip::slowdown(){
@@ -332,14 +339,22 @@ pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double
 Color SpaceShip::getRandomColor(){
     Color randomColor;
     switch (rand() % 5){
-        case 1: randomColor = Color(81, 21, 62); break;
-        case 2: randomColor = Color(126, 7, 54); break;
-        case 3: randomColor = Color(194, 0, 47); break;
-        case 4: randomColor = Color(255, 75, 35); break;
-        case 5: randomColor = Color(255, 188, 0); break;
+        case 1: randomColor = Color(220,220,220); break;
+        case 2: randomColor = Color(192,192,192); break;
+        case 3: randomColor = Color(105,105,105); break;
+        case 4: randomColor = Color(211,211,211); break;
+        case 5: randomColor = Color(119,136,153); break;
         default: break;
     }
     return randomColor;
+}
+
+Color SpaceShip::getNextColor(){
+    Color result;
+    if (colorIter == availableColors.end()) { colorIter = availableColors.begin();}
+    result = *colorIter;
+    colorIter++;
+    return result;
 }
 
 void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
@@ -354,9 +369,11 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
     Point px1, px2;
     double Vx, Vy;
     double ribLength;
+    Color tmpColor;
+    colorIter = availableColors.end();
     while (length >= 0){
         if (randomColor){
-            Color tmpColor = getRandomColor();
+            tmpColor = getNextColor();
             SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
         }
         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
@@ -372,7 +389,7 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
         int vIndex = 1;
         while (ribLength >= 0){
             if (randomColor){
-                Color tmpColor = getRandomColor();
+                tmpColor = getNextColor();
                 SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
             }
             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);

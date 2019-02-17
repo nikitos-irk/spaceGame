@@ -158,8 +158,11 @@ private:
     int nozzleWidth;
     Nozzle *leftNozzle;
     Nozzle *rightNozzle;
+    vector<Color> availableColors;
+    vector<Color>::iterator colorIter;
 public:
     Color getRandomColor();
+    Color getNextColor();
     void updateNozzles();
     double getCurrentA();
     Point getMedianIntersaction();
