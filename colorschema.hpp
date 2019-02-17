@@ -39,6 +39,7 @@ public:
     ColorSchema(int, int, int);
     ColorSchema(Color, Color);
     void update();
+    void update(double);
     int getR();
     int getG();
     int getB();

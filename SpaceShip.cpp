@@ -94,6 +94,8 @@ Point SpaceShip::getMedianIntersaction(){
 SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed) : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
 
     shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
+    ship_color_change = NOW + static_cast<std::chrono::milliseconds> (SHIP_COLOR_CHANGE);
+
     speed = new Speed(max_speed);
 
     spaceWidth = 30;
@@ -113,13 +115,15 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
                 renderer,
                 Point(screen_width/2 + spaceWidth/2 + nozzleWidth , screen_height/2 + spaceHeight + nozzleMinHeight),
                 Point(screen_width/2 + spaceWidth/2                , screen_height/2 + spaceHeight),
-                Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight)
+                Point(screen_width/2 + spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight),
+                speed
     );
     rightNozzle = new Nozzle(
                 renderer,
                 Point(screen_width/2 - spaceWidth/2 - nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight),
                 Point(screen_width/2 - spaceWidth/2                , screen_height/2 + spaceHeight),
-                Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight)
+                Point(screen_width/2 - spaceWidth/2 + nozzleWidth  , screen_height/2 + spaceHeight + nozzleMinHeight),
+                speed
     );
     initialMedianIntersection = getMedianIntersaction();
 }
@@ -236,8 +240,8 @@ void SpaceShip::change_x(bool clockwise){
     rotatePointsInVector(rightNozzle->originPoints, initialMedianIntersection, angle);
 
 
-    leftNozzle->update(0);
-    rightNozzle->update(0);
+    leftNozzle->update();
+    rightNozzle->update();
     leftNozzle->display();
     rightNozzle->display();
 
@@ -325,7 +329,20 @@ pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double
     return make_pair(Cx, Cy);
 }
 
-void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical){
+Color SpaceShip::getRandomColor(){
+    Color randomColor;
+    switch (rand() % 5){
+        case 1: randomColor = Color(81, 21, 62); break;
+        case 2: randomColor = Color(126, 7, 54); break;
+        case 3: randomColor = Color(194, 0, 47); break;
+        case 4: randomColor = Color(255, 75, 35); break;
+        case 5: randomColor = Color(255, 188, 0); break;
+        default: break;
+    }
+    return randomColor;
+}
+
+void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
 
     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
     double length = getLengthOfVector(topPoint, downPoint);
@@ -338,6 +355,10 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
     double Vx, Vy;
     double ribLength;
     while (length >= 0){
+        if (randomColor){
+            Color tmpColor = getRandomColor();
+            SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+        }
         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
         putSquareOnPoint(vertebra, blockHypotenuse);
 
@@ -350,6 +371,10 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
         ribLength = getLengthOfVector(px1, px2);
         int vIndex = 1;
         while (ribLength >= 0){
+            if (randomColor){
+                Color tmpColor = getRandomColor();
+                SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+            }
             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
             putSquareOnPoint(tmpVertebraRight, blockHypotenuse);
             if (symmetrical){
@@ -365,7 +390,7 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
-    cs->update();
+//    cs->update();
     for (int k = 0; k < 1/*3*/; ++k){
         int i = 0;
         int kIndex = k*3;
@@ -374,22 +399,20 @@ void SpaceShip::display(){
         }
         SDL_RenderDrawLine(renderer, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
     }
-    double currentA = getCurrentA();
-    leftNozzle->update(currentA);
-    rightNozzle->update(currentA);
+    updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true, true);
+    leftNozzle->update();
+    rightNozzle->update();
     leftNozzle->display();
     rightNozzle->display();
-
-    updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true);
     Point a,b,c;
     a = leftNozzle->points[0];
     b = leftNozzle->points[1];
     c = leftNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true);
+    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true, false);
     a = rightNozzle->points[0];
     b = rightNozzle->points[1];
     c = rightNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true);
+    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true, false);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }
@@ -398,6 +421,7 @@ std::chrono::time_point<std::chrono::system_clock> Projectile::getLifeTime(){ re
 
 Projectile * SpaceShip::shoot(){
     if (this->shoot_delay > NOW) { return nullptr; }
+    shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
@@ -405,7 +429,6 @@ Projectile * SpaceShip::shoot(){
     double diff_y = (mediana_y - pp[0].y)/5;
 	
     Projectile *projectile = new Projectile(this->renderer, 0, 0, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
-    shoot_delay = NOW + static_cast<std::chrono::milliseconds> (SHOOTING_DELAY);
 	return projectile;
 }
 

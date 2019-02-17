@@ -5,7 +5,6 @@ void ColorSchema::update(){
     if (now <= change_colorchema_delay) { return; }
     change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
 
-
     if (flag){
         if (colorMix >= 1){ flag = !flag; return;}
         colorMix += 0.01;
@@ -19,6 +18,16 @@ void ColorSchema::update(){
         g = colorA.g * (1-colorMix) + colorB.g * (colorMix);
         b = colorA.b * (1-colorMix) + colorB.b * (colorMix);
     }
+}
+
+void ColorSchema::update(double currentA){
+    auto now = std::chrono::system_clock::now();
+    if (now <= change_colorchema_delay) { return; }
+    change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
+
+    r = colorA.r + abs(colorA.r - colorB.r) * currentA;
+    g = colorA.g + abs(colorA.g - colorB.g) * currentA;
+    b = colorA.b + abs(colorA.b - colorB.b) * currentA;
 }
 
 ColorSchema::ColorSchema(int r, int g, int b){

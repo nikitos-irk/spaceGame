@@ -23,6 +23,7 @@
 #define INERTIA_DELAY 10
 #define INERTIA_COUNTER 500
 #define PROJ_LIFETIME 5000
+#define SHIP_COLOR_CHANGE 50
 #define NOW std::chrono::system_clock::now()
 
 using namespace std;
@@ -57,26 +58,29 @@ struct Nozzle{
     vector <Point> points;
     vector <Point> originPoints;
     SDL_Renderer* renderer;
-    double lastAValue;
+    ColorSchema *cs;
+    Speed *speed;
 
-    Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c){
+    Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c, Speed *speed){
         originPoints.push_back(a);
         originPoints.push_back(b);
         originPoints.push_back(c);
         copy(originPoints.begin(), originPoints.end(), back_inserter(points));
-
         this->renderer = renderer;
-        lastAValue = 0.0;
+        this->speed = speed;
+        cs = new ColorSchema(Color(255, 17, 0), Color(255, 237, 0));
     }
     void display(){
+        cs->update(speed->getCurrentA());
+        SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
         SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[1].x, points[1].y);
         SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[2].x, points[2].y);
         SDL_RenderDrawLine(renderer, points[1].x, points[1].y, points[2].x, points[2].y);
     }
 
 
-    void update(double offsetLength){
-
+    void update(){
+        double offsetLength = speed->getCurrentA();
         points.clear();
         copy(originPoints.begin(), originPoints.end(), back_inserter(points));
 
@@ -137,10 +141,11 @@ private:
     vector<Point> pp;
     vector<Point> skeleton;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
+    std::chrono::time_point<std::chrono::system_clock> ship_color_change;
     Point initialMedianIntersection;
     double getTiltAngel();
     void putSquareOnPoint(Point, double);
-    void updateSkeleton(Point, Point, Point, double, bool);
+    void updateSkeleton(Point, Point, Point, double, bool, bool);
     pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point);
     double getLengthOfBase();
     Point getTwoLinesIntersaction(Point, Point, Point, Point);
@@ -154,6 +159,7 @@ private:
     Nozzle *leftNozzle;
     Nozzle *rightNozzle;
 public:
+    Color getRandomColor();
     void updateNozzles();
     double getCurrentA();
     Point getMedianIntersaction();
