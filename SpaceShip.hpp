@@ -55,12 +55,15 @@ public:
 
 struct Nozzle{
     vector <Point> points;
+    vector <Point> originPoints;
     SDL_Renderer* renderer;
     double lastAValue;
     Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c){
-        points.push_back(a);
-        points.push_back(b);
-        points.push_back(c);
+        originPoints.push_back(a);
+        originPoints.push_back(b);
+        originPoints.push_back(c);
+        copy(originPoints.begin(), originPoints.end(), back_inserter(points));
+
         this->renderer = renderer;
         lastAValue = 0.0;
     }
@@ -71,22 +74,21 @@ struct Nozzle{
     }
 
     void update(double offsetLength){
-        if (offsetLength < 0.001) {return;}
+        if (offsetLength < 0.001) {
+            return;
+        }
+        points.clear();
+        copy(originPoints.begin(), originPoints.end(), back_inserter(points));
 
-        double Cx = (points[0].x - points[1].x) / (offsetLength * 100);
-        double Cy = (points[0].y - points[1].y) / (offsetLength * 100);
-//        if (offsetLength < lastAValue){ Cx = -Cx; Cy = -Cy; lastAValue = offsetLength; }
-
-        double Cx2 = (points[0].x - points[2].x) / (offsetLength * 100);
-        double Cy2 = (points[0].y - points[2].y) / (offsetLength * 100);
-//        if (offsetLength < lastAValue){ Cx2 = -Cx2; Cy2 = -Cy2; lastAValue = offsetLength; }
+        double Cx = (points[0].x - points[1].x) * (offsetLength);
+        double Cy = (points[0].y - points[1].y) * (offsetLength);
 
         points[0].x += Cx;
         points[0].y += Cy;
 
-        points[2].x -= Cx2;
-        points[2].y += Cy2;
-//        points[2].x += Cx2; points[2].y += Cy2;
+        points[2].x -= Cx;
+        points[2].y += Cy;
+
     }
 };
 
@@ -142,8 +144,8 @@ private:
     void fillRect(Point, Point, Point);
     int spaceWidth;
     int spaceHeight;
-    int nozzleMinHeight;
-    int nozzleMaxHeight;
+    double nozzleMinHeight;
+    double nozzleMaxHeight;
     int nozzleWidth;
     Nozzle *leftNozzle;
     Nozzle *rightNozzle;
