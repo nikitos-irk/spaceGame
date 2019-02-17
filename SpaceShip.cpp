@@ -425,11 +425,11 @@ void SpaceShip::display(){
     a = leftNozzle->points[0];
     b = leftNozzle->points[1];
     c = leftNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true, false);
+    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
     a = rightNozzle->points[0];
     b = rightNozzle->points[1];
     c = rightNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 2, true, false);
+    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }
