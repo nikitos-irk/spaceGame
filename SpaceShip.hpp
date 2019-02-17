@@ -58,7 +58,8 @@ struct Nozzle{
     vector <Point> points;
     vector <Point> originPoints;
     SDL_Renderer* renderer;
-    ColorSchema *cs;
+    ColorSchema *csForward;
+    ColorSchema *csBackward;
     Speed *speed;
 
     Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c, Speed *speed){
@@ -68,11 +69,19 @@ struct Nozzle{
         copy(originPoints.begin(), originPoints.end(), back_inserter(points));
         this->renderer = renderer;
         this->speed = speed;
-        cs = new ColorSchema(Color(255, 17, 0), Color(255, 237, 0));
+        csForward  = new ColorSchema(Color(255, 17, 0), Color(255, 237, 0));
+        csBackward = new ColorSchema(Color(255, 17, 0), Color(100,149,237));
     }
     void display(){
-        cs->update(speed->getCurrentA());
-        SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
+        cout << "speed->getCurrentA() = " << speed->getCurrentA() << endl;
+        cout << "abs(speed->getForwardA()) < abs(speed->getBackwardA()) = " << (abs(speed->getForwardA())) << " : " <<  (abs(speed->getBackwardA())) << endl;
+        if (abs(speed->getForwardA()) < abs(speed->getBackwardA())){
+            csForward->update(speed->getCurrentA());
+            SDL_SetRenderDrawColor(renderer, csForward->getR(),  csForward->getG(),  csForward->getB(), 255);
+        } else {
+            csBackward->update(speed->getCurrentA());
+            SDL_SetRenderDrawColor(renderer, csBackward->getR(), csBackward->getG(), csBackward->getB(), 255);
+        }
         SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[1].x, points[1].y);
         SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[2].x, points[2].y);
         SDL_RenderDrawLine(renderer, points[1].x, points[1].y, points[2].x, points[2].y);

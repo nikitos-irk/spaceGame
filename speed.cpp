@@ -21,7 +21,9 @@ DirectionXY Speed::getOffsetXY(DirectionalVector dv){
     return DirectionXY((p2.x - p1.x)*currentA, (p2.y - p1.y)*currentA);
 }
 
-double Speed::getCurrentA() { return abs(currentA); }
+double Speed::getCurrentA()  { return abs(currentA) < 0.01 ? 0.0 : abs(currentA); }
+double Speed::getForwardA()  { return ( abs(forwardOffset) < 0.01 ? 0.0 : abs(forwardOffset) );   }
+double Speed::getBackwardA() { return ( abs(forwardOffset) < 0.01 ? 0.0 : abs(backwardOffset) );  }
 
 void Speed::accelarate(){
     if (forwardOffset <= 0.0){

@@ -40,6 +40,9 @@ public:
     void backward_accelarate();
     DirectionXY getOffsetXY(DirectionalVector);
     double getCurrentA();
+
+    double getForwardA();
+    double getBackwardA();
 };
 
 #endif // SPEED_H
