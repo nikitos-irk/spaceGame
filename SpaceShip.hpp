@@ -58,6 +58,7 @@ struct Nozzle{
     vector <Point> originPoints;
     SDL_Renderer* renderer;
     double lastAValue;
+
     Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c){
         originPoints.push_back(a);
         originPoints.push_back(b);
@@ -73,6 +74,7 @@ struct Nozzle{
         SDL_RenderDrawLine(renderer, points[1].x, points[1].y, points[2].x, points[2].y);
     }
 
+
     void update(double offsetLength){
         if (offsetLength < 0.001) {
             return;
@@ -83,12 +85,14 @@ struct Nozzle{
         double Cx = (points[0].x - points[1].x) * (offsetLength);
         double Cy = (points[0].y - points[1].y) * (offsetLength);
 
+        double Cx2 = (points[1].x - points[2].x) * (offsetLength);
+        double Cy2 = (points[1].y - points[2].y) * (offsetLength);
+
         points[0].x += Cx;
         points[0].y += Cy;
 
-        points[2].x -= Cx;
-        points[2].y += Cy;
-
+        points[2].x -= Cx2;
+        points[2].y -= Cy2;
     }
 };
 
