@@ -76,11 +76,11 @@ struct Nozzle{
 
 
     void update(double offsetLength){
-        if (offsetLength < 0.001) {
-            return;
-        }
+
         points.clear();
         copy(originPoints.begin(), originPoints.end(), back_inserter(points));
+
+        if (offsetLength < 0.001) { return; }
 
         double Cx = (points[0].x - points[1].x) * (offsetLength);
         double Cy = (points[0].y - points[1].y) * (offsetLength);

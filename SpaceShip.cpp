@@ -234,6 +234,13 @@ void SpaceShip::change_x(bool clockwise){
     rotatePointsInVector(pp, initialMedianIntersection, angle);
     rotatePointsInVector(leftNozzle->originPoints, initialMedianIntersection, angle);
     rotatePointsInVector(rightNozzle->originPoints, initialMedianIntersection, angle);
+
+
+    leftNozzle->update(0);
+    rightNozzle->update(0);
+    leftNozzle->display();
+    rightNozzle->display();
+
     rotation_delay = NOW + static_cast<std::chrono::milliseconds> (ROTATION_DELAY);
 }
 
