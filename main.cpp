@@ -43,7 +43,7 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
-	Game *space_game = new Game(renderer, screen_width, screen_height);
+    Game *space_game = new Game(renderer, screen_width, screen_height, 5);
 	space_game->run();
 	
 	SDL_DestroyRenderer(renderer);

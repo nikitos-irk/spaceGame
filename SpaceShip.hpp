@@ -138,7 +138,6 @@ public:
 class SpaceShip: public SpaceObject{
 private:
     ColorSchema *cs;
-    vector<Point> pp;
     vector<Point> skeleton;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     std::chrono::time_point<std::chrono::system_clock> ship_color_change;
@@ -161,6 +160,7 @@ private:
     vector<Color> availableColors;
     vector<Color>::iterator colorIter;
 public:
+    vector<Point> pp;
     Color getRandomColor();
     Color getNextColor();
     void updateNozzles();

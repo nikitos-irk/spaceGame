@@ -1,6 +1,8 @@
 #include "Game.hpp"
 
-Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height){
+Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height, int liveAmount){
+
+    this->liveAmount = liveAmount;
 
 	this->screen_width = screen_width;
 	this->screen_height = screen_height;
@@ -129,6 +131,55 @@ bool intersect (Point a, Point b, Point c, Point d) {
             && intersect_1 (a.y, b.y, c.y, d.y);
 }
 
+void Game::check_ship_hits(){
+
+    vector<Point*> tmpPoints;
+    bool hitStatus = false;
+    while (true){
+        auto ast = asteroids.begin();
+        projectiles_mutex.lock();
+        asteroids_mutex.lock();
+        while (ast != asteroids.end()){
+            tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
+            Point *p1, *p2;
+            Point sp1, sp2;
+            for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
+                p1 = *p;
+                p2 = *(p+1);
+                if (tmpPoints.end() == p){
+                    p2 = *tmpPoints.begin();
+                } else {
+                    p2 = *(p + 1);
+                }
+                for (auto spacePointsIter = my_ship->pp.begin(); spacePointsIter != my_ship->pp.end() - 1; ++spacePointsIter){
+                    sp1 = *spacePointsIter;
+                    sp2 = *(spacePointsIter+1);
+                    if (my_ship->pp.end()-1 == spacePointsIter){
+                        sp2 = *my_ship->pp.begin();
+                    } else {
+                        sp2 = *(spacePointsIter + 1);
+                    }
+                    hitStatus = intersect(*p1, *p2, sp1, sp2);
+                    if (hitStatus){
+                        liveAmount--;
+                        if (!liveAmount){
+                            throw GameOverException();
+                        }
+                        (*ast)->markAsDead();
+                        delete *ast;
+                        asteroids.erase(ast++);
+                        break;
+                    }
+                }
+            }
+            if (!hitStatus) {++ast;}// else { break; }
+        }
+        asteroids_mutex.unlock();
+        projectiles_mutex.unlock();
+        usleep(100);
+    }
+}
+
 void Game::check_hits(){
     vector<Point*> tmpPoints;
     bool hitStatus;
@@ -148,7 +199,7 @@ void Game::check_hits(){
                 for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
                     p1 = *p;
                     p2 = *(p+1);
-                    if (tmpPoints.end() == p){
+                    if (tmpPoints.end() - 1 == p){
                         p2 = *tmpPoints.begin();
                     } else {
                         p2 = *(p + 1);
@@ -223,9 +274,11 @@ void Game::run(){
 
 //    thread thUpdating(&Game::update, this);
     thread thHitsMonitoring(&Game::check_hits, this);
+    thread thShipHitsMonitoring(&Game::check_ship_hits, this);
 
 //    thUpdating.join();
     thHitsMonitoring.detach();
+    thShipHitsMonitoring.detach();
     int quit = 1;
     SpaceObject *tmp_space_obj;
     while(quit) {

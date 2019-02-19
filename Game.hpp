@@ -16,11 +16,31 @@
 #define ASTEROIDS_REMOVING_DELAY 10000 // 10 seconds
 using namespace std;
 
+class GameOverException: public exception{
+    const char *file;
+    int line;
+    const char* func;
+    const char* info;
+public:
+    GameOverException(const char *msg, const char *file_, int line_, const char *func_, const char *info_=""):
+        file(file_),
+        line(line_),
+        func(func_),
+        info(info_)
+    {}
+    GameOverException(){}
+    const char * get_file() {return file;}
+    int get_line() {return line;}
+    const char * get_func() {return func;}
+    const char * get_info() {return info;}
+};
+
 class Game{
 private:
 
     int screen_width;
 	int screen_height;
+    int liveAmount;
 
 	std::chrono::time_point<std::chrono::system_clock> change_position_delay;
 	std::chrono::time_point<std::chrono::system_clock> inertia_delay;
@@ -58,9 +78,10 @@ private:
     void update_asteroids();
     void update_projectiles();
     void check_hits();
+    void check_ship_hits();
     void update();
 public:
-	Game(SDL_Renderer *, int, int);
+    Game(SDL_Renderer *, int, int, int);
 	void run();
 };
 
