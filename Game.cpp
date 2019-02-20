@@ -265,6 +265,26 @@ void Game::changeObjectsPositions(){
     change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
 }
 
+void Game::displayLifeAmount(){
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
+    SDL_Rect rect;
+    rect.x = 5;
+    rect.y = screen_height - 32;
+    rect.w = 5 * 15 + 4;
+    rect.h = 24;
+    SDL_RenderFillRect(renderer, &rect);
+
+    for (int i = 0; i < liveAmount; ++i){
+        rect.x = 10 + i * 15;
+        rect.y = screen_height - 30;
+        rect.w = 10;
+        rect.h = 20;
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+}
+
 void Game::run(){
 
 	my_background->fill_background();
@@ -366,6 +386,7 @@ void Game::run(){
 
         my_background->fill_background();
         displayObjects();
+        displayLifeAmount();
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
     }

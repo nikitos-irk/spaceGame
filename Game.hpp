@@ -80,6 +80,7 @@ private:
     void check_hits();
     void check_ship_hits();
     void update();
+    void displayLifeAmount();
 public:
     Game(SDL_Renderer *, int, int, int);
 	void run();
