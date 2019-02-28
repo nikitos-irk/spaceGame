@@ -13,6 +13,8 @@
 #include "Background.hpp"
 #include "thread"
 
+static std::exception_ptr globalExceptionPtr = nullptr;
+
 #define ASTEROIDS_REMOVING_DELAY 10000 // 10 seconds
 using namespace std;
 

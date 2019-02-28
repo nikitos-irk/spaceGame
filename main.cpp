@@ -9,6 +9,7 @@
 #include <functional>
 #include <random>
 #include "Game.hpp"
+#include<exception>
 
 using namespace std;
 
@@ -44,7 +45,7 @@ int main( int argc, char* args[] )
 	}
 
     Game *space_game = new Game(renderer, screen_width, screen_height, 5);
-	space_game->run();
+    space_game->run();
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

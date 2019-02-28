@@ -165,7 +165,11 @@ void Game::check_ship_hits(){
                         if (hitStatus){
                             liveAmount--;
                             if (!liveAmount){
-                                throw GameOverException();
+                                try{
+                                    throw GameOverException();
+                                }catch (...){
+                                    globalExceptionPtr = std::current_exception();
+                                }
                             }
                             (*ast)->markAsDead();
                             delete *ast;
@@ -307,6 +311,20 @@ void Game::run(){
     int quit = 1;
     SpaceObject *tmp_space_obj;
     while(quit) {
+
+        if (globalExceptionPtr)
+          {
+            try
+            {
+              std::rethrow_exception(globalExceptionPtr);
+            }
+            catch (const std::exception &ex)
+            {
+              std::cout << "Gema Over!" << endl;
+              quit = false;
+            }
+          }
+
         projectiles_mutex.lock();
         asteroids_mutex.lock();
         while( SDL_PollEvent( &e ) != 0 ) {
