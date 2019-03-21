@@ -171,15 +171,22 @@ void Game::check_ship_hits(){
                                     globalExceptionPtr = std::current_exception();
                                 }
                             }
+
                             (*ast)->markAsDead();
-                            delete *ast;
-                            asteroids.erase(ast++);
+                            Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
+                            auto tmp_ast_iter = ast;
+
+                            if (ast != asteroids.end()){
+                                ++ast;
+                            }
+                            delete tmp_ast;
+                            asteroids.erase(tmp_ast_iter);
                             break;
                         }
                     }
                 }
             }
-            if (!hitStatus) {++ast;}// else { break; }
+            if (!hitStatus && ast != asteroids.end()) {++ast;}// else { break; }
         }
         asteroids_mutex.unlock();
         usleep(100);
@@ -222,17 +229,25 @@ void Game::check_hits(){
                         (*pr)->markAsDead();
                         Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
                         Projectile *tmp_pr = dynamic_cast<Projectile*>(*pr);
-                        asteroids.erase(ast++);
-                        projectiles.erase(pr++);
+                        auto tmp_ast_iter = ast;
+                        auto tmp_pr_iter = pr;
+                        if (ast != asteroids.end()){
+                            ++ast;
+                        }
+                        if (pr != projectiles.end()){
+                            ++pr;
+                        }
+                        asteroids.erase(tmp_ast_iter);
+                        projectiles.erase(tmp_pr_iter);
                         delete tmp_ast;
                         delete tmp_pr;
 
                         break;
                     }
                 }
-                if (!hitStatus) {++ast;}// else { break; }
+                if (!hitStatus and ast != asteroids.end()) {++ast;}// else { break; }
             }
-            if (!hitStatus) {++pr;}
+            if (!hitStatus and pr != projectiles.end()) {++pr;}
         }
         asteroids_mutex.unlock();
         projectiles_mutex.unlock();
@@ -384,7 +399,7 @@ void Game::run(){
                 }
             }
         }
-//        my_ship->updateNozzles();
+
         if (up_pushed) 	{ my_ship->backward_accelarate(); my_ship->slowdown(); } else if (up_unpushed) {my_ship->backward_slowdown();}
         if (down_pushed) { my_ship->accelarate(); my_ship->backward_slowdown(); } else if (down_unpushed) {my_ship->slowdown();}
 
