@@ -226,11 +226,7 @@ point rotate(point P, point Q, double theta)
 
 void rotatePointsInVector(vector<Point> &vPoints, Point initialMedianIntersection, double angle){
     for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
-        point P(iter->x, iter->y);
-        point Q(initialMedianIntersection.x, initialMedianIntersection.y);
-        point P_rotated = rotate(P, Q, angle);
-        iter->x = P_rotated.real();
-        iter->y = P_rotated.imag();
+        *iter = get_rotated_point(*iter, initialMedianIntersection, angle);
     }
 }
 
@@ -298,10 +294,7 @@ void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
     tmp.y -= blockHypotenuse;
     for (int i = 0; i < 4; ++i){
         double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
-        point P(tmp.x, tmp.y);
-        point Q(centerPoint.x, centerPoint.y);
-        point P_rotated = (P-Q) * polar(1.0, theta) + Q;
-        littleSqare.push_back(Point(P_rotated.real(), P_rotated.imag()));
+        littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
     }
     auto iter2 = littleSqare.begin();
     for (; iter2 != littleSqare.end() - 1; ++iter2){
@@ -317,13 +310,10 @@ double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, Point tp2){
     double Cx, Cy;
     double angle = M_PI_2;
+
     tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, getLengthOfBase()); // to make sure pz will be found
 
-    point topComplexPoint(tp1.x - Cx, tp1.y - Cy);
-    point baseComplexPoint(px.x, px.y);
-    point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
-
-    Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
+    Point px2 = get_rotated_point(Point(tp1.x - Cx, tp1.y - Cy), px, angle);
     Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
 
     return make_pair(px, pz);
