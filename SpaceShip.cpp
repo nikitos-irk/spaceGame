@@ -219,11 +219,6 @@ void SpaceShip::change_y(bool forward){
 	}
 }
 
-point rotate(point P, point Q, double theta)
-{
-    return (P-Q) * polar(1.0, theta) + Q;
-}
-
 void rotatePointsInVector(vector<Point> &vPoints, Point initialMedianIntersection, double angle){
     for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
         *iter = get_rotated_point(*iter, initialMedianIntersection, angle);
