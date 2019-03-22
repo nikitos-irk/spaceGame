@@ -79,8 +79,15 @@ private:
     void create_asteroid();
     void update_asteroids();
     void update_projectiles();
+
     void check_hits();
+    void hist_loop();
+    void clean_asteroids();
+    void clean_projectiles();
+    void clean_loop();
+
     void check_ship_hits();
+    void ship_hits_loop();
     void update();
     void displayLifeAmount();
 public:

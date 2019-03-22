@@ -132,127 +132,142 @@ bool intersect (Point a, Point b, Point c, Point d) {
 }
 
 void Game::check_ship_hits(){
-
-    vector<Point*> tmpPoints;
-    bool hitStatus = false;
     while (true){
-        auto ast = asteroids.begin();
         asteroids_mutex.lock();
-        while (ast != asteroids.end()){
-            hitStatus = false;
-            if (!(*ast)->isAlive()){ ast++; continue; }
-            tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
-            Point *p1, *p2;
-            Point sp1, sp2;
-            for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
-                if (!hitStatus){
-                    p1 = *p;
-                    p2 = *(p+1);
-                    if (tmpPoints.end()-1 == p){
-                        p2 = *tmpPoints.begin();
-                    } else {
-                        p2 = *(p + 1);
-                    }
-                    for (auto spacePointsIter = my_ship->pp.begin(); spacePointsIter != my_ship->pp.end() - 1; ++spacePointsIter){
-                        sp1 = *spacePointsIter;
-                        sp2 = *(spacePointsIter+1);
-                        if (my_ship->pp.end()-1 == spacePointsIter){
-                            sp2 = *my_ship->pp.begin();
-                        } else {
-                            sp2 = *(spacePointsIter + 1);
-                        }
-                        hitStatus = intersect(*p1, *p2, sp1, sp2);
-                        if (hitStatus){
-                            liveAmount--;
-                            if (!liveAmount){
-                                try{
-                                    throw GameOverException();
-                                }catch (...){
-                                    globalExceptionPtr = std::current_exception();
-                                }
-                            }
-
-                            (*ast)->markAsDead();
-                            Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
-                            auto tmp_ast_iter = ast;
-
-                            if (ast != asteroids.end()){
-                                ++ast;
-                            }
-                            delete tmp_ast;
-                            asteroids.erase(tmp_ast_iter);
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!hitStatus && ast != asteroids.end()) {++ast;}// else { break; }
-        }
+        ship_hits_loop();
         asteroids_mutex.unlock();
         usleep(100);
     }
 }
 
-void Game::check_hits(){
+void Game::ship_hits_loop(){
+
     vector<Point*> tmpPoints;
-    bool hitStatus;
+    bool hitStatus = false;
+
+    for (auto ast = asteroids.begin(); ast != asteroids.end(); ++ast){
+        hitStatus = false;
+        if (!(*ast)->isAlive()){ continue; }
+        tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
+        Point *p1, *p2;
+        Point sp1, sp2;
+        for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
+            if (!hitStatus){
+                p1 = *p;
+                p2 = *(p+1);
+                if (tmpPoints.end()-1 == p){
+                    p2 = *tmpPoints.begin();
+                } else {
+                    p2 = *(p + 1);
+                }
+                for (auto spacePointsIter = my_ship->pp.begin(); spacePointsIter != my_ship->pp.end() - 1; ++spacePointsIter){
+                    sp1 = *spacePointsIter;
+                    sp2 = *(spacePointsIter+1);
+                    if (my_ship->pp.end()-1 == spacePointsIter){
+                        sp2 = *my_ship->pp.begin();
+                    } else {
+                        sp2 = *(spacePointsIter + 1);
+                    }
+                    hitStatus = intersect(*p1, *p2, sp1, sp2);
+                    if (hitStatus){
+                        liveAmount--;
+                        if (!liveAmount){
+                            try{
+                                throw GameOverException();
+                            }catch (...){
+                                globalExceptionPtr = std::current_exception();
+                            }
+                        }
+                        (*ast)->markAsDead();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    clean_asteroids();
+}
+
+void Game::check_hits(){
     while (true)
     {
         projectiles_mutex.lock();
         asteroids_mutex.lock();
-        auto pr = projectiles.begin();
-        while (pr != projectiles.end()){
-            auto ast = asteroids.begin();
-            hitStatus = false;
-            while (ast != asteroids.end()){
-                if (pr == projectiles.end()) {break;}
-
-                tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
-                Point *p1, *p2, *px;
-
-                for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
-                    p1 = *p;
-                    p2 = *(p+1);
-                    if (tmpPoints.end() - 1 == p){
-                        p2 = *tmpPoints.begin();
-                    } else {
-                        p2 = *(p + 1);
-                    }
-
-                    px = dynamic_cast<Projectile*>(*pr)->getXY();
-                    pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
-
-                    bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
-                    delete px;
-                    if ( hitStatus ){
-                        (*ast)->markAsDead();
-                        (*pr)->markAsDead();
-                        Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
-                        Projectile *tmp_pr = dynamic_cast<Projectile*>(*pr);
-                        auto tmp_ast_iter = ast;
-                        auto tmp_pr_iter = pr;
-                        if (ast != asteroids.end()){
-                            ++ast;
-                        }
-                        if (pr != projectiles.end()){
-                            ++pr;
-                        }
-                        asteroids.erase(tmp_ast_iter);
-                        projectiles.erase(tmp_pr_iter);
-                        delete tmp_ast;
-                        delete tmp_pr;
-
-                        break;
-                    }
-                }
-                if (!hitStatus and ast != asteroids.end()) {++ast;}// else { break; }
-            }
-            if (!hitStatus and pr != projectiles.end()) {++pr;}
-        }
+        hist_loop();
         asteroids_mutex.unlock();
         projectiles_mutex.unlock();
         usleep(100);
     }
+}
+
+void Game::hist_loop(){
+
+    vector<Point*> tmpPoints;
+    bool hitStatus;
+
+    for (auto pr = projectiles.begin(); pr != projectiles.end(); ++pr){
+        if (!(*pr)->isAlive()) { continue; }
+        hitStatus = false;
+        for (auto ast = asteroids.begin(); ast != asteroids.end(); ++ast){
+            if (!(*ast)->isAlive()) { continue; }
+            tmpPoints = dynamic_cast<Asteroid*>(*ast)->getPoints();
+            Point *p1, *p2, *px;
+
+            for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
+                p1 = *p;
+                p2 = *(p+1);
+                if (tmpPoints.end() - 1 == p){
+                    p2 = *tmpPoints.begin();
+                } else {
+                    p2 = *(p + 1);
+                }
+
+                px = dynamic_cast<Projectile*>(*pr)->getXY();
+                pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+
+                bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
+                delete px;
+                if ( hitStatus ){
+                    cout << "HIT!" << endl;
+                    (*ast)->markAsDead();
+                    (*pr)->markAsDead();
+                    break;
+                }
+            }
+        }
+    }
+    clean_loop();
+}
+
+void Game::clean_asteroids(){
+    auto ast = asteroids.begin();
+    while (ast != asteroids.end()){
+        if (!(*ast)->isAlive()){
+            Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
+            asteroids.erase(ast++);
+            delete tmp_ast;
+        } else {
+            ++ast;
+        }
+    }
+}
+
+void Game::clean_projectiles(){
+    auto pr = projectiles.begin();
+    while (pr != projectiles.end()){
+        if (!(*pr)->isAlive()){
+            Projectile *tmp_pr = dynamic_cast<Projectile*>(*pr);
+            projectiles.erase(pr++);
+            delete tmp_pr;
+        } else {
+            ++pr;
+        }
+    }
+}
+
+void Game::clean_loop(){
+    clean_asteroids();
+    clean_projectiles();
 }
 
 void Game::displayObjects(){
