@@ -435,7 +435,10 @@ Projectile * SpaceShip::shoot(){
 }
 
 void Projectile::display(){
-	double error = (double) - BLOCK_SIZE;
+
+    if (this->display_delay < NOW){ return; }
+
+    double error = (double) - BLOCK_SIZE;
 	double tmp_x = (double) BLOCK_SIZE - 0.5;
 	double tmp_y = (double) 0.5;
 	
@@ -481,11 +484,11 @@ void Projectile::display(){
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
-    if (this->display_delay < NOW){
+//    if (this->display_delay < NOW){
 		this->x -= direction_x;
 		this->y -= direction_y;
-        display_delay = NOW + (std::chrono::milliseconds) DISPLAY_DELAY;
-	}
+        this->display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY);
+//	}
 }
 
 void Asteroid::display(){

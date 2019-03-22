@@ -24,7 +24,6 @@
 #define INERTIA_COUNTER 500
 #define PROJ_LIFETIME 5000
 #define SHIP_COLOR_CHANGE 50
-#define NOW std::chrono::system_clock::now()
 
 using namespace std;
 
