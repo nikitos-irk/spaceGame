@@ -9,9 +9,7 @@ Explosion::Fragment::Fragment(Point p, Point next_p, int dots_number=3){
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number; ++i){
-        dots.push_back(get_rotated_point(initial_p,
-                                         Point(initial_p.x + rand() % distribution_value,
-                                               initial_p.y + rand() % distribution_value)));
+        dots.push_back(get_rotated_point(initial_p, Point(initial_p.x + rand() % distribution_value, initial_p.y)));
     }
     fragment_shift_delay = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
 }
@@ -44,10 +42,19 @@ void Explosion::Fragment::shift(){
         iter->x += this->x_shift;
         iter->y += this->y_shift;
     }
+
+//    std::time_t ttp = std::chrono::system_clock::to_time_t(NOW);
+//    std::time_t ttp_new = std::chrono::system_clock::to_time_t(fragment_shift_delay);
+//    std::cout << "time:     " << std::ctime(&ttp);
+//    std::cout << "time new: " << std::ctime(&ttp_new);
+//    sleep(10);
+
     fragment_shift_delay = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
 }
 
 Explosion::Explosion(Point p, SDL_Renderer *renderer){
+
+    destroy_time = NOW + static_cast<std::chrono::milliseconds> (EXPLOSION_LIFE_TIME);
     this->p = p;
     this->renderer = renderer;
 
@@ -55,7 +62,7 @@ Explosion::Explosion(Point p, SDL_Renderer *renderer){
     double angle_diff = 360 / random_number_of_ragments;
 
     for (int i = 0; i < random_number_of_ragments; ++i){
-        int random_x = rand() % 10;
+        int random_x = 5 + rand() % 5;
         Point tmp = get_rotated_point(p, Point(p.x + random_x, p.y), angle_diff * i);
         fragments.push_back(Fragment(p, tmp, 3 + rand() % 3));
     }
@@ -66,3 +73,5 @@ void Explosion::display(){
         iter->display(renderer);
     }
 }
+
+bool Explosion::isAlive(){ return NOW < destroy_time; }

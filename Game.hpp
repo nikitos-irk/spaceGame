@@ -85,6 +85,7 @@ private:
     void hist_loop();
     void clean_asteroids();
     void clean_projectiles();
+    void clean_explosions();
     void clean_loop();
 
     void check_ship_hits();

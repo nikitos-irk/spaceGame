@@ -7,11 +7,13 @@
 #include <vector>
 #include <iostream>
 
-#define FRAGMENT_SHIFT_DELAY 150
+#define FRAGMENT_SHIFT_DELAY 5000
+#define EXPLOSION_LIFE_TIME 30000
 
 class Explosion{
     Point p;
     SDL_Renderer *renderer;
+    std::chrono::time_point<std::chrono::system_clock> destroy_time;
     class Fragment{
         std::chrono::time_point<std::chrono::system_clock> fragment_shift_delay;
         int dots_number;
@@ -30,6 +32,7 @@ public:
     Explosion(Point p, SDL_Renderer*);
     void bang();
     void display();
+    bool isAlive();
 };
 
 #endif // EXPLOSION_HPP

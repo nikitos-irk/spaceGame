@@ -278,6 +278,19 @@ void Game::clean_projectiles(){
     }
 }
 
+void Game::clean_explosions(){
+    auto expl = explosions.begin();
+    while (expl != explosions.end()){
+        if (!(*expl)->isAlive()){
+            Explosion *tmp_expl = *expl;
+            explosions.erase(expl++);
+            delete tmp_expl;
+        } else {
+            ++expl;
+        }
+    }
+}
+
 void Game::clean_loop(){
     clean_asteroids();
     clean_projectiles();
@@ -298,8 +311,11 @@ void Game::displayObjects(){
     }
 
     for (auto explosion = explosions.begin(); explosion != explosions.end(); ++explosion){
-        (*explosion)->display();
+        if ( (*explosion)->isAlive() ){
+            (*explosion)->display();
+        }
     }
+    clean_explosions();
 }
 
 void Game::changeObjectsPositions(){

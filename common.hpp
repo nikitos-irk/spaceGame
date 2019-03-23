@@ -5,8 +5,8 @@
 #include <complex>
 #include <utility>
 #include <chrono>
+#include <unistd.h>
 #define NOW std::chrono::system_clock::now()
-#define SHIFT_FRAGMENT_DELAY 50
 
 using namespace std;
 typedef complex<double> point;
