@@ -228,7 +228,6 @@ void Game::hist_loop(){
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
                 delete px;
                 if ( hitStatus ){
-                    cout << "HIT!" << endl;
                     (*ast)->markAsDead();
                     (*pr)->markAsDead();
                     break;
@@ -239,11 +238,25 @@ void Game::hist_loop(){
     clean_loop();
 }
 
+void Game::generate_explosion(Asteroid *tmp_ast){
+    double middle_x = 0.0, middle_y = 0.0;
+
+    vector<Point*> tmpPoints = tmp_ast->getPoints();
+    for (auto iter = tmpPoints.begin(); iter != tmpPoints.end(); ++iter){
+        middle_x += (*iter)->x;
+        middle_y += (*iter)->y;
+    }
+    middle_x /= tmpPoints.size();
+    middle_y /= tmpPoints.size();
+    explosions.push_back(new Explosion(Point(middle_x, middle_y), renderer));
+}
+
 void Game::clean_asteroids(){
     auto ast = asteroids.begin();
     while (ast != asteroids.end()){
         if (!(*ast)->isAlive()){
             Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
+            generate_explosion(tmp_ast);
             asteroids.erase(ast++);
             delete tmp_ast;
         } else {
@@ -272,9 +285,7 @@ void Game::clean_loop(){
 
 void Game::displayObjects(){
 	my_ship->display();
-	for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
-		(*spaceObject)->display();
-	}
+
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
         if ((*spaceObject)->isAlive()){
             (*spaceObject)->display();
@@ -285,6 +296,10 @@ void Game::displayObjects(){
             (*spaceObject)->display();
         }
     }
+
+    for (auto explosion = explosions.begin(); explosion != explosions.end(); ++explosion){
+        (*explosion)->display();
+    }
 }
 
 void Game::changeObjectsPositions(){
@@ -292,9 +307,6 @@ void Game::changeObjectsPositions(){
 	if (change_position_delay >= now){ return; }
     DirectionXY directionXY = my_ship->get_offset();
 
-    for (auto spaceObject = spaceObjects.begin(); spaceObject != spaceObjects.end(); ++spaceObject){
-		(*spaceObject)->change_position(directionXY);
-	}
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
         (*spaceObject)->change_position(directionXY);
     }

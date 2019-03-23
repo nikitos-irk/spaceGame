@@ -13,33 +13,38 @@ Explosion::Fragment::Fragment(Point p, Point next_p, int dots_number=3){
                                          Point(initial_p.x + rand() % distribution_value,
                                                initial_p.y + rand() % distribution_value)));
     }
-    fragment_shift_display_delay = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DISPLAY_DELAY);
+    fragment_shift_delay = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
 }
 
-void Explosion::Fragment::show(SDL_Renderer *renderer){
-
-    if (fragment_shift_display_delay < NOW) { return; }
+void Explosion::Fragment::display(SDL_Renderer *renderer){
 
     int x1, y1, x2, y2;
-    for(auto iter = dots.begin(); iter != dots.end() - 1; ++iter){
+
+    auto iter = dots.begin();
+    auto iter_next = iter + 1;
+
+    while (iter_next != dots.end()){
         x1 = iter->x;
         y1 = iter->y;
-        x2 = (iter + 1)->x;
-        y2 = (iter + 1)->y;
+        x2 = iter_next->x;
+        y2 = iter_next->y;
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+        ++iter; ++iter_next;
     }
-    x2 = dots.begin()->x;
-    y2 = dots.begin()->y;
+    iter = dots.begin();
+    x1 = iter->x;
+    y1 = iter->y;
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-
-    fragment_shift_display_delay = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DISPLAY_DELAY;
+    shift();
 }
 
 void Explosion::Fragment::shift(){
+    if (fragment_shift_delay < NOW) { return; }
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
         iter->x += this->x_shift;
         iter->y += this->y_shift;
     }
+    fragment_shift_delay = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
 }
 
 Explosion::Explosion(Point p, SDL_Renderer *renderer){
@@ -50,11 +55,14 @@ Explosion::Explosion(Point p, SDL_Renderer *renderer){
     double angle_diff = 360 / random_number_of_ragments;
 
     for (int i = 0; i < random_number_of_ragments; ++i){
-        Point tmp = get_rotated_point(p, Point(p.x + FRAGMENT_SHIFT_DISPLAY_DELAY, p.y + FRAGMENT_SHIFT_DISPLAY_DELAY), angle_diff * i);
+        int random_x = rand() % 10;
+        Point tmp = get_rotated_point(p, Point(p.x + random_x, p.y), angle_diff * i);
         fragments.push_back(Fragment(p, tmp, 3 + rand() % 3));
     }
 }
 
-void Explosion::bang(){
-
+void Explosion::display(){
+    for (auto iter = fragments.begin(); iter != fragments.end(); ++iter){
+        iter->display(renderer);
+    }
 }

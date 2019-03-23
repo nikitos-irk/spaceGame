@@ -12,6 +12,7 @@
 #include <utility>
 #include "colorschema.hpp"
 #include "common.hpp"
+#include "explosion.hpp"
 
 #define BLOCK_SIZE 5
 #define POINTS_COUNT 4

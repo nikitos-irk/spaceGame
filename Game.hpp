@@ -60,6 +60,7 @@ private:
 	vector<SpaceObject*> spaceObjects;
     list<SpaceObject*> asteroids;
     list<SpaceObject*> projectiles;
+    list<Explosion*> explosions;
 	SDL_Renderer *renderer;
 	SpaceShip *my_ship;
 
@@ -90,6 +91,8 @@ private:
     void ship_hits_loop();
     void update();
     void displayLifeAmount();
+
+    void generate_explosion(Asteroid*);
 public:
     Game(SDL_Renderer *, int, int, int);
 	void run();

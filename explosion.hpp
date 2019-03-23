@@ -2,16 +2,18 @@
 #define EXPLOSION_HPP
 
 #include "SDL2/SDL.h"
-#include "SpaceShip.hpp"
 #include "common.hpp"
+#include <functional>
+#include <vector>
+#include <iostream>
 
-#define FRAGMENT_SHIFT_DISPLAY_DELAY 150
+#define FRAGMENT_SHIFT_DELAY 150
 
 class Explosion{
     Point p;
     SDL_Renderer *renderer;
     class Fragment{
-        std::chrono::time_point<std::chrono::system_clock> fragment_shift_display_delay;
+        std::chrono::time_point<std::chrono::system_clock> fragment_shift_delay;
         int dots_number;
         double x_shift;
         double y_shift;
@@ -19,7 +21,7 @@ class Explosion{
         Point next_p;
         vector<Point> dots;
     public:
-        void show(SDL_Renderer *);
+        void display(SDL_Renderer *);
         void shift();
         Fragment(Point, Point, int);
     };
@@ -27,6 +29,7 @@ class Explosion{
 public:
     Explosion(Point p, SDL_Renderer*);
     void bang();
+    void display();
 };
 
 #endif // EXPLOSION_HPP
