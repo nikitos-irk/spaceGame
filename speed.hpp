@@ -2,26 +2,7 @@
 #define SPEED_H
 
 #include <cmath>
-
-struct DirectionXY{
-    double x;
-    double y;
-    DirectionXY(double, double);
-    DirectionXY();
-
-    DirectionXY& operator *=(int value){
-        x *= value;
-        y *= value;
-        return *this;
-    }
-    DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
-};
-
-struct DirectionalVector{
-    DirectionXY p1, p2;
-    DirectionalVector();
-    DirectionalVector(DirectionXY, DirectionXY);
-};
+#include "common.hpp"
 
 class Speed{
 

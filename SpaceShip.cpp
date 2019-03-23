@@ -178,16 +178,6 @@ SpaceShip::~SpaceShip(){
     cout << "SpaceShip destructor" << endl;
 }
 
-DirectionXY::DirectionXY(double x, double y){
-	this->x = x;
-	this->y = y;
-}
-
-DirectionXY::DirectionXY(){
-	this->x = 0;
-	this->y = 0;
-}
-
 DirectionXY SpaceShip::get_direction(){
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
@@ -219,18 +209,9 @@ void SpaceShip::change_y(bool forward){
 	}
 }
 
-point rotate(point P, point Q, double theta)
-{
-    return (P-Q) * polar(1.0, theta) + Q;
-}
-
 void rotatePointsInVector(vector<Point> &vPoints, Point initialMedianIntersection, double angle){
     for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
-        point P(iter->x, iter->y);
-        point Q(initialMedianIntersection.x, initialMedianIntersection.y);
-        point P_rotated = rotate(P, Q, angle);
-        iter->x = P_rotated.real();
-        iter->y = P_rotated.imag();
+        *iter = get_rotated_point(*iter, initialMedianIntersection, angle);
     }
 }
 
@@ -298,10 +279,7 @@ void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
     tmp.y -= blockHypotenuse;
     for (int i = 0; i < 4; ++i){
         double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
-        point P(tmp.x, tmp.y);
-        point Q(centerPoint.x, centerPoint.y);
-        point P_rotated = (P-Q) * polar(1.0, theta) + Q;
-        littleSqare.push_back(Point(P_rotated.real(), P_rotated.imag()));
+        littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
     }
     auto iter2 = littleSqare.begin();
     for (; iter2 != littleSqare.end() - 1; ++iter2){
@@ -317,13 +295,10 @@ double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, Point tp2){
     double Cx, Cy;
     double angle = M_PI_2;
+
     tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, getLengthOfBase()); // to make sure pz will be found
 
-    point topComplexPoint(tp1.x - Cx, tp1.y - Cy);
-    point baseComplexPoint(px.x, px.y);
-    point rotetedComplexPoint = rotate(topComplexPoint, baseComplexPoint, angle);
-
-    Point px2 = Point(rotetedComplexPoint.real(), rotetedComplexPoint.imag());
+    Point px2 = get_rotated_point(Point(tp1.x - Cx, tp1.y - Cy), px, angle);
     Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
 
     return make_pair(px, pz);
@@ -450,7 +425,10 @@ Projectile * SpaceShip::shoot(){
 }
 
 void Projectile::display(){
-	double error = (double) - BLOCK_SIZE;
+
+    if (display_delay > NOW){ return; }
+
+    double error = (double) - BLOCK_SIZE;
 	double tmp_x = (double) BLOCK_SIZE - 0.5;
 	double tmp_y = (double) 0.5;
 	
@@ -496,11 +474,11 @@ void Projectile::display(){
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
-    if (this->display_delay < NOW){
+//    if (this->display_delay < NOW){
 		this->x -= direction_x;
 		this->y -= direction_y;
-        display_delay = NOW + (std::chrono::milliseconds) DISPLAY_DELAY;
-	}
+        display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY/5);
+//	}
 }
 
 void Asteroid::display(){
