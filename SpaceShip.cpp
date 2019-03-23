@@ -178,16 +178,6 @@ SpaceShip::~SpaceShip(){
     cout << "SpaceShip destructor" << endl;
 }
 
-DirectionXY::DirectionXY(double x, double y){
-	this->x = x;
-	this->y = y;
-}
-
-DirectionXY::DirectionXY(){
-	this->x = 0;
-	this->y = 0;
-}
-
 DirectionXY SpaceShip::get_direction(){
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
@@ -436,7 +426,7 @@ Projectile * SpaceShip::shoot(){
 
 void Projectile::display(){
 
-    if (this->display_delay < NOW){ return; }
+    if (display_delay > NOW){ return; }
 
     double error = (double) - BLOCK_SIZE;
 	double tmp_x = (double) BLOCK_SIZE - 0.5;
@@ -487,7 +477,7 @@ void Projectile::display(){
 //    if (this->display_delay < NOW){
 		this->x -= direction_x;
 		this->y -= direction_y;
-        this->display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY);
+        display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY/5);
 //	}
 }
 

@@ -7,8 +7,8 @@
 #include <vector>
 #include <iostream>
 
-#define FRAGMENT_SHIFT_DELAY 5000
-#define EXPLOSION_LIFE_TIME 30000
+#define FRAGMENT_SHIFT_DELAY 50
+#define EXPLOSION_LIFE_TIME 1000
 
 class Explosion{
     Point p;
@@ -21,8 +21,8 @@ class Explosion{
         double y_shift;
         Point initial_p;
         Point next_p;
-        vector<Point> dots;
     public:
+        vector<Point> dots;
         void display(SDL_Renderer *);
         void shift();
         Fragment(Point, Point, int);
@@ -30,7 +30,7 @@ class Explosion{
     vector<Fragment> fragments;
 public:
     Explosion(Point p, SDL_Renderer*);
-    void bang();
+    void shift(DirectionXY);
     void display();
     bool isAlive();
 };

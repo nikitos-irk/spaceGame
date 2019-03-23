@@ -10,6 +10,16 @@ Point get_rotated_point(Point center_point, Point rotated_point, double angle){
     return Point(P_rotated.real(), P_rotated.imag());
 }
 
+DirectionXY::DirectionXY(double x, double y){
+    this->x = x;
+    this->y = y;
+}
+
+DirectionXY::DirectionXY(){
+    this->x = 0;
+    this->y = 0;
+}
+
 Common::Common() {
 
 }

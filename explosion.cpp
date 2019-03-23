@@ -37,17 +37,13 @@ void Explosion::Fragment::display(SDL_Renderer *renderer){
 }
 
 void Explosion::Fragment::shift(){
-    if (fragment_shift_delay < NOW) { return; }
+
+    if (fragment_shift_delay > NOW) { return; }
+
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
         iter->x += this->x_shift;
         iter->y += this->y_shift;
     }
-
-//    std::time_t ttp = std::chrono::system_clock::to_time_t(NOW);
-//    std::time_t ttp_new = std::chrono::system_clock::to_time_t(fragment_shift_delay);
-//    std::cout << "time:     " << std::ctime(&ttp);
-//    std::cout << "time new: " << std::ctime(&ttp_new);
-//    sleep(10);
 
     fragment_shift_delay = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
 }
@@ -75,3 +71,14 @@ void Explosion::display(){
 }
 
 bool Explosion::isAlive(){ return NOW < destroy_time; }
+
+void Explosion::shift(DirectionXY shiftValue){
+
+    for (auto fragment = fragments.begin(); fragment != fragments.end(); ++fragment){
+        for(auto iter = fragment->dots.begin(); iter != fragment->dots.end(); ++iter){
+            iter->x += shiftValue.x;
+            iter->y += shiftValue.y;
+        }
+    }
+
+}

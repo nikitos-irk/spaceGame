@@ -23,11 +23,10 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height, int live
         asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
 	}
 	
-	// Initiating delays
-	auto now = std::chrono::system_clock::now();
-    change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
-    inertia_delay = now + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
-    update_asteroids_delay = now + static_cast<std::chrono::milliseconds> (ASTEROIDS_REMOVING_DELAY);
+    // Initiating delays
+    change_position_delay = NOW + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
+    inertia_delay = NOW + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
+    update_asteroids_delay = NOW + static_cast<std::chrono::milliseconds> (ASTEROIDS_REMOVING_DELAY);
 	
 	space_pushed 	= false;
 	left_pushed  	= false;
@@ -319,8 +318,9 @@ void Game::displayObjects(){
 }
 
 void Game::changeObjectsPositions(){
-	auto now = std::chrono::system_clock::now();
-	if (change_position_delay >= now){ return; }
+
+    if (change_position_delay > NOW){ return; }
+
     DirectionXY directionXY = my_ship->get_offset();
 
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
@@ -329,7 +329,13 @@ void Game::changeObjectsPositions(){
     for (auto spaceObject = projectiles.begin(); spaceObject != projectiles.end(); ++spaceObject){
         (*spaceObject)->change_position(directionXY);
     }
-    change_position_delay = now + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
+    for (auto explosion = explosions.begin(); explosion != explosions.end(); ++explosion){
+        if ( (*explosion)->isAlive() ){
+            (*explosion)->shift(directionXY);
+        }
+    }
+
+    change_position_delay = NOW + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
 }
 
 void Game::displayLifeAmount(){
