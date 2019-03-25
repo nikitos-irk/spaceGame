@@ -21,6 +21,7 @@ class Explosion{
         double y_shift;
         Point initial_p;
         Point next_p;
+        double angle;
     public:
         vector<Point> dots;
         void display(SDL_Renderer *);
