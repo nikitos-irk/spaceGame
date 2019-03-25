@@ -6,6 +6,7 @@ Explosion::Fragment::Fragment(Point p, Point next_p, int dots_number=3){
     this->dots_number = dots_number;
     this->x_shift = p.x - next_p.x;
     this->y_shift = p.y - next_p.y;
+    this->angle = 0.1 + rand() % 15;
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number; ++i){
@@ -40,9 +41,21 @@ void Explosion::Fragment::shift(){
 
     if (fragment_shift_delay > NOW) { return; }
 
+    double center_x = 0.0;
+    double center_y = 0.0;
+
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
+        center_x += iter->x;
+        center_y += iter->y;
         iter->x += this->x_shift;
         iter->y += this->y_shift;
+    }
+
+    center_x /= dots.size();
+    center_y /= dots.size();
+
+    for(auto iter = dots.begin(); iter != dots.end(); ++iter){
+        *iter = get_rotated_point(*iter, Point(center_x, center_y), this->angle);
     }
 
     fragment_shift_delay = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
