@@ -6,6 +6,7 @@
 #include <functional>
 #include <vector>
 #include <iostream>
+#include "SpaceShip.hpp"
 
 #define FRAGMENT_SHIFT_DELAY 50
 #define EXPLOSION_LIFE_TIME 1000
@@ -27,10 +28,11 @@ class Explosion{
         void display(SDL_Renderer *);
         void shift();
         Fragment(Point, Point, int);
+        Fragment(Point, Point, Point);
     };
     vector<Fragment> fragments;
 public:
-    Explosion(Point p, SDL_Renderer*);
+    Explosion(Point p, SDL_Renderer*, Asteroid*);
     void shift(DirectionXY);
     void display();
     bool isAlive();

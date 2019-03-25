@@ -4,40 +4,40 @@ Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height, int live
 
     this->liveAmount = liveAmount;
 
-	this->screen_width = screen_width;
-	this->screen_height = screen_height;
-	
-	// Hope I will think something more interesting background than it is now
-	my_background = new Background(renderer, screen_width, screen_height);
+    this->screen_width = screen_width;
+    this->screen_height = screen_height;
 
-	// Renderer
-	this->renderer = renderer;
+    // Hope I will think something more interesting background than it is now
+    my_background = new Background(renderer, screen_width, screen_height);
 
-	// Create ship
+    // Renderer
+    this->renderer = renderer;
+
+    // Create ship
     my_ship = new SpaceShip(renderer, screen_width, screen_height, 50);
-	
-	// Create asteroids
+
+    // Create asteroids
     for (int i = 0; i < 10; ++i) {
-		int tmp_x = rand() % this->screen_width;
-		int tmp_y = rand() % this->screen_height;
+        int tmp_x = rand() % this->screen_width;
+        int tmp_y = rand() % this->screen_height;
         asteroids.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
-	}
-	
+    }
+
     // Initiating delays
     change_position_delay = NOW + static_cast<std::chrono::milliseconds> (CHANGE_POSITION_DELAY);
     inertia_delay = NOW + static_cast<std::chrono::milliseconds> (INERTIA_DELAY);
     update_asteroids_delay = NOW + static_cast<std::chrono::milliseconds> (ASTEROIDS_REMOVING_DELAY);
-	
-	space_pushed 	= false;
-	left_pushed  	= false;
-	right_pushed 	= false;
-	up_pushed 		= false;
-	down_pushed 	= false;
+
+    space_pushed 	= false;
+    left_pushed  	= false;
+    right_pushed 	= false;
+    up_pushed 	= false;
+    down_pushed 	= false;
     up_unpushed     = false;
     down_unpushed   = false;
 
-	inertia_counter_up = 0;
-	inertia_counter_down = 0;
+    inertia_counter_up = 0;
+    inertia_counter_down = 0;
 }
 
 void Game::create_asteroid(){
@@ -247,7 +247,7 @@ void Game::generate_explosion(Asteroid *tmp_ast){
     }
     middle_x /= tmpPoints.size();
     middle_y /= tmpPoints.size();
-    explosions.push_back(new Explosion(Point(middle_x, middle_y), renderer));
+    explosions.push_back(new Explosion(Point(middle_x, middle_y), renderer, tmp_ast));
 }
 
 void Game::clean_asteroids(){

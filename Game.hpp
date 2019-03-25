@@ -12,6 +12,7 @@
 #include "Background.hpp"
 #include "Background.hpp"
 #include "thread"
+#include "explosion.hpp"
 
 static std::exception_ptr globalExceptionPtr = nullptr;
 
