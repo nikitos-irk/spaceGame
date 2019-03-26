@@ -51,7 +51,7 @@ protected:
     vector<Color> availableColors;
     vector<Color>::iterator colorIter;
 public:
-    Color getRandomColor();
+    virtual Color getRandomColor();
     Color getNextColor();
     Color setToEnd();
 };

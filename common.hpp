@@ -9,6 +9,7 @@
 #include <functional>
 #include <unistd.h>
 #include "SDL2/SDL.h"
+#include "colorschema.hpp"
 
 #define NOW std::chrono::system_clock::now()
 
@@ -68,6 +69,8 @@ pair<double, double> getXYOffsetOnVector(Point, Point, double);
 Point getTwoLinesIntersaction(Point, Point, Point, Point);
 void putSquareOnPoint(SDL_Renderer*, Point, double, double);
 void fillRect(SDL_Renderer*, Point, Point, Point);
+pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point, double);
+void updateSkeleton(colorGenerator*, SDL_Renderer*, double, double, Point, Point, Point, double, bool, bool);
 
 class Common {
 public:

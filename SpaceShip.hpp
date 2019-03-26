@@ -115,8 +115,6 @@ private:
     std::chrono::time_point<std::chrono::system_clock> ship_color_change;
     Point initialMedianIntersection;
     double getTiltAngel();
-    void updateSkeleton(Point, Point, Point, double, bool, bool);
-    pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point);
     double getLengthOfBase();
     int spaceWidth;
     int spaceHeight;
@@ -126,7 +124,7 @@ private:
     Nozzle *leftNozzle;
     Nozzle *rightNozzle;
 public:
-    colorGeneratorShip *colorGenerator;
+    colorGeneratorShip *cg;
     vector<Point> pp;
     void updateNozzles();
     double getCurrentA();

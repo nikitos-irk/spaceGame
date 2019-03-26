@@ -81,55 +81,62 @@ void fillRect(SDL_Renderer* renderer, Point a, Point b, Point c){
     }
 }
 
-// void updateSkeleton(
-//     Point topPoint,
-//     Point downPoint, 
-//     Point pz, 
-//     double blockHypotenuse, 
-//     bool symmetrical, 
-//     bool randomColor){
+pair<Point, Point> getPerpendicularLineByPoint(Point px, Point tp1, Point tp2, double lengthOfBase){
+    double Cx, Cy;
+    double angle = M_PI_2;
 
-//     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
-//     double length = getLengthOfVector(topPoint, downPoint);
-//     double Cx, Cy;
-//     tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
+    tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, lengthOfBase); // to make sure pz will be found
 
-//     double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
-//     int index = 0;
-//     Point px1, px2;
-//     double Vx, Vy;
-//     double ribLength;
-//     Color tmpColor;
-//     colorIter = availableColors.end();
-//     while (length >= 0){
-//         if (randomColor){
-//             tmpColor = getNextColor();
-//             SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
-//         }
-//         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
-//         putSquareOnPoint(vertebra, blockHypotenuse, getTiltAngel());
+    Point px2 = get_rotated_point(Point(tp1.x - Cx, tp1.y - Cy), px, angle);
+    Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
 
-//         length -= littleHypotenuse;
-//         ++index;
+    return make_pair(px, pz);
+}
 
-//         tie(px1, px2) = getPerpendicularLineByPoint(vertebra, topPoint, pz);
-//         tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
+void updateSkeleton(colorGenerator * cg, SDL_Renderer* renderer, double angle, double lengthOfBase, Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
 
-//         ribLength = getLengthOfVector(px1, px2);
-//         int vIndex = 1;
-//         while (ribLength >= 0){
-//             if (randomColor){
-//                 tmpColor = getNextColor();
-//                 SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
-//             }
-//             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
-//             putSquareOnPoint(tmpVertebraRight, blockHypotenuse, getTiltAngel());
-//             if (symmetrical){
-//                 Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
-//                 putSquareOnPoint(tmpVertebraLeft, blockHypotenuse, getTiltAngel());
-//             }
-//             ribLength -= littleHypotenuse;
-//             ++vIndex;
-//         }
-//     }
-// }
+    double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
+    double length = getLengthOfVector(topPoint, downPoint);
+    double Cx, Cy;
+    tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
+
+    double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
+    int index = 0;
+    Point px1, px2;
+    double Vx, Vy;
+    double ribLength;
+    Color tmpColor;
+    // colorIter = availableColors.end();
+    cg->setToEnd();
+    while (length >= 0){
+        if (randomColor){
+            tmpColor = cg->getNextColor();
+            SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+        }
+        Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
+        putSquareOnPoint(renderer, vertebra, blockHypotenuse, angle);
+
+        length -= littleHypotenuse;
+        ++index;
+
+        tie(px1, px2) = getPerpendicularLineByPoint(vertebra, topPoint, pz, lengthOfBase);
+        tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
+
+        ribLength = getLengthOfVector(px1, px2);
+        int vIndex = 1;
+        while (ribLength >= 0){
+            if (randomColor){
+                tmpColor = cg->getNextColor();
+                SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+            }
+            Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
+            putSquareOnPoint(renderer, tmpVertebraRight, blockHypotenuse, angle);
+            if (symmetrical){
+                Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
+                putSquareOnPoint(renderer, tmpVertebraLeft, blockHypotenuse, angle);
+            }
+            ribLength -= littleHypotenuse;
+            ++vIndex;
+        }
+    }
+}

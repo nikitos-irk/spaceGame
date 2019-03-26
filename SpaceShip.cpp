@@ -86,7 +86,7 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     nozzleWidth = 8;
 
     cs = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
-    colorGenerator = new colorGeneratorShip;
+    cg = new colorGeneratorShip();
 
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
@@ -238,66 +238,6 @@ double SpaceShip::getTiltAngel(){
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
-pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, Point tp2){
-    double Cx, Cy;
-    double angle = M_PI_2;
-
-    tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, getLengthOfBase()); // to make sure pz will be found
-
-    Point px2 = get_rotated_point(Point(tp1.x - Cx, tp1.y - Cy), px, angle);
-    Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
-
-    return make_pair(px, pz);
-}
-
-void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
-
-    double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
-    double length = getLengthOfVector(topPoint, downPoint);
-    double Cx, Cy;
-    tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
-
-    double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
-    int index = 0;
-    Point px1, px2;
-    double Vx, Vy;
-    double ribLength;
-    Color tmpColor;
-    // colorIter = availableColors.end();
-    colorGenerator->setToEnd();
-    while (length >= 0){
-        if (randomColor){
-            tmpColor = colorGenerator->getNextColor();
-            SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
-        }
-        Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
-        putSquareOnPoint(renderer, vertebra, blockHypotenuse, getTiltAngel());
-
-        length -= littleHypotenuse;
-        ++index;
-
-        tie(px1, px2) = getPerpendicularLineByPoint(vertebra, topPoint, pz);
-        tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
-
-        ribLength = getLengthOfVector(px1, px2);
-        int vIndex = 1;
-        while (ribLength >= 0){
-            if (randomColor){
-                tmpColor = colorGenerator->getNextColor();
-                SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
-            }
-            Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
-            putSquareOnPoint(renderer, tmpVertebraRight, blockHypotenuse, getTiltAngel());
-            if (symmetrical){
-                Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
-                putSquareOnPoint(renderer, tmpVertebraLeft, blockHypotenuse, getTiltAngel());
-            }
-            ribLength -= littleHypotenuse;
-            ++vIndex;
-        }
-    }
-}
-
 void SpaceShip::display(){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
@@ -310,7 +250,10 @@ void SpaceShip::display(){
         }
         SDL_RenderDrawLine(renderer, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
     }
-    updateSkeleton(pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true, true);
+
+    double lengthOfBase = getLengthOfBase();
+
+    updateSkeleton(cg, renderer, getTiltAngel(), lengthOfBase, pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true, true);
     leftNozzle->update();
     rightNozzle->update();
     leftNozzle->display();
@@ -319,11 +262,11 @@ void SpaceShip::display(){
     a = leftNozzle->points[0];
     b = leftNozzle->points[1];
     c = leftNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
+    updateSkeleton(cg, renderer, getTiltAngel(), lengthOfBase, b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
     a = rightNozzle->points[0];
     b = rightNozzle->points[1];
     c = rightNozzle->points[2];
-    updateSkeleton(b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
+    updateSkeleton(cg, renderer, getTiltAngel(), lengthOfBase, b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 }
