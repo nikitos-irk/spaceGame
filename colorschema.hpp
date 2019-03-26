@@ -3,6 +3,7 @@
 
 #include "iostream"
 #include <complex>
+#include <vector>
 #define COLOR_MODIFICATION_DELAY 10
 
 using namespace std;
@@ -44,4 +45,26 @@ public:
     int getG();
     int getB();
 };
+
+class colorGenerator{
+protected:
+    vector<Color> availableColors;
+    vector<Color>::iterator colorIter;
+public:
+    virtual Color getRandomColor();
+    Color getNextColor();
+    void setToEnd();
+};
+
+class colorGeneratorShip: public colorGenerator{
+public:
+    colorGeneratorShip();
+};
+
+class colorGeneratorAsteroid: public colorGenerator{
+public:
+    colorGeneratorAsteroid();
+};
+
+
 #endif // COLORSCHEMA_H

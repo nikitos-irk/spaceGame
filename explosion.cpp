@@ -81,21 +81,12 @@ Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
     destroy_time = NOW + static_cast<std::chrono::milliseconds> (EXPLOSION_LIFE_TIME);
     this->p = p;
     this->renderer = renderer;
+    Point p_center = ast->getCenterPoint();
 
     int random_number_of_ragments = 5 + rand() % 10;
     double angle_diff = 360 / random_number_of_ragments;
-
-    int dots_number = ast->getPoints().size();
-    double center_x = 0.0;
-    double center_y = 0.0;
-    for (auto iter = ast->getPoints().begin(); iter != ast->getPoints().end(); ++iter){
-        center_x += (*iter)->x / dots_number;
-        center_y += (*iter)->y / dots_number;
-    }
-
     auto p_first = ast->getPoints().begin();
     auto p_second = p_first + 1;
-    Point p_center(center_x, center_y);
 
     while (p_second != ast->getPoints().end()){
         fragments.push_back(Fragment(**p_first, **p_second, p_center));

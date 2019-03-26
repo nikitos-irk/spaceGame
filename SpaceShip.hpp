@@ -2,7 +2,6 @@
 #define SPACESHIP_H
 
 #include "SDL2/SDL.h"
-#include <utility>
 #include <functional>
 #include <vector>
 #include <iostream>
@@ -116,13 +115,7 @@ private:
     std::chrono::time_point<std::chrono::system_clock> ship_color_change;
     Point initialMedianIntersection;
     double getTiltAngel();
-    void putSquareOnPoint(Point, double);
-    void updateSkeleton(Point, Point, Point, double, bool, bool);
-    pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point);
     double getLengthOfBase();
-    Point getTwoLinesIntersaction(Point, Point, Point, Point);
-    pair<double, double> getXYOffsetOnVector(Point, Point, double);
-    void fillRect(Point, Point, Point);
     int spaceWidth;
     int spaceHeight;
     double nozzleMinHeight;
@@ -130,12 +123,9 @@ private:
     int nozzleWidth;
     Nozzle *leftNozzle;
     Nozzle *rightNozzle;
-    vector<Color> availableColors;
-    vector<Color>::iterator colorIter;
 public:
+    colorGeneratorShip *cg;
     vector<Point> pp;
-    Color getRandomColor();
-    Color getNextColor();
     void updateNozzles();
     double getCurrentA();
     Point getMedianIntersaction();
@@ -159,7 +149,10 @@ public:
 class Asteroid: public SpaceObject{
 private:
     vector<Point*> pp;
+    void fill();
 public:
+    colorGeneratorAsteroid *cg;
+    Point getCenterPoint();
 	void display();
     vector<Point*>& getPoints();
 	Asteroid(SDL_Renderer*, int, int, int, int);
