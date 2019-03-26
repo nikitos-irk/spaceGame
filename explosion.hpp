@@ -12,6 +12,9 @@
 #define EXPLOSION_LIFE_TIME 1000
 
 class Explosion{
+public:
+    Asteroid* ast;
+private:
     Point p;
     SDL_Renderer *renderer;
     std::chrono::time_point<std::chrono::system_clock> destroy_time;
@@ -25,17 +28,19 @@ class Explosion{
         double angle;
     public:
         vector<Point> dots;
-        void display(SDL_Renderer *);
+        void display(SDL_Renderer *, bool);
         void shift();
-        Fragment(Point, Point, int);
-        Fragment(Point, Point, Point);
+        Fragment(Asteroid*, Point, Point, int);
+        Fragment(Asteroid*, Point, Point, Point);
+        Asteroid *ast;
     };
     vector<Fragment> fragments;
 public:
     Explosion(Point p, SDL_Renderer*, Asteroid*);
     void shift(DirectionXY);
-    void display();
+    void display(bool);
     bool isAlive();
+    ~Explosion();
 };
 
 #endif // EXPLOSION_HPP

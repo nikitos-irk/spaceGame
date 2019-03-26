@@ -83,7 +83,7 @@ protected:
     bool alive;
 public:
 	SpaceObject(SDL_Renderer*, int, int, int, int);
-	virtual void display() = 0;
+	virtual void display(bool) = 0;
 	virtual void change_position(DirectionXY);
     virtual ~SpaceObject();
     bool isAlive();
@@ -100,7 +100,7 @@ private:
 public:
     Projectile(SDL_Renderer*, int, int, int, int, int, int);
 	void change_position(DirectionXY);
-    void display();
+    void display(bool);
     Point* getXY();
     pair<Point, Point> getLine();
     std::chrono::time_point<std::chrono::system_clock> getLifeTime();
@@ -139,7 +139,7 @@ public:
 	vector<Projectile*> projectiles;
 	DirectionXY get_direction();
     DirectionXY get_offset();
-	void display();
+	void display(bool);
 	void change_x(bool);
 	void change_y(bool);
     DirectionalVector getDerectionalVector();
@@ -153,7 +153,7 @@ private:
 public:
     colorGeneratorAsteroid *cg;
     Point getCenterPoint();
-	void display();
+	void display(bool);
     vector<Point*>& getPoints();
 	Asteroid(SDL_Renderer*, int, int, int, int);
 	void change_position(DirectionXY);

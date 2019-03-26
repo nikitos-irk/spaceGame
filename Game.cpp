@@ -83,7 +83,7 @@ void Game::update_projectiles(){
     {
         if (dynamic_cast<Projectile*>(*iter)->getLifeTime() < NOW){
             SpaceObject *tmp = *iter;
-            asteroids.erase(iter++);
+            projectiles.erase(iter++);
             delete tmp;
         } else {
             ++iter;
@@ -257,7 +257,7 @@ void Game::clean_asteroids(){
             Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
             generate_explosion(tmp_ast);
             asteroids.erase(ast++);
-            delete tmp_ast;
+            // delete tmp_ast; // will be remove in ~Explosion() 
         } else {
             ++ast;
         }
@@ -295,23 +295,23 @@ void Game::clean_loop(){
     clean_projectiles();
 }
 
-void Game::displayObjects(){
-	my_ship->display();
+void Game::displayObjects(bool displaySkeletons=false){
+	my_ship->display(displaySkeletons);
 
     for (auto spaceObject = asteroids.begin(); spaceObject != asteroids.end(); ++spaceObject){
         if ((*spaceObject)->isAlive()){
-            (*spaceObject)->display();
+            (*spaceObject)->display(displaySkeletons);
         }
     }
     for (auto spaceObject = projectiles.begin(); spaceObject != projectiles.end(); ++spaceObject){
         if ((*spaceObject)->isAlive()){
-            (*spaceObject)->display();
+            (*spaceObject)->display(displaySkeletons);
         }
     }
 
     for (auto explosion = explosions.begin(); explosion != explosions.end(); ++explosion){
         if ( (*explosion)->isAlive() ){
-            (*explosion)->display();
+            (*explosion)->display(displaySkeletons);
         }
     }
     clean_explosions();
