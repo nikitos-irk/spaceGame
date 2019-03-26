@@ -58,24 +58,24 @@ void out(double x, double y){
     cout << x << ":" << y << endl;
 }
 
-Point SpaceShip::getTwoLinesIntersaction(Point p1, Point p2, Point p3, Point p4){
-    double x1 = p1.x;
-    double y1 = p1.y;
+// Point SpaceShip::getTwoLinesIntersaction(Point p1, Point p2, Point p3, Point p4){
+//     double x1 = p1.x;
+//     double y1 = p1.y;
 
-    double x2 = p2.x;
-    double y2 = p2.y;
+//     double x2 = p2.x;
+//     double y2 = p2.y;
 
-    double x3 = p3.x;
-    double y3 = p3.y;
+//     double x3 = p3.x;
+//     double y3 = p3.y;
 
-    double x4 = p4.x;
-    double y4 = p4.y;
+//     double x4 = p4.x;
+//     double y4 = p4.y;
 
-    double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+//     double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+//     double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
 
-    return Point(px, py);
-}
+//     return Point(px, py);
+// }
 
 Point SpaceShip::getMedianIntersaction(){
     double x1 = pp[0].x;
@@ -253,41 +253,39 @@ double SpaceShip::getTiltAngel(){
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
 }
 
-inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
+// void SpaceShip::fillRect(Point a, Point b, Point c){
+//     double Cx_ab, Cy_ab;
+//     double step = 1;
+//     double sideLength = getLengthOfVector(a, b);
+//     tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
+//     int index = 1;
+// //    for (int i = a.x; i <= a.x + sideLength; ++i){
+// //        for (int j = a.y; j <= a.y + sideLength; ++j){
+// //            SDL_RenderDrawPoint(renderer, i, j);
+// //        }
+// //    }
+//     while (sideLength >= 0){
+//         SDL_RenderDrawLine(renderer, a.x - Cx_ab*index, a.y - Cy_ab*index, c.x - Cx_ab*index, c.y - Cy_ab*index);
+//         sideLength -= step;
+//         ++index;
+//     }
+// }
 
-void SpaceShip::fillRect(Point a, Point b, Point c){
-    double Cx_ab, Cy_ab;
-    double step = 1;
-    double sideLength = getLengthOfVector(a, b);
-    tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
-    int index = 1;
-//    for (int i = a.x; i <= a.x + sideLength; ++i){
-//        for (int j = a.y; j <= a.y + sideLength; ++j){
-//            SDL_RenderDrawPoint(renderer, i, j);
-//        }
-//    }
-    while (sideLength >= 0){
-        SDL_RenderDrawLine(renderer, a.x - Cx_ab*index, a.y - Cy_ab*index, c.x - Cx_ab*index, c.y - Cy_ab*index);
-        sideLength -= step;
-        ++index;
-    }
-}
-
-void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
-    vector<Point> littleSqare;
-    Point tmp = centerPoint;
-    tmp.y -= blockHypotenuse;
-    for (int i = 0; i < 4; ++i){
-        double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
-        littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
-    }
-    auto iter2 = littleSqare.begin();
-    for (; iter2 != littleSqare.end() - 1; ++iter2){
-        SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
-    }
-    SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
-    fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
-}
+// void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
+//     vector<Point> littleSqare;
+//     Point tmp = centerPoint;
+//     tmp.y -= blockHypotenuse;
+//     for (int i = 0; i < 4; ++i){
+//         double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
+//         littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
+//     }
+//     auto iter2 = littleSqare.begin();
+//     for (; iter2 != littleSqare.end() - 1; ++iter2){
+//         SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
+//     }
+//     SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
+//     fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
+// }
 
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
@@ -302,13 +300,6 @@ pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, P
     Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
 
     return make_pair(px, pz);
-}
-
-pair<double, double> SpaceShip::getXYOffsetOnVector(Point px1, Point px2, double offsetLength){
-    double length = getLengthOfVector(px1, px2);
-    double Cx = (px1.x - px2.x) / (length/(offsetLength*2));
-    double Cy = (px1.y - px2.y) / (length/(offsetLength*2));
-    return make_pair(Cx, Cy);
 }
 
 Color SpaceShip::getRandomColor(){
@@ -352,7 +343,7 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
             SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
         }
         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
-        putSquareOnPoint(vertebra, blockHypotenuse);
+        putSquareOnPoint(renderer, vertebra, blockHypotenuse, getTiltAngel());
 
         length -= littleHypotenuse;
         ++index;
@@ -368,10 +359,10 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
                 SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
             }
             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
-            putSquareOnPoint(tmpVertebraRight, blockHypotenuse);
+            putSquareOnPoint(renderer, tmpVertebraRight, blockHypotenuse, getTiltAngel());
             if (symmetrical){
                 Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
-                putSquareOnPoint(tmpVertebraLeft, blockHypotenuse);
+                putSquareOnPoint(renderer, tmpVertebraLeft, blockHypotenuse, getTiltAngel());
             }
             ribLength -= littleHypotenuse;
             ++vIndex;
