@@ -75,7 +75,7 @@ private:
 	int inertia_counter_up;
 	int inertia_counter_down;
 
-    void displayObjects();
+    void displayObjects(bool);
     void changeObjectsPositions();
 
     void create_asteroid();
