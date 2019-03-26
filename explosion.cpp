@@ -1,13 +1,14 @@
 #include "explosion.hpp"
 
 
-Explosion::Fragment::Fragment(Point p, Point next_p, int dots_number=3){
+Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_number=3){
 
     this->initial_p = p;
     this->dots_number = dots_number;
     this->x_shift = p.x - next_p.x;
     this->y_shift = p.y - next_p.y;
     this->angle = 0.1 + rand() % 15;
+    this->ast = ast;
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number; ++i){
@@ -16,14 +17,14 @@ Explosion::Fragment::Fragment(Point p, Point next_p, int dots_number=3){
     fragment_shift_delay = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
 }
 
-Explosion::Fragment::Fragment(Point p1, Point p2, Point p3){
+Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
 
     double tmp_x = p1.x/3 + p2.x/3 + p3.x/3;
     double tmp_y = p1.y/3 + p2.y/3 + p3.y/3;
 
     this->x_shift = abs(tmp_x - p1.x)/3 + abs(tmp_x - p2.x)/3 + abs(tmp_x - p3.x)/3;
     this->y_shift = abs(tmp_y - p1.y)/3 + abs(tmp_y - p2.y)/3 + abs(tmp_y - p3.y)/3;
-
+    this->ast = ast;
     this->angle = 0.1 + rand() % 15;
 
     dots.push_back(p1);
@@ -32,26 +33,41 @@ Explosion::Fragment::Fragment(Point p1, Point p2, Point p3){
     fragment_shift_delay = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
 }
 
-void Explosion::Fragment::display(SDL_Renderer *renderer){
+void Explosion::Fragment::display(SDL_Renderer *renderer, bool displaySkeleton){
 
     int x1, y1, x2, y2;
 
     auto iter = dots.begin();
     auto iter_next = iter + 1;
+    Point p1 = *iter;
+    Point p2 = *iter_next;
+    Point center_point = this->ast->getCenterPoint();
+    int blocksize = 3;
 
     while (iter_next != dots.end()){
-        x1 = iter->x;
-        y1 = iter->y;
-        x2 = iter_next->x;
-        y2 = iter_next->y;
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+        if (displaySkeleton){
+            x1 = iter->x;
+            y1 = iter->y;
+            x2 = iter_next->x;
+            y2 = iter_next->y;
+            SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+        }
+        
+        Point p1 = *iter;
+        Point p2 = *iter_next;
+        
+        updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p1, p2), p2, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
         ++iter; ++iter_next;
     }
-    iter = dots.begin();
-    x1 = iter->x;
-    y1 = iter->y;
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    p2 = *dots.begin();
+    updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p1, p2), p2, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+    if (displaySkeleton){
+        x1 = iter->x;
+        y1 = iter->y;
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    }
     shift();
+
 }
 
 void Explosion::Fragment::shift(){
@@ -82,6 +98,7 @@ Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
     this->p = p;
     this->renderer = renderer;
     Point p_center = ast->getCenterPoint();
+    this->ast = ast;
 
     int random_number_of_ragments = 5 + rand() % 10;
     double angle_diff = 360 / random_number_of_ragments;
@@ -89,17 +106,21 @@ Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
     auto p_second = p_first + 1;
 
     while (p_second != ast->getPoints().end()){
-        fragments.push_back(Fragment(**p_first, **p_second, p_center));
+        fragments.push_back(Fragment(this->ast, **p_first, **p_second, p_center));
         ++p_first;
         ++p_second;
     }
     p_second = ast->getPoints().begin();
-    fragments.push_back(Fragment(**p_first, **p_second, p_center));
+    fragments.push_back(Fragment(this->ast, **p_first, **p_second, p_center));
 }
 
-void Explosion::display(){
+Explosion::~Explosion(){
+    delete this->ast;
+}
+
+void Explosion::display(bool displaySkeleton){
     for (auto iter = fragments.begin(); iter != fragments.end(); ++iter){
-        iter->display(renderer);
+        iter->display(renderer, displaySkeleton);
     }
 }
 

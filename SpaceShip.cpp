@@ -109,13 +109,6 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
                 speed
     );
     initialMedianIntersection = getMedianIntersaction();
-
-    // availableColors.push_back(Color(220,220,220));
-    // availableColors.push_back(Color(192,192,192));
-    // availableColors.push_back(Color(105,105,105));
-    // availableColors.push_back(Color(211,211,211));
-    // availableColors.push_back(Color(119,136,153));
-    // colorIter = availableColors.end();
 }
 
 void SpaceShip::slowdown(){
@@ -239,7 +232,7 @@ double SpaceShip::getTiltAngel(){
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
-void SpaceShip::display(){
+void SpaceShip::display(bool displaySkeleton){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer, cs->getR(), cs->getG(), cs->getB(), 255);
 //    cs->update();
@@ -287,7 +280,7 @@ Projectile * SpaceShip::shoot(){
 	return projectile;
 }
 
-void Projectile::display(){
+void Projectile::display(bool displaySkeleton){
 
     if (display_delay > NOW){ return; }
 
@@ -376,19 +369,21 @@ void Asteroid::fill(){
     updateSkeleton(cg, renderer, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
 }
 
-void Asteroid::display(){
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    auto iter = pp.begin();
-    
-    Point *p1;
-    Point *p2;
-    for (; iter != pp.end()-1; ++iter){
-        p1 = *iter;
-        p2 = *(iter+1);
+void Asteroid::display(bool displaySkeleton){
+
+    if (displaySkeleton){
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        auto iter = pp.begin();
+        Point *p1;
+        Point *p2;
+        for (; iter != pp.end()-1; ++iter){
+            p1 = *iter;
+            p2 = *(iter+1);
+            SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
+        }
+        p1 = *pp.begin();
         SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
     }
-    p1 = *pp.begin();
-    SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
 
     fill();
 }
