@@ -58,25 +58,6 @@ void out(double x, double y){
     cout << x << ":" << y << endl;
 }
 
-// Point SpaceShip::getTwoLinesIntersaction(Point p1, Point p2, Point p3, Point p4){
-//     double x1 = p1.x;
-//     double y1 = p1.y;
-
-//     double x2 = p2.x;
-//     double y2 = p2.y;
-
-//     double x3 = p3.x;
-//     double y3 = p3.y;
-
-//     double x4 = p4.x;
-//     double y4 = p4.y;
-
-//     double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-//     double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-
-//     return Point(px, py);
-// }
-
 Point SpaceShip::getMedianIntersaction(){
     double x1 = pp[0].x;
     double y1 = pp[0].y;
@@ -105,6 +86,7 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     nozzleWidth = 8;
 
     cs = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
+    colorGenerator = new colorGeneratorShip;
 
     // spaceship coordination
     pp.push_back(Point(screen_width/2, screen_height/2));
@@ -127,12 +109,12 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height
     );
     initialMedianIntersection = getMedianIntersaction();
 
-    availableColors.push_back(Color(220,220,220));
-    availableColors.push_back(Color(192,192,192));
-    availableColors.push_back(Color(105,105,105));
-    availableColors.push_back(Color(211,211,211));
-    availableColors.push_back(Color(119,136,153));
-    colorIter = availableColors.end();
+    // availableColors.push_back(Color(220,220,220));
+    // availableColors.push_back(Color(192,192,192));
+    // availableColors.push_back(Color(105,105,105));
+    // availableColors.push_back(Color(211,211,211));
+    // availableColors.push_back(Color(119,136,153));
+    // colorIter = availableColors.end();
 }
 
 void SpaceShip::slowdown(){
@@ -253,40 +235,6 @@ double SpaceShip::getTiltAngel(){
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
 }
 
-// void SpaceShip::fillRect(Point a, Point b, Point c){
-//     double Cx_ab, Cy_ab;
-//     double step = 1;
-//     double sideLength = getLengthOfVector(a, b);
-//     tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
-//     int index = 1;
-// //    for (int i = a.x; i <= a.x + sideLength; ++i){
-// //        for (int j = a.y; j <= a.y + sideLength; ++j){
-// //            SDL_RenderDrawPoint(renderer, i, j);
-// //        }
-// //    }
-//     while (sideLength >= 0){
-//         SDL_RenderDrawLine(renderer, a.x - Cx_ab*index, a.y - Cy_ab*index, c.x - Cx_ab*index, c.y - Cy_ab*index);
-//         sideLength -= step;
-//         ++index;
-//     }
-// }
-
-// void SpaceShip::putSquareOnPoint(Point centerPoint, double blockHypotenuse){
-//     vector<Point> littleSqare;
-//     Point tmp = centerPoint;
-//     tmp.y -= blockHypotenuse;
-//     for (int i = 0; i < 4; ++i){
-//         double theta = M_PI/4 + i*M_PI/2 - getTiltAngel();
-//         littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
-//     }
-//     auto iter2 = littleSqare.begin();
-//     for (; iter2 != littleSqare.end() - 1; ++iter2){
-//         SDL_RenderDrawLine(renderer, iter2->x, iter2->y, (iter2+1)->x, (iter2+1)->y);
-//     }
-//     SDL_RenderDrawLine(renderer, iter2->x, iter2->y, littleSqare.begin()->x, littleSqare.begin()->y);
-//     fillRect(littleSqare[1], littleSqare[2], littleSqare[0]);
-// }
-
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
@@ -302,27 +250,6 @@ pair<Point, Point> SpaceShip::getPerpendicularLineByPoint(Point px, Point tp1, P
     return make_pair(px, pz);
 }
 
-Color SpaceShip::getRandomColor(){
-    Color randomColor;
-    switch (rand() % 5){
-        case 1: randomColor = Color(220,220,220); break;
-        case 2: randomColor = Color(192,192,192); break;
-        case 3: randomColor = Color(105,105,105); break;
-        case 4: randomColor = Color(211,211,211); break;
-        case 5: randomColor = Color(119,136,153); break;
-        default: break;
-    }
-    return randomColor;
-}
-
-Color SpaceShip::getNextColor(){
-    Color result;
-    if (colorIter == availableColors.end()) { colorIter = availableColors.begin();}
-    result = *colorIter;
-    colorIter++;
-    return result;
-}
-
 void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
 
     double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
@@ -336,10 +263,11 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
     double Vx, Vy;
     double ribLength;
     Color tmpColor;
-    colorIter = availableColors.end();
+    // colorIter = availableColors.end();
+    colorGenerator->setToEnd();
     while (length >= 0){
         if (randomColor){
-            tmpColor = getNextColor();
+            tmpColor = colorGenerator->getNextColor();
             SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
         }
         Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
@@ -355,7 +283,7 @@ void SpaceShip::updateSkeleton(Point topPoint, Point downPoint, Point pz, double
         int vIndex = 1;
         while (ribLength >= 0){
             if (randomColor){
-                tmpColor = getNextColor();
+                tmpColor = colorGenerator->getNextColor();
                 SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
             }
             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
@@ -465,11 +393,9 @@ void Projectile::display(){
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - BLOCK_SIZE, cx + dx, cy + dy - BLOCK_SIZE);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + BLOCK_SIZE, cx + dx, cy - dy + BLOCK_SIZE);
 	}
-//    if (this->display_delay < NOW){
-		this->x -= direction_x;
-		this->y -= direction_y;
-        display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY/5);
-//	}
+	this->x -= direction_x;
+	this->y -= direction_y;
+    display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY/5);
 }
 
 void Asteroid::display(){
