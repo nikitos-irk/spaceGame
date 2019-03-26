@@ -75,7 +75,7 @@ Color colorGenerator::getNextColor(){
     return result;
 }
 
-Color colorGenerator::setToEnd(){
+void colorGenerator::setToEnd(){
     colorIter = availableColors.end();
 }
 

@@ -39,6 +39,7 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, 
     int error_x = rand() % 10;
     int error_y = rand() % 10;
     int size = rand() % 20;
+    cg = new colorGeneratorAsteroid();
 
     pp.push_back(new Point(x + error_x,                 y + error_y));
     pp.push_back(new Point(x - size + rand() % 5,       y + size + rand() % 5));
@@ -341,9 +342,44 @@ void Projectile::display(){
     display_delay = NOW + (std::chrono::milliseconds) (DISPLAY_DELAY/5);
 }
 
+Point Asteroid::getCenterPoint(){
+    double x = 0.0, y = 0.0;
+    int size = pp.size();
+    for (auto iter = pp.begin(); iter != pp.end(); ++iter){
+        x += (*iter)->x / size;
+        y += (*iter)->y / size;
+    }
+    return Point(x, y);
+}
+
+void Asteroid::fill(){
+    
+    Point center_point = getCenterPoint();
+    int blocksize = 3;
+
+    auto iter = pp.begin();
+    auto iter_next = iter + 1;
+    
+    Point p1 = **iter;
+    Point p2 = **iter_next;
+    
+    while (iter_next != pp.end()){
+        p1 = **iter;
+        p2 = **iter_next;
+        updateSkeleton(cg, renderer, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+        ++iter;
+        ++iter_next;
+    }
+    iter_next = pp.begin();
+    p1 = **iter;
+    p2 = **iter_next;
+    updateSkeleton(cg, renderer, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+}
+
 void Asteroid::display(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
     auto iter = pp.begin();
+    
     Point *p1;
     Point *p2;
     for (; iter != pp.end()-1; ++iter){
@@ -353,6 +389,8 @@ void Asteroid::display(){
     }
     p1 = *pp.begin();
     SDL_RenderDrawLine(renderer, p1->x, p1->y, p2->x, p2->y);
+
+    fill();
 }
 
 void Asteroid::change_position(DirectionXY directionXY){

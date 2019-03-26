@@ -106,7 +106,6 @@ void updateSkeleton(colorGenerator * cg, SDL_Renderer* renderer, double angle, d
     double Vx, Vy;
     double ribLength;
     Color tmpColor;
-    // colorIter = availableColors.end();
     cg->setToEnd();
     while (length >= 0){
         if (randomColor){

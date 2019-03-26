@@ -149,7 +149,10 @@ public:
 class Asteroid: public SpaceObject{
 private:
     vector<Point*> pp;
+    void fill();
 public:
+    colorGeneratorAsteroid *cg;
+    Point getCenterPoint();
 	void display();
     vector<Point*>& getPoints();
 	Asteroid(SDL_Renderer*, int, int, int, int);

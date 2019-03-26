@@ -53,7 +53,7 @@ protected:
 public:
     virtual Color getRandomColor();
     Color getNextColor();
-    Color setToEnd();
+    void setToEnd();
 };
 
 class colorGeneratorShip: public colorGenerator{
