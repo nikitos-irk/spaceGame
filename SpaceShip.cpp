@@ -362,6 +362,7 @@ void Asteroid::fill(){
         updateSkeleton(cg, renderer, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
         ++iter;
         ++iter_next;
+        // break;
     }
     iter_next = pp.begin();
     p1 = **iter;
