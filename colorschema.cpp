@@ -55,15 +55,21 @@ colorGeneratorShip::colorGeneratorShip(){
 }
 
 colorGeneratorAsteroid::colorGeneratorAsteroid(){
-    availableColors.push_back(Color(96, 54, 102));
-    availableColors.push_back(Color(209, 167, 229));
-    availableColors.push_back(Color(176, 10, 255));
-    availableColors.push_back(Color(72, 6, 104));
-    availableColors.push_back(Color(51, 9, 71));
-    availableColors.push_back(Color(48, 23, 61));
-    availableColors.push_back(Color(119, 98, 130));
-    availableColors.push_back(Color(217, 204, 224));
-    availableColors.push_back(Color(205, 114, 255));
+    // availableColors.push_back(Color(96, 54, 102));
+    // availableColors.push_back(Color(209, 167, 229));
+    // availableColors.push_back(Color(176, 10, 255));
+    // availableColors.push_back(Color(72, 6, 104));
+    // availableColors.push_back(Color(51, 9, 71));
+    // availableColors.push_back(Color(48, 23, 61));
+    // availableColors.push_back(Color(119, 98, 130));
+    // availableColors.push_back(Color(217, 204, 224));
+    // availableColors.push_back(Color(205, 114, 255));
+    availableColors.push_back(Color(160, 177, 188));
+    availableColors.push_back(Color(119, 98, 84));
+    availableColors.push_back(Color(128, 0, 0));
+    availableColors.push_back(Color(81, 81, 81));
+    availableColors.push_back(Color(76, 62, 54));
+    availableColors.push_back(Color(139, 69, 19));
     colorIter = availableColors.end();
 }
 
