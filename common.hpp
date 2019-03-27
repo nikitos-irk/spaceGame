@@ -1,5 +1,6 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
+#include <mutex>
 #include <utility>
 #include <cstdlib>
 #include <complex>
