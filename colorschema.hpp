@@ -4,6 +4,7 @@
 #include "iostream"
 #include <complex>
 #include <vector>
+#include <chrono>
 #define COLOR_MODIFICATION_DELAY 10
 
 using namespace std;
