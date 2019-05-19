@@ -3,6 +3,7 @@
 
 ## Build
 ```Shell
+conan remote add public-conan https://api.bintray.com/conan/bincrafters/public-conan True
 mkdir build
 cd build
 conan install ..
