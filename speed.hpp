@@ -1,7 +1,6 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-#include <cmath>
 #include "common.hpp"
 
 class Speed{

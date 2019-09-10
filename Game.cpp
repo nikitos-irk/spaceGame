@@ -1,5 +1,16 @@
 #include "Game.hpp"
 
+#include <iostream>
+#include <thread>
+
+#include <unistd.h>
+
+#include <SDL2/SDL.h>
+
+#include "Background.hpp"
+#include "explosion.hpp"
+#include "SpaceShip.hpp"
+
 Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height, int liveAmount){
 
     this->liveAmount = liveAmount;
@@ -48,7 +59,7 @@ void Game::create_asteroid(){
 
     point P(tmp_x, tmp_y);
     point Q(ship_center.x, ship_center.y);
-    point P_rotated = (P-Q) * polar(1.0, theta) + Q;
+    point P_rotated = (P-Q) * std::polar(1.0, theta) + Q;
     tmp_x = P_rotated.real();
     tmp_y = P_rotated.imag();
 
@@ -104,13 +115,13 @@ inline int det (int a, int b, int c, int d) {
 
 inline bool between (int a, int b, double c) {
     double epsilon = 1E-9;
-    return min(a,b) <= c + epsilon && c <= max(a,b) + epsilon;
+    return std::min(a,b) <= c + epsilon && c <= std::max(a,b) + epsilon;
 }
 
 inline bool intersect_1 (int a, int b, int c, int d) {
-    if (a > b)  swap (a, b);
-    if (c > d)  swap (c, d);
-    return max(a,c) <= min(b,d);
+    if (a > b)  std::swap(a, b);
+    if (c > d)  std::swap(c, d);
+    return std::max(a,c) <= std::min(b,d);
 }
 
 
@@ -141,7 +152,7 @@ void Game::check_ship_hits(){
 
 void Game::ship_hits_loop(){
 
-    vector<Point*> tmpPoints;
+    std::vector<Point*> tmpPoints;
     bool hitStatus = false;
 
     for (auto ast = asteroids.begin(); ast != asteroids.end(); ++ast){
@@ -201,7 +212,7 @@ void Game::check_hits(){
 
 void Game::hist_loop(){
 
-    vector<Point*> tmpPoints;
+    std::vector<Point*> tmpPoints;
     bool hitStatus;
 
     for (auto pr = projectiles.begin(); pr != projectiles.end(); ++pr){
@@ -222,7 +233,7 @@ void Game::hist_loop(){
                 }
 
                 px = dynamic_cast<Projectile*>(*pr)->getXY();
-                pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+                std::pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
 
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
                 delete px;
@@ -240,7 +251,7 @@ void Game::hist_loop(){
 void Game::generate_explosion(Asteroid *tmp_ast){
     double middle_x = 0.0, middle_y = 0.0;
 
-    vector<Point*> tmpPoints = tmp_ast->getPoints();
+    std::vector<Point*> tmpPoints = tmp_ast->getPoints();
     for (auto iter = tmpPoints.begin(); iter != tmpPoints.end(); ++iter){
         middle_x += (*iter)->x;
         middle_y += (*iter)->y;
@@ -365,9 +376,9 @@ void Game::run(){
 	SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
 
-//    thread thUpdating(&Game::update, this);
-    thread thHitsMonitoring(&Game::check_hits, this);
-    thread thShipHitsMonitoring(&Game::check_ship_hits, this);
+//    std::thread thUpdating(&Game::update, this);
+  std::thread thHitsMonitoring(&Game::check_hits, this);
+  std::thread thShipHitsMonitoring(&Game::check_ship_hits, this);
 
 //    thUpdating.join();
     thHitsMonitoring.detach();
@@ -384,7 +395,7 @@ void Game::run(){
             }
             catch (const std::exception &ex)
             {
-              std::cout << "Gema Over!" << endl;
+              std::cout << "Gema Over!" << std::endl;
               quit = false;
             }
           }

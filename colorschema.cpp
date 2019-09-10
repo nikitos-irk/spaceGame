@@ -1,5 +1,9 @@
 #include "colorschema.hpp"
 
+#include <cstdlib>
+
+constexpr auto COLOR_MODIFICATION_DELAY = 10;
+
 void ColorSchema::update(){
     auto now = std::chrono::system_clock::now();
     if (now <= change_colorchema_delay) { return; }
