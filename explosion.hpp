@@ -1,15 +1,16 @@
 #ifndef EXPLOSION_HPP
 #define EXPLOSION_HPP
 
-#include "SDL2/SDL.h"
-#include "common.hpp"
-#include <functional>
+#include <chrono>
 #include <vector>
-#include <iostream>
-#include "SpaceShip.hpp"
 
-#define FRAGMENT_SHIFT_DELAY 50
-#define EXPLOSION_LIFE_TIME 1000
+#include <SDL2/SDL.h>
+
+#include "common.hpp"
+
+struct SDL_Renderer;
+
+class Asteroid;
 
 class Explosion{
 public:
@@ -27,14 +28,14 @@ private:
         Point next_p;
         double angle;
     public:
-        vector<Point> dots;
+        std::vector<Point> dots;
         void display(SDL_Renderer *, bool);
         void shift();
         Fragment(Asteroid*, Point, Point, int);
         Fragment(Asteroid*, Point, Point, Point);
         Asteroid *ast;
     };
-    vector<Fragment> fragments;
+    std::vector<Fragment> fragments;
 public:
     Explosion(Point p, SDL_Renderer*, Asteroid*);
     void shift(DirectionXY);

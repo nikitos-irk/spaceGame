@@ -1,5 +1,12 @@
 #include "explosion.hpp"
 
+#include <SDL2/SDL.h>
+
+#include "common.hpp"
+#include "SpaceShip.hpp"
+
+constexpr auto FRAGMENT_SHIFT_DELAY = 50;
+constexpr auto EXPLOSION_LIFE_TIME = 1000;
 
 Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_number=3){
 

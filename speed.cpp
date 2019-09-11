@@ -1,8 +1,7 @@
 #include "speed.hpp"
-#include "iostream"
-#define ACCELERATION 100
 
-using namespace std;
+constexpr auto ACCELERATION = 100;
+
 Speed::Speed(int maxOffset){
     this->maxOffset = maxOffset;
     negativeOffset = 0.0;

@@ -1,25 +1,25 @@
 #ifndef GAME_H
 #define GAME_H
-#include "vector"
-#include "list"
-#include "SpaceShip.hpp"
-#include <random>
-#include <cstdlib>
-#include <ctime>
-#include <unistd.h>
-#include "SDL2/SDL.h"
-#include "iostream"
-#include "Background.hpp"
-#include "Background.hpp"
-#include "thread"
-#include "explosion.hpp"
+
+#include <chrono>
+#include <exception>
+#include <list>
+#include <mutex>
+#include <vector>
+
+#include <SDL2/SDL.h>
+
+class Asteroid;
+class Background;
+class Explosion;
+class SpaceShip;
+class SpaceObject;
 
 static std::exception_ptr globalExceptionPtr = nullptr;
 
-#define ASTEROIDS_REMOVING_DELAY 10000 // 10 seconds
-using namespace std;
+constexpr auto ASTEROIDS_REMOVING_DELAY = std::chrono::seconds(10);
 
-class GameOverException: public exception{
+class GameOverException: public std::exception {
     const char *file;
     int line;
     const char* func;
@@ -58,10 +58,10 @@ private:
 	// For event handling
 	SDL_Event e;
 	
-	vector<SpaceObject*> spaceObjects;
-    list<SpaceObject*> asteroids;
-    list<SpaceObject*> projectiles;
-    list<Explosion*> explosions;
+  std::vector<SpaceObject*> spaceObjects;
+  std::list<SpaceObject*> asteroids;
+  std::list<SpaceObject*> projectiles;
+  std::list<Explosion*> explosions;
 	SDL_Renderer *renderer;
 	SpaceShip *my_ship;
 

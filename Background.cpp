@@ -1,5 +1,6 @@
 #include "Background.hpp"
 
+#include <SDL2/SDL.h>
 
 Background::Background(SDL_Renderer *renderer, int screen_width, int screen_height){
 	this->renderer = renderer;

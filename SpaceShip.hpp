@@ -1,34 +1,28 @@
 #ifndef SPACESHIP_H
 #define SPACESHIP_H
 
-#include "SDL2/SDL.h"
-#include <functional>
 #include <vector>
-#include <iostream>
-#include <chrono>
-#include <time.h>
-#include "speed.hpp"
-#include <utility>
+
+#include <SDL2/SDL.h>
+
 #include "colorschema.hpp"
-#include "common.hpp"
+#include "speed.hpp"
 
-#define BLOCK_SIZE 5
-#define POINTS_COUNT 4
-#define ASTEROID_POINTS_COUNT 7
-#define ROTATION_DELAY 60
-#define DISPLAY_DELAY 10
-#define SHOOTING_DELAY 100
-#define CHANGE_POSITION_DELAY 30
-#define INERTIA_DELAY 10
-#define INERTIA_COUNTER 500
-#define PROJ_LIFETIME 5000
-#define SHIP_COLOR_CHANGE 50
-
-using namespace std;
+constexpr auto BLOCK_SIZE = 5;
+constexpr auto POINTS_COUNT = 4;
+constexpr auto ASTEROID_POINTS_COUNT = 7;
+constexpr auto ROTATION_DELAY = 60;
+constexpr auto DISPLAY_DELAY = 10;
+constexpr auto SHOOTING_DELAY = 100;
+constexpr auto CHANGE_POSITION_DELAY = 30;
+constexpr auto INERTIA_DELAY = 10;
+constexpr auto INERTIA_COUNTER = 500;
+constexpr auto PROJ_LIFETIME = 5000;
+constexpr auto SHIP_COLOR_CHANGE = 50;
 
 struct Nozzle{
-    vector <Point> points;
-    vector <Point> originPoints;
+    std::vector <Point> points;
+    std::vector <Point> originPoints;
     SDL_Renderer* renderer;
     ColorSchema *cs;
     Speed *speed;
@@ -102,7 +96,7 @@ public:
 	void change_position(DirectionXY);
     void display(bool);
     Point* getXY();
-    pair<Point, Point> getLine();
+    std::pair<Point, Point> getLine();
     std::chrono::time_point<std::chrono::system_clock> getLifeTime();
     ~Projectile();
 };
@@ -110,7 +104,7 @@ public:
 class SpaceShip: public SpaceObject{
 private:
     ColorSchema *cs;
-    vector<Point> skeleton;
+    std::vector<Point> skeleton;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay;
     std::chrono::time_point<std::chrono::system_clock> ship_color_change;
     Point initialMedianIntersection;
@@ -125,7 +119,7 @@ private:
     Nozzle *rightNozzle;
 public:
     colorGeneratorShip *cg;
-    vector<Point> pp;
+    std::vector<Point> pp;
     void updateNozzles();
     double getCurrentA();
     Point getMedianIntersaction();
@@ -136,7 +130,7 @@ public:
     void backward_accelarate();
     SpaceShip(SDL_Renderer*, int, int, int);
 	Projectile * shoot();
-	vector<Projectile*> projectiles;
+  std::vector<Projectile*> projectiles;
 	DirectionXY get_direction();
     DirectionXY get_offset();
 	void display(bool);
@@ -148,13 +142,13 @@ public:
 
 class Asteroid: public SpaceObject{
 private:
-    vector<Point*> pp;
+    std::vector<Point*> pp;
     void fill();
 public:
     colorGeneratorAsteroid *cg;
     Point getCenterPoint();
 	void display(bool);
-    vector<Point*>& getPoints();
+  std::vector<Point*>& getPoints();
 	Asteroid(SDL_Renderer*, int, int, int, int);
 	void change_position(DirectionXY);
     Point* getFirstPoint();

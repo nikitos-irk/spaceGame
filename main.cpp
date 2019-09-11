@@ -1,20 +1,14 @@
-#include "SDL2/SDL.h"
-#include "iostream"
-#include "vector"
 #include <cstdlib>
 #include <ctime>
-#include <typeinfo>
-#include <map>
-#include <utility>
-#include <functional>
-#include <random>
+
+#include <iostream>
+
+#include <SDL2/SDL.h>
+
 #include "Game.hpp"
-#include<exception>
 
-using namespace std;
-
-const int screen_width  = 640;
-const int screen_height = 480;
+constexpr int kScreenWidth = 640;
+constexpr int kScreenHeight = 480;
 
 void logSDLError(std::ostream &os, const std::string &msg){
 	os << msg << " error: " << SDL_GetError() << std::endl;
@@ -22,7 +16,7 @@ void logSDLError(std::ostream &os, const std::string &msg){
 
 int main( int argc, char* args[] )
 {
-	srand(unsigned(std::time(0)));
+	std::srand(unsigned(std::time(0)));
 
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
@@ -30,7 +24,7 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
-    SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
 	if (window == nullptr){
 		logSDLError(std::cout, "CreateWindow");
 		SDL_Quit();
@@ -44,7 +38,7 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
-    Game *space_game = new Game(renderer, screen_width, screen_height, 5);
+    Game *space_game = new Game(renderer, kScreenWidth, kScreenHeight, 5);
     space_game->run();
 	
 	SDL_DestroyRenderer(renderer);

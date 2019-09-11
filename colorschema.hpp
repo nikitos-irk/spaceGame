@@ -1,13 +1,8 @@
 #ifndef COLORSCHEMA_H
 #define COLORSCHEMA_H
 
-#include "iostream"
-#include <complex>
-#include <vector>
 #include <chrono>
-#define COLOR_MODIFICATION_DELAY 10
-
-using namespace std;
+#include <vector>
 
 struct Color{
     int r, g, b;
@@ -49,8 +44,8 @@ public:
 
 class colorGenerator{
 protected:
-    vector<Color> availableColors;
-    vector<Color>::iterator colorIter;
+    std::vector<Color> availableColors;
+    std::vector<Color>::iterator colorIter;
 public:
     virtual Color getRandomColor();
     Color getNextColor();

@@ -1,5 +1,8 @@
 #include "SpaceShip.hpp"
 
+#include <cstdlib>
+#include <iostream>
+
 SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y){
 	this->renderer = renderer;
 	this->x = x;
@@ -12,7 +15,7 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_he
 }
 
 SpaceObject::~SpaceObject(){
-    cout << "SpaceObject destructor" << endl;
+    std::cout << "SpaceObject destructor" << std::endl;
 }
 
 bool SpaceObject::isAlive(){ return alive; }
@@ -27,10 +30,10 @@ Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_heig
 }
 
 Point* Projectile::getXY(){ return new Point(x, y); }
-pair<Point, Point> Projectile::getLine(){return make_pair(Point(x, y), Point(x_previous, y_previous));}
+std::pair<Point, Point> Projectile::getLine(){return std::make_pair(Point(x, y), Point(x_previous, y_previous));}
 
 Projectile::~Projectile(){
-    cout << "Projectile destructor" << endl;
+    std::cout << "Projectile destructor" << std::endl;
 }
 
 Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y): SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
@@ -49,14 +52,14 @@ Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, 
     pp.push_back(new Point(x + size + rand() % 5,       y + rand() % 5));
 }
 
-vector<Point*>& Asteroid::getPoints(){ return pp; }
+std::vector<Point*>& Asteroid::getPoints(){ return pp; }
 
 Asteroid::~Asteroid(){
-    cout << "Asteroid destructor" << endl;
+    std::cout << "Asteroid destructor" << std::endl;
 }
 
 void out(double x, double y){
-    cout << x << ":" << y << endl;
+    std::cout << x << ":" << y << std::endl;
 }
 
 Point SpaceShip::getMedianIntersaction(){
@@ -151,7 +154,7 @@ DirectionalVector SpaceShip::getDerectionalVector(){
 }
 
 SpaceShip::~SpaceShip(){
-    cout << "SpaceShip destructor" << endl;
+    std::cout << "SpaceShip destructor" << std::endl;
 }
 
 DirectionXY SpaceShip::get_direction(){
@@ -185,7 +188,7 @@ void SpaceShip::change_y(bool forward){
 	}
 }
 
-void rotatePointsInVector(vector<Point> &vPoints, Point initialMedianIntersection, double angle){
+void rotatePointsInVector(std::vector<Point> &vPoints, Point initialMedianIntersection, double angle){
     for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
         *iter = get_rotated_point(*iter, initialMedianIntersection, angle);
     }

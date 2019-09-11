@@ -1,11 +1,11 @@
-#include "SDL2/SDL.h"
-
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
-const int COEF = 5;
-const int CITIZEN_SIZE = 5 * COEF;
-const int CITIZEN_STEP = 5 * COEF;
+struct SDL_Renderer;
+
+constexpr int COEF = 5;
+constexpr int CITIZEN_SIZE = 5 * COEF;
+constexpr int CITIZEN_STEP = 5 * COEF;
 
 class Background{
 private:
