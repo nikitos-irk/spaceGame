@@ -27,39 +27,40 @@ struct Color{
 };
 
 class ColorSchema{
-    int r, g, b;
-    bool flag;
-    Color colorA, colorB;
-    double colorMix = 1.0;
-    std::chrono::time_point<std::chrono::system_clock> change_colorchema_delay;
+    int r_, g_, b_;
+    bool flag_;
+    Color color_a_, color_b_;
+    double color_mix_ = 1.0;
+    std::chrono::time_point<std::chrono::system_clock> change_colorchema_delay_;
 public:
     ColorSchema(int, int, int);
     ColorSchema(Color, Color);
     void update();
     void update(double);
-    int getR();
-    int getG();
-    int getB();
+    int get_r();
+    int get_g();
+    int get_b();
 };
 
-class colorGenerator{
+class ColorGenerator{
 protected:
-    std::vector<Color> availableColors;
-    std::vector<Color>::iterator colorIter;
+    std::vector<Color> available_colors_;
+    std::vector<Color>::iterator color_iter_;
 public:
+    virtual ~ColorGenerator() = default;
     virtual Color getRandomColor();
     Color getNextColor();
     void setToEnd();
 };
 
-class colorGeneratorShip: public colorGenerator{
+class ColorGeneratorShip: public ColorGenerator{
 public:
-    colorGeneratorShip();
+    ColorGeneratorShip();
 };
 
-class colorGeneratorAsteroid: public colorGenerator{
+class ColorGeneratorAsteroid: public ColorGenerator{
 public:
-    colorGeneratorAsteroid();
+    ColorGeneratorAsteroid();
 };
 
 

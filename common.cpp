@@ -30,10 +30,10 @@ Common::Common() {
 
 }
 
-std::pair<double, double> getXYOffsetOnVector(Point px1, Point px2, double offsetLength){
+std::pair<double, double> getXYOffsetOnVector(Point px1, Point px2, double offset_length){
     double length = getLengthOfVector(px1, px2);
-    double Cx = (px1.x - px2.x) / (length/(offsetLength*2));
-    double Cy = (px1.y - px2.y) / (length/(offsetLength*2));
+    double Cx = (px1.x - px2.x) / (length/(offset_length*2));
+    double Cy = (px1.y - px2.y) / (length/(offset_length*2));
     return std::make_pair(Cx, Cy);
 }
 
@@ -56,15 +56,15 @@ Point getTwoLinesIntersaction(Point p1, Point p2, Point p3, Point p4){
     return Point(px, py);
 }
 
-void putSquareOnPoint(SDL_Renderer* renderer, Point centerPoint, double blockHypotenuseLength, double angle){
+void putSquareOnPoint(SDL_Renderer* renderer, Point center_point, double block_hypotenuse_length, double angle){
     
     std::vector<Point> littleSqare;
-    Point tmp = centerPoint;
-    tmp.y -= blockHypotenuseLength;
+    Point tmp = center_point;
+    tmp.y -= block_hypotenuse_length;
 
     for (int i = 0; i < 4; ++i){
         double theta = M_PI/4 + i*M_PI/2 - angle; // getTiltAngel();
-        littleSqare.push_back(get_rotated_point(tmp, centerPoint, theta));
+        littleSqare.push_back(get_rotated_point(tmp, center_point, theta));
     }
     auto iter = littleSqare.begin();
     for (; iter != littleSqare.end() - 1; ++iter){
@@ -87,11 +87,11 @@ void fillRect(SDL_Renderer* renderer, Point a, Point b, Point c){
     }
 }
 
-std::pair<Point, Point> getPerpendicularLineByPoint(Point px, Point tp1, Point tp2, double lengthOfBase){
+std::pair<Point, Point> getPerpendicularLineByPoint(Point px, Point tp1, Point tp2, double length_of_base){
     double Cx, Cy;
     double angle = M_PI_2;
 
-    std::tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, lengthOfBase); // to make sure pz will be found
+    std::tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, length_of_base); // to make sure pz will be found
 
     Point px2 = get_rotated_point(Point(tp1.x - Cx, tp1.y - Cy), px, angle);
     Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
@@ -99,12 +99,14 @@ std::pair<Point, Point> getPerpendicularLineByPoint(Point px, Point tp1, Point t
     return std::make_pair(px, pz);
 }
 
-void updateSkeleton(colorGenerator * cg, SDL_Renderer* renderer, double angle, double lengthOfBase, Point topPoint, Point downPoint, Point pz, double blockHypotenuse, bool symmetrical, bool randomColor){
+void updateSkeleton(ColorGenerator * cg, SDL_Renderer* renderer, double angle,
+                    double length_of_base, Point top_point, Point down_point,
+                    Point pz, double block_hypotenuse, bool symmetrical, bool random_color){
 
-    double blockSize = sqrt(pow(blockHypotenuse, 2)/2);
-    double length = getLengthOfVector(topPoint, downPoint);
+    double blockSize = sqrt(pow(block_hypotenuse, 2)/2);
+    double length = getLengthOfVector(top_point, down_point);
     double Cx, Cy;
-    std::tie(Cx, Cy) = getXYOffsetOnVector(topPoint, downPoint, blockSize);
+    std::tie(Cx, Cy) = getXYOffsetOnVector(top_point, down_point, blockSize);
 
     double littleHypotenuse = sqrt(pow(Cx, 2) + pow(Cy, 2));
     int index = 0;
@@ -114,31 +116,31 @@ void updateSkeleton(colorGenerator * cg, SDL_Renderer* renderer, double angle, d
     Color tmpColor;
     cg->setToEnd();
     while (length >= 0){
-        if (randomColor){
+        if (random_color){
             tmpColor = cg->getNextColor();
             SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
         }
-        Point vertebra(topPoint.x - Cx*index, topPoint.y - Cy*index);
-        putSquareOnPoint(renderer, vertebra, blockHypotenuse, angle);
+        Point vertebra(top_point.x - Cx*index, top_point.y - Cy*index);
+        putSquareOnPoint(renderer, vertebra, block_hypotenuse, angle);
 
         length -= littleHypotenuse;
         ++index;
 
-        std::tie(px1, px2) = getPerpendicularLineByPoint(vertebra, topPoint, pz, lengthOfBase);
+        std::tie(px1, px2) = getPerpendicularLineByPoint(vertebra, top_point, pz, length_of_base);
         std::tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
 
         ribLength = getLengthOfVector(px1, px2);
         int vIndex = 1;
         while (ribLength >= 0){
-            if (randomColor){
+            if (random_color){
                 tmpColor = cg->getNextColor();
                 SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
             }
             Point tmpVertebraRight(px1.x - Vx*vIndex, px1.y - Vy*vIndex);
-            putSquareOnPoint(renderer, tmpVertebraRight, blockHypotenuse, angle);
+            putSquareOnPoint(renderer, tmpVertebraRight, block_hypotenuse, angle);
             if (symmetrical){
                 Point tmpVertebraLeft(px1.x + Vx*vIndex, px1.y + Vy*vIndex);
-                putSquareOnPoint(renderer, tmpVertebraLeft, blockHypotenuse, angle);
+                putSquareOnPoint(renderer, tmpVertebraLeft, block_hypotenuse, angle);
             }
             ribLength -= littleHypotenuse;
             ++vIndex;

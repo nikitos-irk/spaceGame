@@ -4,22 +4,22 @@
 #include "common.hpp"
 
 class Speed{
-
 private:
-    double maxOffset;
-    double forwardOffset;
-    double backwardOffset;
-    double negativeOffset;
-    double positiveOffset;
-    double currentA;
+    double max_offset_;
+    double forward_offset_;
+    double backward_offset_;
+    double negative_offset_;
+    double positive_offset_;
+    double current_a_;  // TODO: What is it?
+
 public:
     Speed(int);
     void slowdown();
     void accelarate();
-    void backward_slowdown();
-    void backward_accelarate();
+    void backwardSlowdown();
+    void backwardAccelarate();
     DirectionXY getOffsetXY(DirectionalVector);
-    double getCurrentA();
+    double get_current_a();
 };
 
 #endif // SPEED_H

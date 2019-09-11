@@ -6,14 +6,14 @@
 #include <cstdlib>
 
 struct SDL_Renderer;
-class colorGenerator;
+class ColorGenerator;
 
 #define NOW std::chrono::system_clock::now()
 typedef std::complex<double> point;
 
 struct Point{
 private:
-    bool double_equals(double a, double b, double epsilon = 0.000000001)
+    bool doubleEquals(double a, double b, double epsilon = 0.000000001)
     {
         return std::abs(a - b) < epsilon;
     }
@@ -29,10 +29,10 @@ public:
         this->y = 0.0;
     }
     bool operator==(const Point& p){
-        return double_equals(x, p.x) && double_equals(y, p.y);
+        return doubleEquals(x, p.x) && doubleEquals(y, p.y);
     }
     bool operator!=(const Point& p){
-        return double_equals(x, p.x) || double_equals(y, p.y);
+        return doubleEquals(x, p.x) || doubleEquals(y, p.y);
     }
 };
 
@@ -47,7 +47,7 @@ struct DirectionXY{
         y *= value;
         return *this;
     }
-    DirectionXY(const DirectionXY& tmpXY) : x(tmpXY.x), y(tmpXY.y){}
+    DirectionXY(const DirectionXY& tmp_xy) : x(tmp_xy.x), y(tmp_xy.y){}
 };
 
 struct DirectionalVector{
@@ -65,7 +65,7 @@ Point getTwoLinesIntersaction(Point, Point, Point, Point);
 void putSquareOnPoint(SDL_Renderer*, Point, double, double);
 void fillRect(SDL_Renderer*, Point, Point, Point);
 std::pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point, double);
-void updateSkeleton(colorGenerator*, SDL_Renderer*, double, double, Point, Point, Point, double, bool, bool);
+void updateSkeleton(ColorGenerator*, SDL_Renderer*, double, double, Point, Point, Point, double, bool, bool);
 
 class Common {
 public:

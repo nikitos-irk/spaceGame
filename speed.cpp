@@ -1,13 +1,13 @@
 #include "speed.hpp"
 
-constexpr auto ACCELERATION = 100;
+constexpr auto kAcceleration = 100;
 
-Speed::Speed(int maxOffset){
-    this->maxOffset = maxOffset;
-    negativeOffset = 0.0;
-    positiveOffset = 0.0;
-    forwardOffset = 0.0;
-    backwardOffset = 0.0;
+Speed::Speed(int max_offset){
+    this->max_offset_ = max_offset;
+    negative_offset_ = 0.0;
+    positive_offset_ = 0.0;
+    forward_offset_ = 0.0;
+    backward_offset_ = 0.0;
 }
 
 DirectionXY Speed::getOffsetXY(DirectionalVector dv){
@@ -15,44 +15,43 @@ DirectionXY Speed::getOffsetXY(DirectionalVector dv){
     DirectionXY p2 = dv.p2;
 
     double vl = sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
-    currentA = (forwardOffset - backwardOffset) / vl;
+    current_a_ = (forward_offset_ - backward_offset_) / vl;
 
-    return DirectionXY((p2.x - p1.x)*currentA, (p2.y - p1.y)*currentA);
+    return DirectionXY((p2.x - p1.x)*current_a_, (p2.y - p1.y)*current_a_);
 }
 
-double Speed::getCurrentA() { return abs(currentA); }
+double Speed::get_current_a() { return abs(current_a_); }
 
 void Speed::accelarate(){
-    if (forwardOffset <= 0.0){
-        forwardOffset = 1;
+    if (forward_offset_ <= 0.0){
+        forward_offset_ = 1;
     }
 
-    if (forwardOffset < maxOffset){
-        forwardOffset += forwardOffset/ACCELERATION + 0.1;
+    if (forward_offset_ < max_offset_){
+        forward_offset_ += forward_offset_/kAcceleration + 0.1;
     }
 }
 
 void Speed::slowdown(){
-    if (forwardOffset > 0){
-        forwardOffset -= forwardOffset/ACCELERATION;
+    if (forward_offset_ > 0){
+        forward_offset_ -= forward_offset_/kAcceleration;
     }
-    if (forwardOffset <= 0) { forwardOffset = 0.0; }
+    if (forward_offset_ <= 0) { forward_offset_ = 0.0; }
 }
 
-void Speed::backward_accelarate(){
+void Speed::backwardAccelarate(){
 
-    if (backwardOffset == 0.0){
-        backwardOffset = 1;
+    if (backward_offset_ == 0.0){
+        backward_offset_ = 1;
     }
-    if (backwardOffset < maxOffset){
-        backwardOffset += backwardOffset/ACCELERATION + 0.1;
+    if (backward_offset_ < max_offset_){
+        backward_offset_ += backward_offset_/kAcceleration + 0.1;
     }
 }
 
-void Speed::backward_slowdown(){
-    if (backwardOffset > 0){
-        backwardOffset -= backwardOffset/ACCELERATION;
+void Speed::backwardSlowdown(){
+    if (backward_offset_ > 0){
+        backward_offset_ -= backward_offset_/kAcceleration;
     }
-    if (backwardOffset <= 0) { backwardOffset = 0.0; }
+    if (backward_offset_ <= 0) { backward_offset_ = 0.0; }
 }
-
