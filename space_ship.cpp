@@ -4,6 +4,8 @@
 #include <chrono>
 #include <iostream>
 
+#include "figure/factory_shape.hpp"
+
 using namespace std::chrono;
 
 constexpr auto kBlockSize = 5;
@@ -325,23 +327,24 @@ void Projectile::display(bool display_skeleton){
 
     SDL_SetRenderDrawColor(renderer_, 255, 255, 0, 255);
 
+    figure::FactoryShape factory{renderer_};
     while (tmp_x >= tmp_y){
-        SDL_RenderDrawPoint(renderer_, (int)(cx + tmp_x), (int)(cy + tmp_y));
-        SDL_RenderDrawPoint(renderer_, (int)(cx + tmp_y), (int)(cy + tmp_x));
+        factory.point({cx + tmp_x, cy + tmp_y}).draw();
+        factory.point({cx + tmp_y, cy + tmp_x}).draw();
 
         if (tmp_x != 0){
-            SDL_RenderDrawPoint(renderer_, (int)(cx - tmp_x), (int)(cy + tmp_y));
-            SDL_RenderDrawPoint(renderer_, (int)(cx + tmp_y), (int)(cy - tmp_x));
+            factory.point({cx - tmp_x, cy + tmp_y}).draw();
+            factory.point({cx + tmp_y, cy - tmp_x}).draw();
         }
 
         if (tmp_y != 0){
-            SDL_RenderDrawPoint(renderer_, (int)(cx + tmp_x), (int)(cy - tmp_y));
-            SDL_RenderDrawPoint(renderer_, (int)(cx - tmp_y), (int)(cy + tmp_x));
+            factory.point({cx + tmp_x, cy - tmp_y}).draw();
+            factory.point({cx - tmp_y, cy + tmp_x}).draw();
         }
 
         if (tmp_x != 0 && tmp_y != 0){
-            SDL_RenderDrawPoint(renderer_, (int)(cx - tmp_x), (int)(cy - tmp_y));
-            SDL_RenderDrawPoint(renderer_, (int)(cx - tmp_y), (int)(cy - tmp_x));
+            factory.point({cx - tmp_x, cy - tmp_y}).draw();
+            factory.point({cx - tmp_y, cy - tmp_x}).draw();
         }
 
         error += tmp_y;
