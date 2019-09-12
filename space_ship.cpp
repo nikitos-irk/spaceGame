@@ -4,8 +4,6 @@
 #include <chrono>
 #include <iostream>
 
-#include "figure/factory_shape.hpp"
-
 using namespace std::chrono;
 
 constexpr auto kBlockSize = 5;
@@ -267,13 +265,14 @@ void SpaceShip::display(bool displaySkeleton){
     SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer_, cs_->get_r(), cs_->get_g(), cs_->get_b(), 255);
 //    cs->update();
+    figure::FactoryShape factory{renderer_};
     for (int k = 0; k < 1/*3*/; ++k){
         int i = 0;
         int kIndex = k*3;
         for (; i < 2; ++i){
-            SDL_RenderDrawLine(renderer_, pp[i + kIndex].x, pp[i + kIndex].y, pp[i + kIndex + 1].x, pp[i + kIndex + 1].y);
+            factory.line(pp[i + kIndex], pp[i + kIndex + 1]).draw();
         }
-        SDL_RenderDrawLine(renderer_, pp[kIndex + 2].x, pp[kIndex + 2].y, pp[kIndex].x, pp[kIndex].y);
+        factory.line(pp[kIndex + 2], pp[kIndex]).draw();
     }
 
     double lengthOfBase = getLengthOfBase();
@@ -363,8 +362,10 @@ void Projectile::display(bool display_skeleton){
         double dx = floor(sqrt((2.0 * kBlockSize * dy) - (dy * dy)));
         double cx = this->x_;
         double cy = this->y_;
-        SDL_RenderDrawLine(renderer_, cx - dx, cy + dy - kBlockSize, cx + dx, cy + dy - kBlockSize);
-        SDL_RenderDrawLine(renderer_, cx - dx, cy - dy + kBlockSize, cx + dx, cy - dy + kBlockSize);
+        factory.line({cx - dx, cy + dy - kBlockSize},
+                     {cx + dx, cy + dy - kBlockSize}).draw();
+        factory.line({cx - dx, cy - dy + kBlockSize},
+                     {cx + dx, cy - dy + kBlockSize}).draw();
     }
     this->x_ -= direction_x_;
     this->y_ -= direction_y_;
@@ -415,13 +416,14 @@ void Asteroid::display(bool display_skeleton){
         auto iter = pp_.begin();
         primitive::Point *p1;
         primitive::Point *p2;
+        figure::FactoryShape factory{renderer_};
         for (; iter != pp_.end()-1; ++iter){
             p1 = *iter;
             p2 = *(iter+1);
-            SDL_RenderDrawLine(renderer_, p1->x, p1->y, p2->x, p2->y);
+            factory.line(*p1, *p2).draw();
         }
         p1 = *pp_.begin();
-        SDL_RenderDrawLine(renderer_, p1->x, p1->y, p2->x, p2->y);
+        factory.line(*p1, *p2).draw();
     }
 
     fill();

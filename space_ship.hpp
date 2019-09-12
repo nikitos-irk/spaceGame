@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 
 #include "colorschema.hpp"
+#include "figure/factory_shape.hpp"
 #include "primitive/size.hpp"
 #include "speed.hpp"
 
@@ -29,9 +30,10 @@ struct Nozzle{
     void display(){
         cs->update(speed->get_current_a());
         SDL_SetRenderDrawColor(renderer, cs->get_r(), cs->get_g(), cs->get_b(), 255);
-        SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[1].x, points[1].y);
-        SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[2].x, points[2].y);
-        SDL_RenderDrawLine(renderer, points[1].x, points[1].y, points[2].x, points[2].y);
+        figure::FactoryShape factory{renderer};
+        factory.line(points[0], points[1]).draw();
+        factory.line(points[0], points[2]).draw();
+        factory.line(points[1], points[2]).draw();
     }
 
 

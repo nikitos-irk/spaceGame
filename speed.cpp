@@ -1,5 +1,7 @@
 #include "speed.hpp"
 
+#include <cmath>
+
 constexpr auto kAcceleration = 100;
 
 Speed::Speed(int max_offset){

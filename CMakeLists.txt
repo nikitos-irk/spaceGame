@@ -7,6 +7,7 @@ conan_basic_setup(TARGETS)
 
 add_executable(${PROJECT_NAME}
     "figure/factory_shape.cpp"
+    "figure/line.cpp"
     "figure/point.cpp"
     "background.cpp"
     "colorschema.cpp"

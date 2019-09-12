@@ -19,8 +19,8 @@ namespace primitive
     Size(Size const&) = default;
     Size& operator=(Size const&) = default;
     ~Size() = default;
-    int width;
-    int height;
+    int width{0};
+    int height{0};
   };
 }  // namespace primitive
 

@@ -1,4 +1,4 @@
-#include "point.hpp"
+#include "line.hpp"
 
 #include "exception.hpp"
 
@@ -6,11 +6,10 @@
 
 namespace figure
 {
-void Point::draw() const
+void Line::draw() const
 {
-    if (SDL_RenderDrawPoint(renderer_, x_, y_) == -1) {
+    if (SDL_RenderDrawLine(renderer_, x1_, y1_, x2_, y2_) == -1) {
         throw ErrorDrawing{};
     }
 }
-
 }  // namespace figure

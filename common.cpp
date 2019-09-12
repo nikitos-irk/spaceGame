@@ -5,6 +5,8 @@
 #include <SDL2/SDL.h>
 
 #include "colorschema.hpp"
+#include "figure/factory_shape.hpp"
+#include "primitive/point.hpp"
 
 primitive::Point get_rotated_point(primitive::Point center_point,
                                    primitive::Point rotated_point, double angle) {
@@ -14,7 +16,7 @@ primitive::Point get_rotated_point(primitive::Point center_point,
     point P(center_point.x, center_point.y);
     point Q(rotated_point.x, rotated_point.y);
     point P_rotated = (P-Q) * std::polar(1.0, angle) + Q;
-    return primitive::Point{P_rotated.real(), P_rotated.imag()};
+    return {P_rotated.real(), P_rotated.imag()};
 }
 
 DirectionXY::DirectionXY(double x, double y){
@@ -72,10 +74,13 @@ void putSquareOnPoint(SDL_Renderer* renderer, primitive::Point center_point,
         littleSqare.push_back(get_rotated_point(tmp, center_point, theta));
     }
     auto iter = littleSqare.begin();
+    figure::FactoryShape factory{renderer};
     for (; iter != littleSqare.end() - 1; ++iter){
-        SDL_RenderDrawLine(renderer, iter->x, iter->y, (iter+1)->x, (iter+1)->y);
+        factory.line({iter->x, iter->y},
+                     {(iter+1)->x, (iter+1)->y}).draw();
     }
-    SDL_RenderDrawLine(renderer, iter->x, iter->y, littleSqare.begin()->x, littleSqare.begin()->y);
+    factory.line({iter->x, iter->y},
+                 {littleSqare.begin()->x, littleSqare.begin()->y}).draw();
     fillRect(renderer, littleSqare[1], littleSqare[2], littleSqare[0]);
 }
 
@@ -86,8 +91,10 @@ void fillRect(SDL_Renderer* renderer, primitive::Point a, primitive::Point b,
     double sideLength = getLengthOfVector(a, b);
     std::tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
     int index = 1;
+    figure::FactoryShape factory{renderer};
     while (sideLength >= 0){
-        SDL_RenderDrawLine(renderer, a.x - Cx_ab*index, a.y - Cy_ab*index, c.x - Cx_ab*index, c.y - Cy_ab*index);
+        factory.line({a.x - Cx_ab*index, a.y - Cy_ab*index},
+                     {c.x - Cx_ab*index, c.y - Cy_ab*index}).draw();
         sideLength -= step;
         ++index;
     }

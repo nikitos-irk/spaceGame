@@ -2,6 +2,9 @@
 
 #include <SDL2/SDL.h>
 
+#include "figure/factory_shape.hpp"
+#include "primitive/point.hpp"
+
 constexpr auto kCoef = 5;  // TODO: Is it coefficient?
 constexpr auto kCitizenSize = 5 * kCoef;
 
@@ -46,9 +49,14 @@ void Background::fillBackground(){
 void Background::drawGrid(){
     SDL_SetRenderDrawColor(renderer_, 192, 192, 192, 255);
 
-    for (int i = 0; i < screen_size_.height; i = i + kCitizenSize)
-        SDL_RenderDrawLine(renderer_, 0, i, screen_size_.width, i);
+    figure::FactoryShape factory{renderer_};
+    for (int i = 0; i < screen_size_.height; i = i + kCitizenSize) {
+        factory.line({0.0, double(i)},
+                     {double(screen_size_.width), double(i)}).draw();
+    }
 
-    for (int i = 0; i < screen_size_.width; i = i + kCitizenSize)
-        SDL_RenderDrawLine(renderer_, i, 0, i, screen_size_.height);
+    for (int i = 0; i < screen_size_.width; i = i + kCitizenSize) {
+        factory.line({double(i), 0.0},
+                     {double(i), double(screen_size_.height)}).draw();
+    }
 }
