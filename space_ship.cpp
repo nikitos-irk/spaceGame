@@ -1,24 +1,26 @@
 #include "space_ship.hpp"
 
 #include <cstdlib>
+#include <chrono>
 #include <iostream>
 
-constexpr auto kBlockSize = 5;
-constexpr auto kRotationDelay = 60;
-constexpr auto kDisplayDelay = 10;
-constexpr auto kShootingDelay = 100;
-constexpr auto kProjLifetime = 5000;
-constexpr auto kShipColorChange = 50;
+using namespace std::chrono;
 
-SpaceObject::SpaceObject(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y){
-    this->renderer_ = renderer;
-    this->x_ = x;
-    this->y_ = y;
-    this->screen_width_ = screen_width;
-    this->screen_height_ = screen_height;
-    display_delay_ = NOW + static_cast<std::chrono::milliseconds> (kDisplayDelay);
-    rotation_delay_ = NOW + static_cast<std::chrono::milliseconds> (kRotationDelay);
-    alive_ = true;
+constexpr auto kBlockSize = 5;
+constexpr auto kRotationDelay = 60ms;
+constexpr auto kDisplayDelay = 10ms;
+constexpr auto kShootingDelay = 100ms;
+constexpr auto kProjLifetime = 5s;
+constexpr auto kShipColorChange = 50ms;
+
+SpaceObject::SpaceObject(SDL_Renderer *renderer, primitive::Size screen_size, int x, int y)
+    : renderer_{renderer},
+      screen_size_{screen_size},
+      x_{x},
+      y_{y}
+{
+  display_delay_ = NOW + kDisplayDelay;
+  rotation_delay_ = NOW + kRotationDelay;
 }
 
 SpaceObject::~SpaceObject(){
@@ -28,14 +30,14 @@ SpaceObject::~SpaceObject(){
 bool SpaceObject::isAlive(){ return alive_; }
 void SpaceObject::markAsDead() { alive_ = false; }
 
-Projectile::Projectile(SDL_Renderer *renderer, int screen_width, int screen_height,
+Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
                        int offset_x, int offset_y, int x, int y)
-    : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
+    : SpaceObject::SpaceObject(renderer, screen_size, x, y){
     direction_x_ = offset_x;
     direction_y_ = offset_y;
     this->x_ = x;
     this->y_ = y;
-    life_time_ = NOW + static_cast<std::chrono::milliseconds> (kProjLifetime);
+    life_time_ = NOW + kProjLifetime;
 }
 
 Point* Projectile::getXY(){ return new Point(x_, y_); }
@@ -45,8 +47,8 @@ Projectile::~Projectile(){
     std::cout << "Projectile destructor" << std::endl;
 }
 
-Asteroid::Asteroid(SDL_Renderer *renderer, int screen_width, int screen_height, int x, int y)
-    : SpaceObject::SpaceObject(renderer, screen_width, screen_height, x, y){
+Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Size screen_size, int x, int y)
+    : SpaceObject::SpaceObject(renderer, screen_size, x, y){
     //TODO: think about direction_x;direction_y
 
     int error_x = rand() % 10;
@@ -86,40 +88,40 @@ Point SpaceShip::getMedianIntersaction(){
     return getTwoLinesIntersaction(Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4));
 }
 
-SpaceShip::SpaceShip(SDL_Renderer *renderer, int screen_width, int screen_height, int max_speed)
-    : SpaceObject::SpaceObject(renderer, screen_width, screen_height, screen_width/2, screen_height/2){
+SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int max_speed)
+    : SpaceObject::SpaceObject(renderer, screen_size, screen_size.width/2, screen_size.height/2),
+      space_size_{30, screen_size.height / 8},
+      nozzle_size_{8, 0}
+{
 
-    shoot_delay_ = NOW + static_cast<std::chrono::milliseconds> (kShootingDelay);
-    ship_color_change_ = NOW + static_cast<std::chrono::milliseconds> (kShipColorChange);
+    shoot_delay_ = NOW + kShootingDelay;
+    ship_color_change_ = NOW + kShipColorChange;
 
     speed = new Speed(max_speed);
 
-    space_width_ = 30;
-    space_height_ = screen_height / 8;
     nozzle_min_height_ = 25;
 //    nozzleMaxHeight = 25;
-    nozzle_width_ = 8;
 
     cs_ = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
     cg = new ColorGeneratorShip();
 
     // spaceship coordination
-    pp.push_back(Point(screen_width/2, screen_height/2));
-    pp.push_back(Point(screen_width/2 - space_width_/2, screen_height/2 + space_height_));
-    pp.push_back(Point(screen_width/2 + space_width_/2, screen_height/2 + space_height_));
+    pp.push_back(Point(screen_size.width/2, screen_size.height/2));
+    pp.push_back(Point(screen_size.width/2 - space_size_.width/2, screen_size.height/2 + space_size_.height));
+    pp.push_back(Point(screen_size.width/2 + space_size_.width/2, screen_size.height/2 + space_size_.height));
 
     left_nozzle_ = new Nozzle(
                 renderer,
-                Point(screen_width/2 + space_width_/2 + nozzle_width_ , screen_height/2 + space_height_ + nozzle_min_height_),
-                Point(screen_width/2 + space_width_/2                , screen_height/2 + space_height_),
-                Point(screen_width/2 + space_width_/2 - nozzle_width_  , screen_height/2 + space_height_ + nozzle_min_height_),
+                Point(screen_size.width/2 + space_size_.width/2 + nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
+                Point(screen_size.width/2 + space_size_.width/2, screen_size.height/2 + space_size_.height),
+                Point(screen_size.width/2 + space_size_.width/2 - nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
                 speed
     );
     right_nozzle_ = new Nozzle(
                 renderer,
-                Point(screen_width/2 - space_width_/2 - nozzle_width_  , screen_height/2 + space_height_ + nozzle_min_height_),
-                Point(screen_width/2 - space_width_/2                , screen_height/2 + space_height_),
-                Point(screen_width/2 - space_width_/2 + nozzle_width_  , screen_height/2 + space_height_ + nozzle_min_height_),
+                Point(screen_size.width/2 - space_size_.width/2 - nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
+                Point(screen_size.width/2 - space_size_.width/2, screen_size.height/2 + space_size_.height),
+                Point(screen_size.width/2 - space_size_.width/2 + nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
                 speed
     );
     initial_median_intersection_ = getMedianIntersaction();
@@ -223,7 +225,7 @@ void SpaceShip::changeX(bool clockwise){
     left_nozzle_->display();
     right_nozzle_->display();
 
-    rotation_delay_ = NOW + static_cast<std::chrono::milliseconds> (kRotationDelay);
+    rotation_delay_ = NOW + kRotationDelay;
 }
 
 double SpaceShip::getTiltAngel(){
@@ -283,14 +285,14 @@ std::chrono::time_point<std::chrono::system_clock> Projectile::get_life_time(){ 
 
 Projectile * SpaceShip::shoot(){
     if (this->shoot_delay_ > NOW) { return nullptr; }
-    shoot_delay_ = NOW + static_cast<std::chrono::milliseconds> (kShootingDelay);
+    shoot_delay_ = NOW + kShootingDelay;
 
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
     double diff_x = (mediana_x - pp[0].x)/5;
     double diff_y = (mediana_y - pp[0].y)/5;
 
-    Projectile *projectile = new Projectile(this->renderer_, 0, 0, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
+    Projectile *projectile = new Projectile(this->renderer_, primitive::Size{0, 0}, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
     return projectile;
 }
 
@@ -347,7 +349,7 @@ void Projectile::display(bool display_skeleton){
     }
     this->x_ -= direction_x_;
     this->y_ -= direction_y_;
-    display_delay_ = NOW + (std::chrono::milliseconds) (kDisplayDelay/5);
+    display_delay_ = NOW + (kDisplayDelay/5);
 }
 
 Point Asteroid::getCenterPoint(){

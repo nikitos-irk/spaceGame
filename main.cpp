@@ -9,6 +9,7 @@
 
 constexpr int kScreenWidth = 640;
 constexpr int kScreenHeight = 480;
+constexpr primitive::Size kScreenSize{kScreenWidth, kScreenHeight};
 
 void logSDLError(std::ostream &os, const std::string &msg){
 os << msg << " error: " << SDL_GetError() << std::endl;
@@ -23,7 +24,7 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, kScreenSize.width, kScreenSize.height, SDL_WINDOW_SHOWN);
     if (window == nullptr){
         logSDLError(std::cout, "CreateWindow");
         SDL_Quit();
@@ -37,7 +38,7 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    Game *space_game = new Game(renderer, kScreenWidth, kScreenHeight, 5);
+    Game *space_game = new Game(renderer, kScreenSize, 5);
     space_game->run();
 
     SDL_DestroyRenderer(renderer);

@@ -11,52 +11,40 @@
 #include "explosion.hpp"
 #include "space_ship.hpp"
 
-constexpr auto kAsteroidsRemovingDelay = std::chrono::seconds(10);
+using namespace std::chrono;
 
-Game::Game(SDL_Renderer *renderer, int screen_width, int screen_height, int live_amount){
+constexpr auto kAsteroidsRemovingDelay = 10ms;
+constexpr auto kChangePositionDelay = 30ms;
+constexpr auto kInertiaDelay = 10ms;
 
-    this->live_amount_ = live_amount;
+Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
+    : renderer_{renderer},
+      screen_size_{size},
+      live_amount_{live_amount}
+{
+  // Hope I will think something more interesting background than it is now
+  my_background_ = new Background(renderer, screen_size_);
 
-    this->screen_width_ = screen_width;
-    this->screen_height_ = screen_height;
+  // Create ship
+  my_ship_ = new SpaceShip(renderer, screen_size_, 50);
 
-    // Hope I will think something more interesting background than it is now
-    my_background_ = new Background(renderer, screen_width, screen_height);
+  // Create asteroids
+  for (int i = 0; i < 10; ++i) {
+      int tmp_x = rand() % screen_size_.width;
+      int tmp_y = rand() % screen_size_.height;
+      asteroids_.push_back(new Asteroid(renderer, screen_size_, tmp_x, tmp_y));
+  }
 
-    // Renderer
-    this->renderer_ = renderer;
-
-    // Create ship
-    my_ship_ = new SpaceShip(renderer, screen_width, screen_height, 50);
-
-    // Create asteroids
-    for (int i = 0; i < 10; ++i) {
-        int tmp_x = rand() % this->screen_width_;
-        int tmp_y = rand() % this->screen_height_;
-        asteroids_.push_back(new Asteroid(renderer, screen_width, screen_height, tmp_x, tmp_y));
-    }
-
-    // Initiating delays
-    change_position_delay_ = NOW + static_cast<std::chrono::milliseconds> (kChangePositionDelay);
-    inertia_delay_ = NOW + static_cast<std::chrono::milliseconds> (kInertiaDelay);
-    update_asteroids_delay_ = NOW + static_cast<std::chrono::milliseconds> (kAsteroidsRemovingDelay);
-
-    space_pushed_     = false;
-    left_pushed_      = false;
-    right_pushed_     = false;
-    up_pushed_     = false;
-    down_pushed_     = false;
-    up_unpushed_     = false;
-    down_unpushed_   = false;
-
-    inertia_counter_up_ = 0;
-    inertia_counter_down_ = 0;
+  // Initiating delays
+  change_position_delay_ = NOW + kChangePositionDelay;
+  inertia_delay_ = NOW + kInertiaDelay;
+  update_asteroids_delay_ = NOW + kAsteroidsRemovingDelay;
 }
 
 void Game::createAsteroid(){
     double theta = (rand() % 360)/M_PI;
     Point ship_center = my_ship_->getMedianIntersaction();
-    double tmp_x = (rand() % this->screen_width_) + this->screen_width_;
+    double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
 
     point P(tmp_x, tmp_y);
@@ -65,7 +53,7 @@ void Game::createAsteroid(){
     tmp_x = P_rotated.real();
     tmp_y = P_rotated.imag();
 
-    asteroids_.push_back(new Asteroid(renderer_, screen_width_, screen_height_, tmp_x, tmp_y));
+    asteroids_.push_back(new Asteroid(renderer_, screen_size_, tmp_x, tmp_y));
 }
 
 void Game::updateAsteroids(){
@@ -73,7 +61,7 @@ void Game::updateAsteroids(){
     Point tmp_p = my_ship_->getMedianIntersaction();
     Point *ap = nullptr;
     double distance;
-    double diagonal = sqrt(pow(this->screen_width_, 2) + pow(this->screen_height_, 2));
+    double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
     auto iter = asteroids_.begin();
     while (iter != asteroids_.end())
     {
@@ -87,7 +75,7 @@ void Game::updateAsteroids(){
             ++iter;
         }
     }
-    update_asteroids_delay_ = NOW + static_cast<std::chrono::milliseconds> (kAsteroidsRemovingDelay);
+    update_asteroids_delay_ = NOW + kAsteroidsRemovingDelay;
 }
 
 void Game::updateProjectiles(){
@@ -348,7 +336,7 @@ void Game::changeObjectsPositions(){
         }
     }
 
-    change_position_delay_ = NOW + static_cast<std::chrono::milliseconds> (kChangePositionDelay);
+    change_position_delay_ = NOW + kChangePositionDelay;
 }
 
 void Game::displayLifeAmount(){
@@ -356,14 +344,14 @@ void Game::displayLifeAmount(){
 
     SDL_Rect rect;
     rect.x = 5;
-    rect.y = screen_height_ - 32;
+    rect.y = screen_size_.height - 32;
     rect.w = 5 * 15 + 4;
     rect.h = 24;
     SDL_RenderFillRect(renderer_, &rect);
 
     for (int i = 0; i < live_amount_; ++i){
         rect.x = 10 + i * 15;
-        rect.y = screen_height_ - 30;
+        rect.y = screen_size_.height - 30;
         rect.w = 10;
         rect.h = 20;
         SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);

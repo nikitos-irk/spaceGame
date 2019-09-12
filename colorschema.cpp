@@ -2,12 +2,14 @@
 
 #include <cstdlib>
 
-constexpr auto kColorModificationDelay = 10;
+using namespace std::chrono;
+
+constexpr auto kColorModificationDelay = 10ms;
 
 void ColorSchema::update(){
     auto now = std::chrono::system_clock::now();
     if (now <= change_colorchema_delay_) { return; }
-    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
+    change_colorchema_delay_ = now + kColorModificationDelay;
 
     if (flag_){
         if (color_mix_ >= 1){ flag_ = !flag_; return;}
@@ -27,7 +29,7 @@ void ColorSchema::update(){
 void ColorSchema::update(double current_a){
     auto now = std::chrono::system_clock::now();
     if (now <= change_colorchema_delay_) { return; }
-    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
+    change_colorchema_delay_ = now + kColorModificationDelay;
 
     r_ = color_a_.r + abs(color_a_.r - color_b_.r) * current_a;
     g_ = color_a_.g + abs(color_a_.g - color_b_.g) * current_a;
@@ -40,7 +42,7 @@ ColorSchema::ColorSchema(int r, int g, int b){
     this->b_ = b;
     flag_ = false;
     auto now = std::chrono::system_clock::now();
-    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
+    change_colorchema_delay_ = now + kColorModificationDelay;
 }
 
 ColorSchema::ColorSchema(Color a, Color b): color_a_(a), color_b_(b){}

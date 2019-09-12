@@ -1,12 +1,16 @@
 #include "explosion.hpp"
 
+#include <chrono>
+
 #include <SDL2/SDL.h>
 
 #include "common.hpp"
 #include "space_ship.hpp"
 
-constexpr auto FRAGMENT_SHIFT_DELAY = 50;
-constexpr auto EXPLOSION_LIFE_TIME = 1000;
+using namespace std::chrono;
+
+constexpr auto kFragmentShiftDelay = 50ms;
+constexpr auto kExplosionLifeTime = 1s;
 
 Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_number=3){
 
@@ -21,7 +25,7 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_num
     for (int i = 0; i < this->dots_number_; ++i){
         dots.push_back(get_rotated_point(initial_p_, Point(initial_p_.x + rand() % distribution_value, initial_p_.y)));
     }
-    fragment_shift_delay_ = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
+    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
 }
 
 Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
@@ -37,7 +41,7 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
     dots.push_back(p1);
     dots.push_back(p2);
     dots.push_back(p3);
-    fragment_shift_delay_ = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
+    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
 }
 
 void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton){
@@ -70,12 +74,12 @@ void Explosion::Fragment::shift(){
         *iter = get_rotated_point(*iter, Point(center_x, center_y), this->angle_);
     }
 
-    fragment_shift_delay_ = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
+    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
 }
 
 Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
 
-    destroy_time_ = NOW + static_cast<std::chrono::milliseconds> (EXPLOSION_LIFE_TIME);
+    destroy_time_ = NOW + kExplosionLifeTime;
     this->p_ = p;
     this->renderer_ = renderer;
     Point p_center = ast->getCenterPoint();

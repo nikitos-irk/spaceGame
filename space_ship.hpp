@@ -6,10 +6,8 @@
 #include <SDL2/SDL.h>
 
 #include "colorschema.hpp"
+#include "primitive/size.hpp"
 #include "speed.hpp"
-
-constexpr auto kChangePositionDelay = 30;
-constexpr auto kInertiaDelay = 10;
 
 struct Nozzle{
     std::vector <Point> points;
@@ -59,16 +57,15 @@ struct Nozzle{
 
 class SpaceObject{
 protected:
-    SDL_Renderer *renderer_;
+    SDL_Renderer *renderer_{nullptr};
     int x_, y_;
-    int screen_width_;
-    int screen_height_;
+    primitive::Size screen_size_;
     std::chrono::time_point<std::chrono::system_clock> display_delay_;
     std::chrono::time_point<std::chrono::system_clock> rotation_delay_;
-    bool alive_;
+    bool alive_{true};
 
 public:
-    SpaceObject(SDL_Renderer*, int, int, int, int);
+    SpaceObject(SDL_Renderer*, primitive::Size, int, int);
     virtual void display(bool) = 0;
     virtual void changePosition(DirectionXY);
     virtual ~SpaceObject();
@@ -85,7 +82,7 @@ private:
     std::chrono::time_point<std::chrono::system_clock> life_time_;
 
 public:
-    Projectile(SDL_Renderer*, int, int, int, int, int, int);
+    Projectile(SDL_Renderer*, primitive::Size, int, int, int, int);
     void changePosition(DirectionXY);
     void display(bool);
     Point* getXY();
@@ -103,11 +100,10 @@ private:
     Point initial_median_intersection_;
     double getTiltAngel();
     double getLengthOfBase();
-    int space_width_;
-    int space_height_;
+    primitive::Size space_size_;
     double nozzle_min_height_;
     double nozzle_max_height_;
-    int nozzle_width_;
+    primitive::Size nozzle_size_;
     Nozzle *left_nozzle_;
     Nozzle *right_nozzle_;
 
@@ -122,7 +118,7 @@ public:
     void accelarate();
     void backwardSlowdown();
     void backwardAccelarate();
-    SpaceShip(SDL_Renderer*, int, int, int);
+    SpaceShip(SDL_Renderer*, primitive::Size, int);
     Projectile * shoot();
     std::vector<Projectile*> projectiles;
     DirectionXY getDirection();
@@ -143,7 +139,7 @@ public:
     Point getCenterPoint();
     void display(bool);
     std::vector<Point*>& get_points();
-    Asteroid(SDL_Renderer*, int, int, int, int);
+    Asteroid(SDL_Renderer*, primitive::Size, int, int);
     void changePosition(DirectionXY);
     Point* getFirstPoint();
     ~Asteroid();

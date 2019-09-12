@@ -5,20 +5,14 @@
 constexpr auto kCoef = 5;  // TODO: Is it coefficient?
 constexpr auto kCitizenSize = 5 * kCoef;
 
-Background::Background(SDL_Renderer *renderer, int screen_width, int screen_height){
-    this->renderer_ = renderer;
-    this->screen_width_ = screen_width;
-    this->screen_height_ = screen_height;
-}
-
 void Background::fillBackground(){
     int gradient_size = 1;
-    int steps = 1 + (screen_width_ / (kCitizenSize * gradient_size));
+    int steps = 1 + (screen_size_.width / (kCitizenSize * gradient_size));
 
     SDL_Rect rect;
     rect.x = 0;
     rect.y = 0;
-    rect.w = screen_width_;
+    rect.w = screen_size_.width;
     rect.h = kCitizenSize * 10;
 
     double r_start = 100;
@@ -37,7 +31,7 @@ void Background::fillBackground(){
     double g_step = abs(g_finish - g_start) / steps;
     double b_step = abs(b_finish - b_start) / steps;
 
-    while (rect.y < screen_height_) {
+    while (rect.y < screen_size_.height) {
         r = (r_start < r_finish) ? r + r_step : r - r_step;
         g = (g_start < g_finish) ? g + g_step : g - g_step;
         b = (b_start < b_finish) ? b + b_step : b - b_step;
@@ -52,9 +46,9 @@ void Background::fillBackground(){
 void Background::drawGrid(){
     SDL_SetRenderDrawColor(renderer_, 192, 192, 192, 255);
 
-    for (int i = 0; i < screen_height_; i = i + kCitizenSize)
-        SDL_RenderDrawLine(renderer_, 0, i, screen_width_, i);
+    for (int i = 0; i < screen_size_.height; i = i + kCitizenSize)
+        SDL_RenderDrawLine(renderer_, 0, i, screen_size_.width, i);
 
-    for (int i = 0; i < screen_width_; i = i + kCitizenSize)
-        SDL_RenderDrawLine(renderer_, i, 0, i, screen_height_);
+    for (int i = 0; i < screen_size_.width; i = i + kCitizenSize)
+        SDL_RenderDrawLine(renderer_, i, 0, i, screen_size_.height);
 }
