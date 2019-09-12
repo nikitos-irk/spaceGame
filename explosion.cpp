@@ -1,7 +1,5 @@
 #include "explosion.hpp"
 
-#include <chrono>
-
 #include <SDL2/SDL.h>
 
 #include "common.hpp"
@@ -12,7 +10,8 @@ using namespace std::chrono;
 constexpr auto kFragmentShiftDelay = 50ms;
 constexpr auto kExplosionLifeTime = 1s;
 
-Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_number=3){
+Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p, primitive::Point next_p,
+                              int dots_number=3) {
 
     this->initial_p_ = p;
     this->dots_number_ = dots_number;
@@ -23,12 +22,13 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_num
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number_; ++i){
-        dots.push_back(get_rotated_point(initial_p_, Point(initial_p_.x + rand() % distribution_value, initial_p_.y)));
+        dots.push_back(get_rotated_point(initial_p_, primitive::Point{initial_p_.x + rand() % distribution_value, initial_p_.y}));
     }
     fragment_shift_delay_ = NOW + kFragmentShiftDelay;
 }
 
-Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
+Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p1, primitive::Point p2,
+                              primitive::Point p3){
 
     double tmp_x = p1.x/3 + p2.x/3 + p3.x/3;
     double tmp_y = p1.y/3 + p2.y/3 + p3.y/3;
@@ -47,10 +47,11 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
 void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton){
 
     int blocksize = 3;
-    Point p1 = *dots.begin();
-    Point p2 = *(dots.begin() + 1);
-    Point p3 = *(dots.begin() + 2);
-    updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p3, p2), p2, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+    primitive::Point p1 = *dots.begin();
+    primitive::Point p2 = *(dots.begin() + 1);
+    primitive::Point p3 = *(dots.begin() + 2);
+    updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p3, p2), p2,
+                   primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
     shift();
 
 }
@@ -71,18 +72,18 @@ void Explosion::Fragment::shift(){
     }
 
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
-        *iter = get_rotated_point(*iter, Point(center_x, center_y), this->angle_);
+        *iter = get_rotated_point(*iter, primitive::Point{center_x, center_y}, this->angle_);
     }
 
     fragment_shift_delay_ = NOW + kFragmentShiftDelay;
 }
 
-Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
+Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer, Asteroid *ast){
 
     destroy_time_ = NOW + kExplosionLifeTime;
     this->p_ = p;
     this->renderer_ = renderer;
-    Point p_center = ast->getCenterPoint();
+    primitive::Point p_center = ast->getCenterPoint();
     this->ast = ast;
 
     int random_number_of_ragments = 5 + rand() % 10;

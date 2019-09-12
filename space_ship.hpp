@@ -10,13 +10,14 @@
 #include "speed.hpp"
 
 struct Nozzle{
-    std::vector <Point> points;
-    std::vector <Point> origin_points;
+    std::vector <primitive::Point> points;
+    std::vector <primitive::Point> origin_points;
     SDL_Renderer* renderer;
     ColorSchema *cs;
     Speed *speed;
 
-    Nozzle(SDL_Renderer* renderer, Point a, Point b, Point c, Speed *speed){
+    Nozzle(SDL_Renderer* renderer, primitive::Point a, primitive::Point b,
+           primitive::Point c, Speed *speed) {
         origin_points.push_back(a);
         origin_points.push_back(b);
         origin_points.push_back(c);
@@ -85,8 +86,8 @@ public:
     Projectile(SDL_Renderer*, primitive::Size, int, int, int, int);
     void changePosition(DirectionXY);
     void display(bool);
-    Point* getXY();
-    std::pair<Point, Point> getLine();
+    primitive::Point* getXY();
+    std::pair<primitive::Point, primitive::Point> getLine();
     std::chrono::time_point<std::chrono::system_clock> get_life_time();
     ~Projectile();
 };
@@ -94,10 +95,10 @@ public:
 class SpaceShip: public SpaceObject{
 private:
     ColorSchema *cs_;
-    std::vector<Point> skeleton_;
+    std::vector<primitive::Point> skeleton_;
     std::chrono::time_point<std::chrono::system_clock> shoot_delay_;
     std::chrono::time_point<std::chrono::system_clock> ship_color_change_;
-    Point initial_median_intersection_;
+    primitive::Point initial_median_intersection_;
     double getTiltAngel();
     double getLengthOfBase();
     primitive::Size space_size_;
@@ -109,10 +110,10 @@ private:
 
 public:
     ColorGeneratorShip *cg;
-    std::vector<Point> pp;
+    std::vector<primitive::Point> pp;
     void updateNozzles();
     double getCurrentA();
-    Point getMedianIntersaction();
+    primitive::Point getMedianIntersaction();
     Speed *speed;
     void slowdown();
     void accelarate();
@@ -132,16 +133,16 @@ public:
 
 class Asteroid: public SpaceObject{
 private:
-    std::vector<Point*> pp_;
+    std::vector<primitive::Point*> pp_;
     void fill();
 public:
     ColorGeneratorAsteroid *cg;
-    Point getCenterPoint();
+    primitive::Point getCenterPoint();
     void display(bool);
-    std::vector<Point*>& get_points();
+    std::vector<primitive::Point*>& get_points();
     Asteroid(SDL_Renderer*, primitive::Size, int, int);
     void changePosition(DirectionXY);
-    Point* getFirstPoint();
+    primitive::Point* getFirstPoint();
     ~Asteroid();
 };
 

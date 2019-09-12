@@ -40,8 +40,10 @@ Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
     life_time_ = NOW + kProjLifetime;
 }
 
-Point* Projectile::getXY(){ return new Point(x_, y_); }
-std::pair<Point, Point> Projectile::getLine(){return std::make_pair(Point(x_, y_), Point(x_previous_, y_previous_));}
+primitive::Point* Projectile::getXY(){ return new primitive::Point{double(x_), double(y_)}; }
+std::pair<primitive::Point, primitive::Point> Projectile::getLine()
+{ return std::make_pair(primitive::Point{double(x_), double(y_)},
+                        primitive::Point{x_previous_, y_previous_}); }
 
 Projectile::~Projectile(){
     std::cout << "Projectile destructor" << std::endl;
@@ -56,15 +58,15 @@ Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Size screen_size, int x, i
     int size = rand() % 20;
     cg = new ColorGeneratorAsteroid();
 
-    pp_.push_back(new Point(x + error_x,                 y + error_y));
-    pp_.push_back(new Point(x - size + rand() % 5,       y + size + rand() % 5));
-    pp_.push_back(new Point(x + rand() % 5,              y + size * 2 + rand() % 5));
-    pp_.push_back(new Point(x + size + rand() % 5,       y + size * 2 + rand() % 5));
-    pp_.push_back(new Point(x + size * 2 + rand() % 5,   y + size + rand() % 5));
-    pp_.push_back(new Point(x + size + rand() % 5,       y + rand() % 5));
+    pp_.push_back(new primitive::Point{double(x + error_x), double(y + error_y)});
+    pp_.push_back(new primitive::Point{double(x - size + rand() % 5), double(y + size + rand() % 5)});
+    pp_.push_back(new primitive::Point{double(x + rand() % 5), double(y + size * 2 + rand() % 5)});
+    pp_.push_back(new primitive::Point{double(x + size + rand() % 5), double(y + size * 2 + rand() % 5)});
+    pp_.push_back(new primitive::Point{double(x + size * 2 + rand() % 5), double(y + size + rand() % 5)});
+    pp_.push_back(new primitive::Point{double(x + size + rand() % 5), double(y + rand() % 5)});
 }
 
-std::vector<Point*>& Asteroid::get_points(){ return pp_; }
+std::vector<primitive::Point*>& Asteroid::get_points(){ return pp_; }
 
 Asteroid::~Asteroid(){
     std::cout << "Asteroid destructor" << std::endl;
@@ -74,7 +76,7 @@ void out(double x, double y){
     std::cout << x << ":" << y << std::endl;
 }
 
-Point SpaceShip::getMedianIntersaction(){
+primitive::Point SpaceShip::getMedianIntersaction(){
     double x1 = pp[0].x;
     double y1 = pp[0].y;
     double x2 = (pp[2].x + pp[1].x)/2;
@@ -85,7 +87,8 @@ Point SpaceShip::getMedianIntersaction(){
     double x4 = (pp[0].x + pp[2].x)/2;
     double y4 = (pp[0].y + pp[2].y)/2;
 
-    return getTwoLinesIntersaction(Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4));
+    return getTwoLinesIntersaction(primitive::Point{x1, y1}, primitive::Point{x2, y2},
+                                   primitive::Point{x3, y3}, primitive::Point{x4, y4});
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int max_speed)
@@ -106,22 +109,30 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int ma
     cg = new ColorGeneratorShip();
 
     // spaceship coordination
-    pp.push_back(Point(screen_size.width/2, screen_size.height/2));
-    pp.push_back(Point(screen_size.width/2 - space_size_.width/2, screen_size.height/2 + space_size_.height));
-    pp.push_back(Point(screen_size.width/2 + space_size_.width/2, screen_size.height/2 + space_size_.height));
+    pp.push_back(primitive::Point{double(screen_size.width/2), double(screen_size.height/2)});
+    pp.push_back(primitive::Point{double(screen_size.width/2 - space_size_.width/2),
+                                  double(screen_size.height/2 + space_size_.height)});
+    pp.push_back(primitive::Point{double(screen_size.width/2 + space_size_.width/2),
+                                  double(screen_size.height/2 + space_size_.height)});
 
     left_nozzle_ = new Nozzle(
                 renderer,
-                Point(screen_size.width/2 + space_size_.width/2 + nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
-                Point(screen_size.width/2 + space_size_.width/2, screen_size.height/2 + space_size_.height),
-                Point(screen_size.width/2 + space_size_.width/2 - nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
+                primitive::Point{double(screen_size.width/2 + space_size_.width/2 + nozzle_size_.width),
+                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
+                primitive::Point{double(screen_size.width/2 + space_size_.width/2),
+                                 double(screen_size.height/2 + space_size_.height)},
+                primitive::Point{double(screen_size.width/2 + space_size_.width/2 - nozzle_size_.width),
+                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
                 speed
     );
     right_nozzle_ = new Nozzle(
                 renderer,
-                Point(screen_size.width/2 - space_size_.width/2 - nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
-                Point(screen_size.width/2 - space_size_.width/2, screen_size.height/2 + space_size_.height),
-                Point(screen_size.width/2 - space_size_.width/2 + nozzle_size_.width, screen_size.height/2 + space_size_.height + nozzle_min_height_),
+                primitive::Point{double(screen_size.width/2 - space_size_.width/2 - nozzle_size_.width),
+                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
+                primitive::Point{double(screen_size.width/2 - space_size_.width/2),
+                                 double(screen_size.height/2 + space_size_.height)},
+                primitive::Point{double(screen_size.width/2 - space_size_.width/2 + nozzle_size_.width),
+                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
                 speed
     );
     initial_median_intersection_ = getMedianIntersaction();
@@ -201,9 +212,10 @@ void SpaceShip::changeY(bool forward){
     }
 }
 
-void rotatePointsInVector(std::vector<Point> &vPoints, Point initialMedianIntersection, double angle){
-    for (auto iter = vPoints.begin(); iter != vPoints.end(); ++iter){
-        *iter = get_rotated_point(*iter, initialMedianIntersection, angle);
+void rotatePointsInVector(std::vector<primitive::Point> &points,
+                          primitive::Point initial_median_intersection, double angle){
+    for (auto iter = points.begin(); iter != points.end(); ++iter){
+        *iter = get_rotated_point(*iter, initial_median_intersection, angle);
     }
 }
 
@@ -229,9 +241,10 @@ void SpaceShip::changeX(bool clockwise){
 }
 
 double SpaceShip::getTiltAngel(){
-    Point centerTmp = *pp.begin();
-    Point tmp(centerTmp.x, centerTmp.y - 10);
-    Point middle((*(pp.begin()+1)).x/2 + (*(pp.begin()+2)).x/2, (*(pp.begin()+1)).y/2 + (*(pp.begin()+2)).y/2); // x4
+    primitive::Point centerTmp = *pp.begin();
+    primitive::Point tmp{centerTmp.x, centerTmp.y - 10};
+    primitive::Point middle{(*(pp.begin()+1)).x/2 + (*(pp.begin()+2)).x/2,
+                            (*(pp.begin()+1)).y/2 + (*(pp.begin()+2)).y/2}; // x4
 
     double x1 = centerTmp.x;
     double y1 = centerTmp.y;
@@ -263,20 +276,23 @@ void SpaceShip::display(bool displaySkeleton){
 
     double lengthOfBase = getLengthOfBase();
 
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, pp[0], Point(pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2), pp[2], 4, true, true);
+    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, pp[0],
+                   primitive::Point{pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2}, pp[2], 4, true, true);
     left_nozzle_->update();
     right_nozzle_->update();
     left_nozzle_->display();
     right_nozzle_->display();
-    Point a,b,c;
+    primitive::Point a,b,c;
     a = left_nozzle_->points[0];
     b = left_nozzle_->points[1];
     c = left_nozzle_->points[2];
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
+    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b,
+                   primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
     a = right_nozzle_->points[0];
     b = right_nozzle_->points[1];
     c = right_nozzle_->points[2];
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b, Point(a.x/2 + c.x/2, a.y/2 + c.y/2), a, 1, true, false);
+    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b,
+                   primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
 
     SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
 }
@@ -352,31 +368,32 @@ void Projectile::display(bool display_skeleton){
     display_delay_ = NOW + (kDisplayDelay/5);
 }
 
-Point Asteroid::getCenterPoint(){
+primitive::Point Asteroid::getCenterPoint(){
     double x = 0.0, y = 0.0;
     int size = pp_.size();
     for (auto iter = pp_.begin(); iter != pp_.end(); ++iter){
         x += (*iter)->x / size;
         y += (*iter)->y / size;
     }
-    return Point(x, y);
+    return primitive::Point{x, y};
 }
 
 void Asteroid::fill(){
     
-    Point center_point = getCenterPoint();
+  primitive::Point center_point = getCenterPoint();
     int blocksize = 3;
 
     auto iter = pp_.begin();
     auto iter_next = iter + 1;
     
-    Point p1 = **iter;
-    Point p2 = **iter_next;
+    primitive::Point p1 = **iter;
+    primitive::Point p2 = **iter_next;
     
     while (iter_next != pp_.end()){
         p1 = **iter;
         p2 = **iter_next;
-        updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+        updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point,
+                       primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
         ++iter;
         ++iter_next;
         // break;
@@ -384,7 +401,8 @@ void Asteroid::fill(){
     iter_next = pp_.begin();
     p1 = **iter;
     p2 = **iter_next;
-    updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+    updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point,
+                   primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 
 void Asteroid::display(bool display_skeleton){
@@ -392,8 +410,8 @@ void Asteroid::display(bool display_skeleton){
     if (display_skeleton){
         SDL_SetRenderDrawColor(renderer_, 0, 0, 255, 255);
         auto iter = pp_.begin();
-        Point *p1;
-        Point *p2;
+        primitive::Point *p1;
+        primitive::Point *p2;
         for (; iter != pp_.end()-1; ++iter){
             p1 = *iter;
             p2 = *(iter+1);
@@ -407,7 +425,7 @@ void Asteroid::display(bool display_skeleton){
 }
 
 void Asteroid::changePosition(DirectionXY direction_xy){
-    Point *p1;
+    primitive::Point *p1;
     for (auto iter = pp_.begin(); iter != pp_.end(); ++iter){
         p1 = *iter;
         p1->x += direction_xy.x;
@@ -415,7 +433,7 @@ void Asteroid::changePosition(DirectionXY direction_xy){
     }
 }
 
-Point* Asteroid::getFirstPoint(){
+primitive::Point* Asteroid::getFirstPoint(){
     return pp_[0];
 }
 

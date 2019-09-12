@@ -43,7 +43,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
 
 void Game::createAsteroid(){
     double theta = (rand() % 360)/M_PI;
-    Point ship_center = my_ship_->getMedianIntersaction();
+    primitive::Point ship_center = my_ship_->getMedianIntersaction();
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
 
@@ -58,8 +58,8 @@ void Game::createAsteroid(){
 
 void Game::updateAsteroids(){
     if (update_asteroids_delay_ >= NOW){ return; }
-    Point tmp_p = my_ship_->getMedianIntersaction();
-    Point *ap = nullptr;
+    primitive::Point tmp_p = my_ship_->getMedianIntersaction();
+    primitive::Point *ap = nullptr;
     double distance;
     double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
     auto iter = asteroids_.begin();
@@ -92,7 +92,7 @@ void Game::updateProjectiles(){
     }
 }
 
-bool dot_on_line(Point *p1, Point *p2, Point *px)
+bool dot_on_line(primitive::Point *p1, primitive::Point *p2, primitive::Point *px)
 {
     double k = (p2->y - p1->y) / (p2->x - p1->x);
     double c = p1->y - k * p1->x;
@@ -115,7 +115,8 @@ inline bool intersect_1 (int a, int b, int c, int d) {
 }
 
 
-bool intersect (Point a, Point b, Point c, Point d) {
+bool intersect (primitive::Point a, primitive::Point b,
+                primitive::Point c, primitive::Point d) {
     int A1 = a.y-b.y,  B1 = b.x-a.x,  C1 = -A1*a.x - B1*a.y;
     int A2 = c.y-d.y,  B2 = d.x-c.x,  C2 = -A2*c.x - B2*c.y;
     int zn = det (A1, B1, A2, B2);
@@ -142,15 +143,15 @@ void Game::checkShipHits(){
 
 void Game::shipHitsLoop(){
 
-    std::vector<Point*> tmpPoints;
+    std::vector<primitive::Point*> tmpPoints;
     bool hitStatus = false;
 
     for (auto ast = asteroids_.begin(); ast != asteroids_.end(); ++ast){
         hitStatus = false;
         if (!(*ast)->isAlive()){ continue; }
         tmpPoints = dynamic_cast<Asteroid*>(*ast)->get_points();
-        Point *p1, *p2;
-        Point sp1, sp2;
+        primitive::Point *p1, *p2;
+        primitive::Point sp1, sp2;
         for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
             if (!hitStatus){
                 p1 = *p;
@@ -202,7 +203,7 @@ void Game::checkHits(){
 
 void Game::histLoop(){
 
-    std::vector<Point*> tmpPoints;
+    std::vector<primitive::Point*> tmpPoints;
     bool hitStatus;
 
     for (auto pr = projectiles_.begin(); pr != projectiles_.end(); ++pr){
@@ -211,7 +212,7 @@ void Game::histLoop(){
         for (auto ast = asteroids_.begin(); ast != asteroids_.end(); ++ast){
             if (!(*ast)->isAlive()) { continue; }
             tmpPoints = dynamic_cast<Asteroid*>(*ast)->get_points();
-            Point *p1, *p2, *px;
+            primitive::Point *p1, *p2, *px;
 
             for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
                 p1 = *p;
@@ -223,7 +224,7 @@ void Game::histLoop(){
                 }
 
                 px = dynamic_cast<Projectile*>(*pr)->getXY();
-                std::pair<Point, Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+                std::pair<primitive::Point, primitive::Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
 
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
                 delete px;
@@ -241,14 +242,14 @@ void Game::histLoop(){
 void Game::generateExplosion(Asteroid *tmp_ast){
     double middle_x = 0.0, middle_y = 0.0;
 
-    std::vector<Point*> tmpPoints = tmp_ast->get_points();
+    std::vector<primitive::Point*> tmpPoints = tmp_ast->get_points();
     for (auto iter = tmpPoints.begin(); iter != tmpPoints.end(); ++iter){
         middle_x += (*iter)->x;
         middle_y += (*iter)->y;
     }
     middle_x /= tmpPoints.size();
     middle_y /= tmpPoints.size();
-    explosions_.push_back(new Explosion(Point(middle_x, middle_y), renderer_, tmp_ast));
+    explosions_.push_back(new Explosion(primitive::Point{middle_x, middle_y}, renderer_, tmp_ast));
 }
 
 void Game::cleanAsteroids(){
@@ -367,12 +368,12 @@ void Game::run(){
     SDL_RenderClear(renderer_);
 
 //    std::thread thUpdating(&Game::update, this);
-  std::thread thHitsMonitoring(&Game::checkHits, this);
-  std::thread thShipHitsMonitoring(&Game::checkShipHits, this);
+    std::thread hits_monitoring(&Game::checkHits, this);
+    std::thread ship_hits_monitoring(&Game::checkShipHits, this);
 
 //    thUpdating.join();
-    thHitsMonitoring.detach();
-    thShipHitsMonitoring.detach();
+    hits_monitoring.detach();
+    ship_hits_monitoring.detach();
     int quit = 1;
     SpaceObject *tmp_space_obj;
     while(quit) {

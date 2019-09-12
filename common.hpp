@@ -5,36 +5,13 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "primitive/point.hpp"
+
 struct SDL_Renderer;
 class ColorGenerator;
 
 #define NOW std::chrono::system_clock::now()
 typedef std::complex<double> point;
-
-struct Point{
-private:
-    bool doubleEquals(double a, double b, double epsilon = 0.000000001)
-    {
-        return std::abs(a - b) < epsilon;
-    }
-public:
-    double x;
-    double y;
-    Point(double x, double y){
-        this->x = x;
-        this->y = y;
-    }
-    Point(){
-        this->x = 0.0;
-        this->y = 0.0;
-    }
-    bool operator==(const Point& p){
-        return doubleEquals(x, p.x) && doubleEquals(y, p.y);
-    }
-    bool operator!=(const Point& p){
-        return doubleEquals(x, p.x) || doubleEquals(y, p.y);
-    }
-};
 
 struct DirectionXY{
     double x;
@@ -57,15 +34,19 @@ struct DirectionalVector{
 };
 
 
-Point get_rotated_point(Point, Point, double angle=0.0);
+primitive::Point get_rotated_point(primitive::Point, primitive::Point, double angle=0.0);
 
-inline double getLengthOfVector(Point px1, Point px2) { return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
-std::pair<double, double> getXYOffsetOnVector(Point, Point, double);
-Point getTwoLinesIntersaction(Point, Point, Point, Point);
-void putSquareOnPoint(SDL_Renderer*, Point, double, double);
-void fillRect(SDL_Renderer*, Point, Point, Point);
-std::pair<Point, Point> getPerpendicularLineByPoint(Point, Point, Point, double);
-void updateSkeleton(ColorGenerator*, SDL_Renderer*, double, double, Point, Point, Point, double, bool, bool);
+inline double getLengthOfVector(primitive::Point px1, primitive::Point px2)
+{ return sqrt(pow(px1.x - px2.x, 2) + pow(px1.y - px2.y, 2)); }
+std::pair<double, double> getXYOffsetOnVector(primitive::Point, primitive::Point, double);
+primitive::Point getTwoLinesIntersaction(primitive::Point, primitive::Point,
+                                         primitive::Point, primitive::Point);
+void putSquareOnPoint(SDL_Renderer*, primitive::Point, double, double);
+void fillRect(SDL_Renderer*, primitive::Point, primitive::Point, primitive::Point);
+std::pair<primitive::Point, primitive::Point> getPerpendicularLineByPoint(
+    primitive::Point, primitive::Point, primitive::Point, double);
+void updateSkeleton(ColorGenerator*, SDL_Renderer*, double, double, primitive::Point,
+                    primitive::Point, primitive::Point, double, bool, bool);
 
 class Common {
 public:
