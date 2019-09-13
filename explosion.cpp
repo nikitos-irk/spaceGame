@@ -1,7 +1,5 @@
 #include "explosion.hpp"
 
-#include <SDL2/SDL.h>
-
 #include "common.hpp"
 #include "space_ship.hpp"
 

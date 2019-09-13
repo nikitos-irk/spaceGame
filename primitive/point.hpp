@@ -6,7 +6,7 @@
 namespace {
 bool doubleEquals(double a, double b, double epsilon = 0.000000001)
 {
-    return std::fabs(a - b) < epsilon;
+    return std::abs(a - b) < epsilon;
 }
 }  // namespace
 

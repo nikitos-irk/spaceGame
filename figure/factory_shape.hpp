@@ -8,8 +8,8 @@
 struct SDL_Renderer;
 
 namespace primitive {
-class Line;
-class Point;
+struct Color;
+struct Point;
 class Size;
 }  // namespace primitive
 
@@ -19,6 +19,7 @@ class FactoryShape
 {
 public:
     explicit FactoryShape(SDL_Renderer* renderer);
+    FactoryShape& color(primitive::Color const& color);
     Point point(primitive::Point const& point) const;
     Line line(primitive::Point const& begin, primitive::Point const& end) const;
     Rectangle rectangle(primitive::Point const& point,

@@ -105,7 +105,7 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int ma
     nozzle_min_height_ = 25;
 //    nozzleMaxHeight = 25;
 
-    cs_ = new ColorSchema(Color(255, 255, 0), Color(255,8,0));
+    cs_ = new ColorSchema(primitive::Color{255, 255, 0}, primitive::Color{255,8,0});
     cg = new ColorGeneratorShip();
 
     // spaceship coordination
@@ -262,10 +262,9 @@ double SpaceShip::getTiltAngel(){
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
 void SpaceShip::display(bool displaySkeleton){
-    SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
-    SDL_SetRenderDrawColor(renderer_, cs_->get_r(), cs_->get_g(), cs_->get_b(), 255);
-//    cs->update();
     figure::FactoryShape factory{renderer_};
+    factory.color({255, 0, 0, 255});
+    factory.color({cs_->get_r(), cs_->get_g(), cs_->get_b(), 255});
     for (int k = 0; k < 1/*3*/; ++k){
         int i = 0;
         int kIndex = k*3;
@@ -295,7 +294,7 @@ void SpaceShip::display(bool displaySkeleton){
     updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b,
                    primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
 
-    SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
+    factory.color({255, 0, 0, 255});
 }
 
 std::chrono::time_point<std::chrono::system_clock> Projectile::get_life_time(){ return life_time_; }
@@ -324,9 +323,8 @@ void Projectile::display(bool display_skeleton){
     double cx = this->x_ - 0.5;
     double cy = this->y_ - 0.5;
 
-    SDL_SetRenderDrawColor(renderer_, 255, 255, 0, 255);
-
     figure::FactoryShape factory{renderer_};
+    factory.color({255, 255, 0, 255});
     while (tmp_x >= tmp_y){
         factory.point({cx + tmp_x, cy + tmp_y}).draw();
         factory.point({cx + tmp_y, cy + tmp_x}).draw();
@@ -357,7 +355,7 @@ void Projectile::display(bool display_skeleton){
         }
     }
 
-    SDL_SetRenderDrawColor(renderer_, 128, 0, 128, 255);
+    factory.color({128, 0, 128, 255});
     for (double dy = 1; dy <= kBlockSize; dy += 1.0){
         double dx = floor(sqrt((2.0 * kBlockSize * dy) - (dy * dy)));
         double cx = this->x_;
@@ -412,11 +410,11 @@ void Asteroid::fill(){
 void Asteroid::display(bool display_skeleton){
 
     if (display_skeleton){
-        SDL_SetRenderDrawColor(renderer_, 0, 0, 255, 255);
         auto iter = pp_.begin();
         primitive::Point *p1;
         primitive::Point *p2;
         figure::FactoryShape factory{renderer_};
+        factory.color({0, 0, 255, 255});
         for (; iter != pp_.end()-1; ++iter){
             p1 = *iter;
             p2 = *(iter+1);

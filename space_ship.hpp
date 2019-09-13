@@ -3,11 +3,10 @@
 
 #include <vector>
 
-#include <SDL2/SDL.h>
-
 #include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/size.hpp"
+#include "primitive/color.hpp"
 #include "speed.hpp"
 
 struct Nozzle{
@@ -25,12 +24,12 @@ struct Nozzle{
         copy(origin_points.begin(), origin_points.end(), back_inserter(points));
         this->renderer = renderer;
         this->speed = speed;
-        cs = new ColorSchema(Color(255, 17, 0), Color(255, 237, 0));
+        cs = new ColorSchema(primitive::Color{255, 17, 0}, primitive::Color{255, 237, 0});
     }
     void display(){
         cs->update(speed->get_current_a());
-        SDL_SetRenderDrawColor(renderer, cs->get_r(), cs->get_g(), cs->get_b(), 255);
         figure::FactoryShape factory{renderer};
+        factory.color({cs->get_r(), cs->get_g(), cs->get_b(), 255});
         factory.line(points[0], points[1]).draw();
         factory.line(points[0], points[2]).draw();
         factory.line(points[1], points[2]).draw();

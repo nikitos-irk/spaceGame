@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include "exception.hpp"
+#include "primitive/color.hpp"
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 
@@ -32,10 +33,18 @@ Line FactoryShape::line(primitive::Point const& begin,
 Rectangle FactoryShape::rectangle(primitive::Point const& point,
                                   primitive::Size const& size) const
 {
-  return {renderer_, {
-      static_cast<int>(point.x), static_cast<int>(point.y),
-      size.width, size.height
-  }};
+    return {renderer_, {
+        static_cast<int>(point.x), static_cast<int>(point.y),
+        size.width, size.height
+    }};
+}
+FactoryShape& FactoryShape::color(primitive::Color const& color)
+{
+    if (SDL_SetRenderDrawColor(renderer_, color.red, color.green, color.blue,
+                               color.alpha) == -1) {
+        throw ErrorDrawing{};
+    }
+    return *this;
 }
 
 }  // namespace figure

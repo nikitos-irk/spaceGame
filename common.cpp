@@ -2,8 +2,6 @@
 
 #include <tuple>
 
-#include <SDL2/SDL.h>
-
 #include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/point.hpp"
@@ -127,12 +125,13 @@ void updateSkeleton(ColorGenerator * cg, SDL_Renderer* renderer, double angle,
     primitive::Point px1, px2;
     double Vx, Vy;
     double ribLength;
-    Color tmpColor;
+    primitive::Color tmpColor;
     cg->setToEnd();
+    figure::FactoryShape factory{renderer};
     while (length >= 0){
         if (random_color){
             tmpColor = cg->getNextColor();
-            SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+            factory.color(tmpColor);
         }
         primitive::Point vertebra{top_point.x - Cx*index, top_point.y - Cy*index};
         putSquareOnPoint(renderer, vertebra, block_hypotenuse, angle);
@@ -148,7 +147,7 @@ void updateSkeleton(ColorGenerator * cg, SDL_Renderer* renderer, double angle,
         while (ribLength >= 0){
             if (random_color){
                 tmpColor = cg->getNextColor();
-                SDL_SetRenderDrawColor(renderer, tmpColor.r, tmpColor.g, tmpColor.b, 255);
+                factory.color(tmpColor);
             }
             primitive::Point tmpVertebraRight{px1.x - Vx*vIndex, px1.y - Vy*vIndex};
             putSquareOnPoint(renderer, tmpVertebraRight, block_hypotenuse, angle);

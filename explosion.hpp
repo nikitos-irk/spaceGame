@@ -4,8 +4,6 @@
 #include <chrono>
 #include <vector>
 
-#include <SDL2/SDL.h>
-
 #include "common.hpp"
 #include "primitive/point.hpp"
 

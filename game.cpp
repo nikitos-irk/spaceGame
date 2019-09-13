@@ -5,8 +5,6 @@
 
 #include <unistd.h>
 
-#include <SDL2/SDL.h>
-
 #include "background.hpp"
 #include "explosion.hpp"
 #include "space_ship.hpp"
@@ -341,16 +339,15 @@ void Game::changeObjectsPositions(){
 }
 
 void Game::displayLifeAmount(){
-    SDL_SetRenderDrawColor(renderer_, 0, 255, 0, 255);
-
     figure::FactoryShape factory{renderer_};
     constexpr primitive::Size size{5 * 15 + 4, 24};
-    factory.rectangle({5.0, double(screen_size_.height - 32)}, size).fill();
+    factory.color({0, 255, 0, 255})
+        .rectangle({5.0, double(screen_size_.height - 32)}, size).fill();
 
     for (int i = 0; i < live_amount_; ++i){
         constexpr primitive::Size size{10, 20};
-        SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
-        factory.rectangle({10.0 + i * 15, double(screen_size_.height - 30)}, size).fill();
+        factory.color({255, 0, 0, 255})
+            .rectangle({10.0 + i * 15, double(screen_size_.height - 30)}, size).fill();
     }
 }
 

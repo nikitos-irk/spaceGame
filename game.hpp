@@ -17,6 +17,8 @@ class Explosion;
 class SpaceShip;
 class SpaceObject;
 
+struct SDL_Renderer;
+
 static std::exception_ptr globalExceptionPtr = nullptr;
 
 class GameOverException: public std::exception {
