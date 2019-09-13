@@ -150,9 +150,6 @@ void SpaceShip::backwardSlowdown(){
 void SpaceShip::backwardAccelarate(){
     speed->backwardAccelarate();
 }
-double SpaceShip::getCurrentA(){
-    return speed->get_current_a();
-}
 
 DirectionXY SpaceShip::getOffset(){
     return speed->getOffsetXY(getDerectionalVector());
@@ -261,7 +258,7 @@ double SpaceShip::getTiltAngel(){
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 
-void SpaceShip::display(bool displaySkeleton){
+void SpaceShip::display(bool display_skeleton){
     figure::FactoryShape factory{renderer_};
     factory.color({255, 0, 0, 255});
     factory.color({cs_->get_r(), cs_->get_g(), cs_->get_b(), 255});

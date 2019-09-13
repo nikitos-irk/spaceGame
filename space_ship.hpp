@@ -113,7 +113,6 @@ public:
     ColorGeneratorShip *cg;
     std::vector<primitive::Point> pp;
     void updateNozzles();
-    double getCurrentA();
     primitive::Point getMedianIntersaction();
     Speed *speed;
     void slowdown();

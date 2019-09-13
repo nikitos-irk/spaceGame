@@ -22,7 +22,7 @@ DirectionXY Speed::getOffsetXY(DirectionalVector dv){
     return DirectionXY((p2.x - p1.x)*current_a_, (p2.y - p1.y)*current_a_);
 }
 
-double Speed::get_current_a() { return abs(current_a_); }
+double Speed::get_current_a() const { return abs(current_a_); }
 
 void Speed::accelarate(){
     if (forward_offset_ <= 0.0){

@@ -19,7 +19,7 @@ public:
     void backwardSlowdown();
     void backwardAccelarate();
     DirectionXY getOffsetXY(DirectionalVector);
-    double get_current_a();
+    double get_current_a() const;
 };
 
 #endif // SPEED_H
