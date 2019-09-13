@@ -1,8 +1,7 @@
 #ifndef FIGURE_RECTANGLE_HPP_
 #define FIGURE_RECTANGLE_HPP_
 
-struct SDL_Rect;
-struct SDL_Renderer;
+#include <SDL2/SDL.h>
 
 namespace figure
 {
@@ -14,7 +13,7 @@ namespace figure
     void fill() const;
   private:
     SDL_Renderer* renderer_;
-    const SDL_Rect& rect_;
+    SDL_Rect rect_;
   };
 
 }  // namespace figure

@@ -11,17 +11,17 @@ void Background::fillBackground(){
     constexpr int gradient_size = 1;
     int steps = 1 + (screen_size_.width / (kCitizenSize * gradient_size));
 
-    constexpr double r_start = 100;
-    constexpr double g_start = 100;
-    constexpr double b_start = 100;
+    constexpr auto r_start = 100;
+    constexpr auto g_start = 100;
+    constexpr auto b_start = 100;
 
-    constexpr double r_finish = 0;
-    constexpr double g_finish = 0;
-    constexpr double b_finish = 60;
+    constexpr auto r_finish = 0;
+    constexpr auto g_finish = 0;
+    constexpr auto b_finish = 60;
 
-    double r_step = abs(r_finish - r_start) / steps;
-    double g_step = abs(g_finish - g_start) / steps;
-    double b_step = abs(b_finish - b_start) / steps;
+    int r_step = abs(r_finish - r_start) / steps;
+    int g_step = abs(g_finish - g_start) / steps;
+    int b_step = abs(b_finish - b_start) / steps;
 
     primitive::Point point{0.0, 0.0};
     primitive::Size size{screen_size_.width, kCitizenSize * 10};

@@ -22,10 +22,10 @@ struct SDL_Renderer;
 static std::exception_ptr globalExceptionPtr = nullptr;
 
 class GameOverException: public std::exception {
-    const char *file_;
-    int line_;
-    const char* func_;
-    const char* info_;
+    const char *file_{nullptr};
+    int line_{0};
+    const char* func_{nullptr};
+    const char* info_{nullptr};
 public:
     GameOverException(const char *msg, const char *file, int line, const char *func, const char *info=""):
         file_(file),

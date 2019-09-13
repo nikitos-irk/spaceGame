@@ -1,7 +1,5 @@
 #include "rectangle.hpp"
 
-#include <SDL2/SDL.h>
-
 #include "exception.hpp"
 
 namespace figure

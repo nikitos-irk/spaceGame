@@ -12,8 +12,7 @@ private:
 
 public:
     Background(SDL_Renderer* renderer, primitive::Size size)
-        : renderer_{renderer},
-          screen_size_{size} {}
+        : renderer_{renderer}, screen_size_{size} {}
     void fillBackground();
     void drawGrid();
 };
