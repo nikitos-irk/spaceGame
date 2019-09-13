@@ -1,7 +1,7 @@
 #ifndef PRIMITIVE_POINT_HPP_
 #define PRIMITIVE_POINT_HPP_
 
-#include <cstdlib>
+#include <cmath>
 
 namespace {
 bool doubleEquals(double a, double b, double epsilon = 0.000000001)
