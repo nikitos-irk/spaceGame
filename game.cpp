@@ -343,20 +343,14 @@ void Game::changeObjectsPositions(){
 void Game::displayLifeAmount(){
     SDL_SetRenderDrawColor(renderer_, 0, 255, 0, 255);
 
-    SDL_Rect rect;
-    rect.x = 5;
-    rect.y = screen_size_.height - 32;
-    rect.w = 5 * 15 + 4;
-    rect.h = 24;
-    SDL_RenderFillRect(renderer_, &rect);
+    figure::FactoryShape factory{renderer_};
+    constexpr primitive::Size size{5 * 15 + 4, 24};
+    factory.rectangle({5.0, double(screen_size_.height - 32)}, size).fill();
 
     for (int i = 0; i < live_amount_; ++i){
-        rect.x = 10 + i * 15;
-        rect.y = screen_size_.height - 30;
-        rect.w = 10;
-        rect.h = 20;
+        constexpr primitive::Size size{10, 20};
         SDL_SetRenderDrawColor(renderer_, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer_, &rect);
+        factory.rectangle({10.0 + i * 15, double(screen_size_.height - 30)}, size).fill();
     }
 }
 

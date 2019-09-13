@@ -12,12 +12,6 @@ void Background::fillBackground(){
     int gradient_size = 1;
     int steps = 1 + (screen_size_.width / (kCitizenSize * gradient_size));
 
-    SDL_Rect rect;
-    rect.x = 0;
-    rect.y = 0;
-    rect.w = screen_size_.width;
-    rect.h = kCitizenSize * 10;
-
     double r_start = 100;
     double g_start = 100;
     double b_start = 100;
@@ -34,15 +28,18 @@ void Background::fillBackground(){
     double g_step = abs(g_finish - g_start) / steps;
     double b_step = abs(b_finish - b_start) / steps;
 
-    while (rect.y < screen_size_.height) {
+    primitive::Point point{0.0, 0.0};
+    primitive::Size size{screen_size_.width, kCitizenSize * 10};
+    figure::FactoryShape factory{renderer_};
+    while (point.y < screen_size_.height) {
         r = (r_start < r_finish) ? r + r_step : r - r_step;
         g = (g_start < g_finish) ? g + g_step : g - g_step;
         b = (b_start < b_finish) ? b + b_step : b - b_step;
 
         SDL_SetRenderDrawColor(renderer_, r, g, b, 255);
-        SDL_RenderFillRect(renderer_, &rect);
-        rect.x = 0;
-        rect.y += kCitizenSize * gradient_size;
+        factory.rectangle(point, size).fill();
+        point.x = 0.0;
+        point.y += kCitizenSize * gradient_size;
     }
 }
 

@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}
     "figure/factory_shape.cpp"
     "figure/line.cpp"
     "figure/point.cpp"
+    "figure/rectangle.cpp"
     "background.cpp"
     "colorschema.cpp"
     "common.cpp"

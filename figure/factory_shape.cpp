@@ -1,7 +1,10 @@
 #include "factory_shape.hpp"
 
+#include <SDL2/SDL.h>
+
 #include "exception.hpp"
 #include "primitive/point.hpp"
+#include "primitive/size.hpp"
 
 namespace figure
 {
@@ -14,16 +17,26 @@ FactoryShape::FactoryShape(SDL_Renderer *renderer)
 
 Point FactoryShape::point(primitive::Point const& point) const
 {
-    return Point{renderer_, static_cast<int>(point.x), static_cast<int>(point.y)};
+    return {renderer_, static_cast<int>(point.x), static_cast<int>(point.y)};
 }
 
 Line FactoryShape::line(primitive::Point const& begin,
                         primitive::Point const& end) const
 {
-    return Line{renderer_,
+    return {renderer_,
         static_cast<int>(begin.x), static_cast<int>(begin.y),
         static_cast<int>(end.x), static_cast<int>(end.y)
     };
 }
+
+Rectangle FactoryShape::rectangle(primitive::Point const& point,
+                                  primitive::Size const& size) const
+{
+  return {renderer_, {
+      static_cast<int>(point.x), static_cast<int>(point.y),
+      size.width, size.height
+  }};
+}
+
 }  // namespace figure
 

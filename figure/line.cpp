@@ -1,8 +1,8 @@
 #include "line.hpp"
 
-#include "exception.hpp"
-
 #include <SDL2/SDL.h>
+
+#include "exception.hpp"
 
 namespace figure
 {
