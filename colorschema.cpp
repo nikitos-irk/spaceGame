@@ -2,94 +2,85 @@
 
 #include <cstdlib>
 
-constexpr auto COLOR_MODIFICATION_DELAY = 10;
+constexpr auto kColorModificationDelay = 10;
 
 void ColorSchema::update(){
     auto now = std::chrono::system_clock::now();
-    if (now <= change_colorchema_delay) { return; }
-    change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
+    if (now <= change_colorchema_delay_) { return; }
+    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
 
-    if (flag){
-        if (colorMix >= 1){ flag = !flag; return;}
-        colorMix += 0.01;
-        r = colorA.r * (1-colorMix) + colorB.r * (colorMix);
-        g = colorA.g * (1-colorMix) + colorB.g * (colorMix);
-        b = colorA.b * (1-colorMix) + colorB.b * (colorMix);
+    if (flag_){
+        if (color_mix_ >= 1){ flag_ = !flag_; return;}
+        color_mix_ += 0.01;
+        r_ = color_a_.r * (1-color_mix_) + color_b_.r * (color_mix_);
+        g_ = color_a_.g * (1-color_mix_) + color_b_.g * (color_mix_);
+        b_ = color_a_.b * (1-color_mix_) + color_b_.b * (color_mix_);
     } else {
-        if (colorMix <= 0){ flag = !flag; return;}
-        colorMix -= 0.01;
-        r = colorA.r * (1-colorMix) + colorB.r * (colorMix);
-        g = colorA.g * (1-colorMix) + colorB.g * (colorMix);
-        b = colorA.b * (1-colorMix) + colorB.b * (colorMix);
+        if (color_mix_ <= 0){ flag_ = !flag_; return;}
+        color_mix_ -= 0.01;
+        r_ = color_a_.r * (1-color_mix_) + color_b_.r * (color_mix_);
+        g_ = color_a_.g * (1-color_mix_) + color_b_.g * (color_mix_);
+        b_ = color_a_.b * (1-color_mix_) + color_b_.b * (color_mix_);
     }
 }
 
-void ColorSchema::update(double currentA){
+void ColorSchema::update(double current_a){
     auto now = std::chrono::system_clock::now();
-    if (now <= change_colorchema_delay) { return; }
-    change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
+    if (now <= change_colorchema_delay_) { return; }
+    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
 
-    r = colorA.r + abs(colorA.r - colorB.r) * currentA;
-    g = colorA.g + abs(colorA.g - colorB.g) * currentA;
-    b = colorA.b + abs(colorA.b - colorB.b) * currentA;
+    r_ = color_a_.r + abs(color_a_.r - color_b_.r) * current_a;
+    g_ = color_a_.g + abs(color_a_.g - color_b_.g) * current_a;
+    b_ = color_a_.b + abs(color_a_.b - color_b_.b) * current_a;
 }
 
 ColorSchema::ColorSchema(int r, int g, int b){
-    this->r = r;
-    this->g = g;
-    this->b = b;
-    flag = false;
+    this->r_ = r;
+    this->g_ = g;
+    this->b_ = b;
+    flag_ = false;
     auto now = std::chrono::system_clock::now();
-    change_colorchema_delay = now + static_cast<std::chrono::milliseconds> (COLOR_MODIFICATION_DELAY);
+    change_colorchema_delay_ = now + static_cast<std::chrono::milliseconds> (kColorModificationDelay);
 }
 
-ColorSchema::ColorSchema(Color a, Color b): colorA(a), colorB(b){}
+ColorSchema::ColorSchema(Color a, Color b): color_a_(a), color_b_(b){}
 
-int ColorSchema::getR(){ return r; }
-int ColorSchema::getG(){ return g; }
-int ColorSchema::getB(){ return b; }
+int ColorSchema::get_r(){ return r_; }
+int ColorSchema::get_g(){ return g_; }
+int ColorSchema::get_b(){ return b_; }
 
-colorGeneratorShip::colorGeneratorShip(){
-    availableColors.push_back(Color(220,220,220));
-    availableColors.push_back(Color(192,192,192));
-    availableColors.push_back(Color(105,105,105));
-    availableColors.push_back(Color(211,211,211));
-    availableColors.push_back(Color(119,136,153));
-    colorIter = availableColors.end();
+ColorGeneratorShip::ColorGeneratorShip(){
+    available_colors_.push_back(Color(220,220,220));
+    available_colors_.push_back(Color(192,192,192));
+    available_colors_.push_back(Color(105,105,105));
+    available_colors_.push_back(Color(211,211,211));
+    available_colors_.push_back(Color(119,136,153));
+    color_iter_ = available_colors_.end();
 }
 
-colorGeneratorAsteroid::colorGeneratorAsteroid(){
-    // availableColors.push_back(Color(96, 54, 102));
-    // availableColors.push_back(Color(209, 167, 229));
-    // availableColors.push_back(Color(176, 10, 255));
-    // availableColors.push_back(Color(72, 6, 104));
-    // availableColors.push_back(Color(51, 9, 71));
-    // availableColors.push_back(Color(48, 23, 61));
-    // availableColors.push_back(Color(119, 98, 130));
-    // availableColors.push_back(Color(217, 204, 224));
-    // availableColors.push_back(Color(205, 114, 255));
-    availableColors.push_back(Color(160, 177, 188));
-    availableColors.push_back(Color(119, 98, 84));
-    availableColors.push_back(Color(128, 0, 0));
-    availableColors.push_back(Color(81, 81, 81));
-    availableColors.push_back(Color(76, 62, 54));
-    availableColors.push_back(Color(139, 69, 19));
-    colorIter = availableColors.end();
+ColorGeneratorAsteroid::ColorGeneratorAsteroid(){
+    available_colors_.push_back(Color(160, 177, 188));
+    available_colors_.push_back(Color(119, 98, 84));
+    available_colors_.push_back(Color(128, 0, 0));
+    available_colors_.push_back(Color(81, 81, 81));
+    available_colors_.push_back(Color(76, 62, 54));
+    available_colors_.push_back(Color(139, 69, 19));
+    color_iter_ = available_colors_.end();
 }
 
-Color colorGenerator::getNextColor(){
+Color ColorGenerator::getNextColor(){
     Color result;
-    if (colorIter == availableColors.end()) { colorIter = availableColors.begin();}
-    result = *colorIter;
-    colorIter++;
+    if (color_iter_ == available_colors_.end()) { color_iter_ = available_colors_.begin();}
+    result = *color_iter_;
+    color_iter_++;
     return result;
 }
 
-void colorGenerator::setToEnd(){
-    colorIter = availableColors.end();
+void ColorGenerator::setToEnd(){
+    color_iter_ = available_colors_.end();
 }
 
-Color colorGenerator::getRandomColor(){
+Color ColorGenerator::getRandomColor(){
     Color randomColor;
     switch (rand() % 5){
         case 1: randomColor = Color(220,220,220); break;
