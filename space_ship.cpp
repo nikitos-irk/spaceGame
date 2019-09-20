@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "primitive/time.hpp"
-
 constexpr auto kBlockSize = 5;
 constexpr auto kRotationDelay = 60ms;
 constexpr auto kDisplayDelay = 10ms;
@@ -12,11 +10,12 @@ constexpr auto kShootingDelay = 100ms;
 constexpr auto kProjLifetime = 5s;
 constexpr auto kShipColorChange = 50ms;
 
-SpaceObject::SpaceObject(SDL_Renderer *renderer, primitive::Size screen_size, int x, int y)
+SpaceObject::SpaceObject(SDL_Renderer *renderer,
+                         primitive::Size screen_size,
+                         primitive::Point coordinate)
     : renderer_{renderer},
-      screen_size_{screen_size},
-      x_{x},
-      y_{y}
+      coordinate_{coordinate},
+      screen_size_{screen_size}
 {
   display_delay_ = primitive::delay(kDisplayDelay);
   rotation_delay_ = primitive::delay(kRotationDelay);
@@ -30,26 +29,26 @@ bool SpaceObject::isAlive(){ return alive_; }
 void SpaceObject::markAsDead() { alive_ = false; }
 
 Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
-                       int offset_x, int offset_y, int x, int y)
-    : SpaceObject::SpaceObject(renderer, screen_size, x, y){
-    direction_x_ = offset_x;
-    direction_y_ = offset_y;
-    this->x_ = x;
-    this->y_ = y;
+                       int offset_x, int offset_y, primitive::Point coordinate)
+    : SpaceObject(renderer, screen_size, coordinate),
+      direction_x_{offset_x},
+      direction_y_{offset_y} {
     life_time_ = primitive::delay(kProjLifetime);
 }
 
-primitive::Point* Projectile::getXY(){ return new primitive::Point{double(x_), double(y_)}; }
+primitive::Point* Projectile::getXY(){ return &coordinate_; }
 std::pair<primitive::Point, primitive::Point> Projectile::getLine()
-{ return std::make_pair(primitive::Point{double(x_), double(y_)},
+{ return std::make_pair(coordinate_,
                         primitive::Point{x_previous_, y_previous_}); }
 
 Projectile::~Projectile(){
     std::cout << "Projectile destructor" << std::endl;
 }
 
-Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Size screen_size, int x, int y)
-    : SpaceObject::SpaceObject(renderer, screen_size, x, y){
+Asteroid::Asteroid(SDL_Renderer *renderer,
+                   primitive::Size screen_size,
+                   primitive::Point coordinate)
+    : SpaceObject(renderer, screen_size, coordinate) {
     //TODO: think about direction_x;direction_y
 
     int error_x = rand() % 10;
@@ -57,12 +56,12 @@ Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Size screen_size, int x, i
     int size = rand() % 20;
     cg = new ColorGeneratorAsteroid();
 
-    pp_.push_back(new primitive::Point{double(x + error_x), double(y + error_y)});
-    pp_.push_back(new primitive::Point{double(x - size + rand() % 5), double(y + size + rand() % 5)});
-    pp_.push_back(new primitive::Point{double(x + rand() % 5), double(y + size * 2 + rand() % 5)});
-    pp_.push_back(new primitive::Point{double(x + size + rand() % 5), double(y + size * 2 + rand() % 5)});
-    pp_.push_back(new primitive::Point{double(x + size * 2 + rand() % 5), double(y + size + rand() % 5)});
-    pp_.push_back(new primitive::Point{double(x + size + rand() % 5), double(y + rand() % 5)});
+    pp_.push_back(new primitive::Point{coordinate_.x + error_x, coordinate_.y + error_y});
+    pp_.push_back(new primitive::Point{coordinate_.x - size + rand() % 5, coordinate_.y + size + rand() % 5});
+    pp_.push_back(new primitive::Point{coordinate_.x + rand() % 5, coordinate_.y + size * 2 + rand() % 5});
+    pp_.push_back(new primitive::Point{coordinate_.x + size + rand() % 5, coordinate_.y + size * 2 + rand() % 5});
+    pp_.push_back(new primitive::Point{coordinate_.x + size * 2 + rand() % 5, coordinate_.y + size + rand() % 5});
+    pp_.push_back(new primitive::Point{coordinate_.x + size + rand() % 5, coordinate_.y + rand() % 5});
 }
 
 std::vector<primitive::Point*>& Asteroid::get_points(){ return pp_; }
@@ -91,7 +90,8 @@ primitive::Point SpaceShip::getMedianIntersaction(){
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int max_speed)
-    : SpaceObject::SpaceObject(renderer, screen_size, screen_size.width/2, screen_size.height/2),
+    : SpaceObject(renderer, screen_size,
+        {double(screen_size.width)/2, double(screen_size.height)/2}),
       space_size_{30, screen_size.height / 8},
       nozzle_size_{8, 0}
 {
@@ -304,7 +304,8 @@ Projectile * SpaceShip::shoot(){
     double diff_x = (mediana_x - pp[0].x)/5;
     double diff_y = (mediana_y - pp[0].y)/5;
 
-    Projectile *projectile = new Projectile(this->renderer_, primitive::Size{0, 0}, diff_x, diff_y, pp[0].x - diff_x, pp[0].y - diff_y);
+    Projectile *projectile = new Projectile(renderer_, primitive::Size{0, 0},
+        diff_x, diff_y, {pp[0].x - diff_x, pp[0].y - diff_y});
     return projectile;
 }
 
@@ -316,8 +317,8 @@ void Projectile::display(bool display_skeleton){
     double tmp_x = (double) kBlockSize - 0.5;
     double tmp_y = (double) 0.5;
 
-    double cx = this->x_ - 0.5;
-    double cy = this->y_ - 0.5;
+    double cx = coordinate_.x - 0.5;
+    double cy = coordinate_.y - 0.5;
 
     figure::FactoryShape factory{renderer_};
     factory.color({255, 255, 0, 255});
@@ -354,15 +355,15 @@ void Projectile::display(bool display_skeleton){
     factory.color({128, 0, 128, 255});
     for (double dy = 1; dy <= kBlockSize; dy += 1.0){
         double dx = floor(sqrt((2.0 * kBlockSize * dy) - (dy * dy)));
-        double cx = this->x_;
-        double cy = this->y_;
+        double cx = coordinate_.x;
+        double cy = coordinate_.y;
         factory.line({cx - dx, cy + dy - kBlockSize},
                      {cx + dx, cy + dy - kBlockSize}).draw();
         factory.line({cx - dx, cy - dy + kBlockSize},
                      {cx + dx, cy - dy + kBlockSize}).draw();
     }
-    this->x_ -= direction_x_;
-    this->y_ -= direction_y_;
+    coordinate_.x -= direction_x_;
+    coordinate_.y -= direction_y_;
     display_delay_ = primitive::delay(kDisplayDelay/5);
 }
 
@@ -437,8 +438,8 @@ primitive::Point* Asteroid::getFirstPoint(){
 }
 
 void Projectile::changePosition(DirectionXY direction_xy){
-    this->x_previous_ = x_;
-    this->y_previous_ = y_;
-    this->x_ += direction_xy.x;
-    this->y_ += direction_xy.y;
+    x_previous_ = coordinate_.x;
+    y_previous_ = coordinate_.y;
+    coordinate_.x += direction_xy.x;
+    coordinate_.y += direction_xy.y;
 }

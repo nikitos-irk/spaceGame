@@ -4,13 +4,7 @@
 
 constexpr auto kAcceleration = 100;
 
-Speed::Speed(int max_offset){
-    this->max_offset_ = max_offset;
-    negative_offset_ = 0.0;
-    positive_offset_ = 0.0;
-    forward_offset_ = 0.0;
-    backward_offset_ = 0.0;
-}
+Speed::Speed(double max_offset) : max_offset_{max_offset} {}
 
 DirectionXY Speed::getOffsetXY(DirectionalVector dv){
     DirectionXY p1 = dv.p1;

@@ -14,20 +14,19 @@
 struct Nozzle{
     std::vector <primitive::Point> points;
     std::vector <primitive::Point> origin_points;
-    SDL_Renderer* renderer;
-    ColorSchema *cs;
-    Speed *speed;
+    SDL_Renderer* renderer{nullptr};
+    ColorSchema* cs{nullptr};
+    Speed* speed{nullptr};
 
     Nozzle(SDL_Renderer* renderer, primitive::Point a, primitive::Point b,
-           primitive::Point c, Speed *speed) {
-        origin_points.push_back(a);
-        origin_points.push_back(b);
-        origin_points.push_back(c);
-        copy(origin_points.begin(), origin_points.end(), back_inserter(points));
-        this->renderer = renderer;
-        this->speed = speed;
-        cs = new ColorSchema(primitive::Color{255, 17, 0}, primitive::Color{255, 237, 0});
-    }
+           primitive::Point c, Speed *speed)
+        : points{a, b, c},
+          origin_points{a, b, c},
+          renderer{renderer},
+          cs{new ColorSchema{primitive::Color{255, 17, 0},
+                             primitive::Color{255, 237, 0}}},
+          speed{speed} {}
+
     void display(){
         cs->update(speed->get_current_a());
         figure::FactoryShape factory{renderer};
@@ -62,14 +61,14 @@ struct Nozzle{
 class SpaceObject{
 protected:
     SDL_Renderer *renderer_{nullptr};
-    int x_, y_;
+    primitive::Point coordinate_;
     primitive::Size screen_size_;
     primitive::Time display_delay_;
     primitive::Time rotation_delay_;
     bool alive_{true};
 
 public:
-    SpaceObject(SDL_Renderer*, primitive::Size, int, int);
+    SpaceObject(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
     virtual void display(bool) = 0;
     virtual void changePosition(DirectionXY);
     virtual ~SpaceObject();
@@ -86,7 +85,7 @@ private:
     primitive::Time life_time_;
 
 public:
-    Projectile(SDL_Renderer*, primitive::Size, int, int, int, int);
+    Projectile(SDL_Renderer*, primitive::Size, int, int, primitive::Point);
     void changePosition(DirectionXY);
     void display(bool);
     primitive::Point* getXY();
@@ -133,7 +132,7 @@ public:
     ~SpaceShip();
 };
 
-class Asteroid: public SpaceObject{
+class Asteroid: public SpaceObject {
 private:
     std::vector<primitive::Point*> pp_;
     void fill();
@@ -142,7 +141,7 @@ public:
     primitive::Point getCenterPoint();
     void display(bool);
     std::vector<primitive::Point*>& get_points();
-    Asteroid(SDL_Renderer*, primitive::Size, int, int);
+    Asteroid(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
     void changePosition(DirectionXY);
     primitive::Point* getFirstPoint();
     ~Asteroid();
