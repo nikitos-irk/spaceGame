@@ -5,9 +5,10 @@
 
 #include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
-#include "primitive/size.hpp"
 #include "primitive/color.hpp"
 #include "primitive/point.hpp"
+#include "primitive/size.hpp"
+#include "primitive/time.hpp"
 #include "speed.hpp"
 
 struct Nozzle{
@@ -63,8 +64,8 @@ protected:
     SDL_Renderer *renderer_{nullptr};
     int x_, y_;
     primitive::Size screen_size_;
-    std::chrono::time_point<std::chrono::system_clock> display_delay_;
-    std::chrono::time_point<std::chrono::system_clock> rotation_delay_;
+    primitive::Time display_delay_;
+    primitive::Time rotation_delay_;
     bool alive_{true};
 
 public:
@@ -82,7 +83,7 @@ private:
     int direction_y_;
     double x_previous_;
     double y_previous_;
-    std::chrono::time_point<std::chrono::system_clock> life_time_;
+    primitive::Time life_time_;
 
 public:
     Projectile(SDL_Renderer*, primitive::Size, int, int, int, int);
@@ -90,7 +91,7 @@ public:
     void display(bool);
     primitive::Point* getXY();
     std::pair<primitive::Point, primitive::Point> getLine();
-    std::chrono::time_point<std::chrono::system_clock> get_life_time();
+    primitive::Time get_life_time();
     ~Projectile();
 };
 
@@ -98,8 +99,8 @@ class SpaceShip: public SpaceObject{
 private:
     ColorSchema *cs_;
     std::vector<primitive::Point> skeleton_;
-    std::chrono::time_point<std::chrono::system_clock> shoot_delay_;
-    std::chrono::time_point<std::chrono::system_clock> ship_color_change_;
+    primitive::Time shoot_delay_;
+    primitive::Time ship_color_change_;
     primitive::Point initial_median_intersection_;
     double getTiltAngel();
     double getLengthOfBase();

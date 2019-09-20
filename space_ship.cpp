@@ -1,10 +1,9 @@
 #include "space_ship.hpp"
 
 #include <cstdlib>
-#include <chrono>
 #include <iostream>
 
-using namespace std::chrono;
+#include "primitive/time.hpp"
 
 constexpr auto kBlockSize = 5;
 constexpr auto kRotationDelay = 60ms;
@@ -19,8 +18,8 @@ SpaceObject::SpaceObject(SDL_Renderer *renderer, primitive::Size screen_size, in
       x_{x},
       y_{y}
 {
-  display_delay_ = NOW + kDisplayDelay;
-  rotation_delay_ = NOW + kRotationDelay;
+  display_delay_ = primitive::delay(kDisplayDelay);
+  rotation_delay_ = primitive::delay(kRotationDelay);
 }
 
 SpaceObject::~SpaceObject(){
@@ -37,7 +36,7 @@ Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
     direction_y_ = offset_y;
     this->x_ = x;
     this->y_ = y;
-    life_time_ = NOW + kProjLifetime;
+    life_time_ = primitive::delay(kProjLifetime);
 }
 
 primitive::Point* Projectile::getXY(){ return new primitive::Point{double(x_), double(y_)}; }
@@ -97,8 +96,8 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int ma
       nozzle_size_{8, 0}
 {
 
-    shoot_delay_ = NOW + kShootingDelay;
-    ship_color_change_ = NOW + kShipColorChange;
+    shoot_delay_ = primitive::delay(kShootingDelay);
+    ship_color_change_ = primitive::delay(kShipColorChange);
 
     speed = new Speed(max_speed);
 
@@ -218,7 +217,7 @@ void rotatePointsInVector(std::vector<primitive::Point> &points,
 
 void SpaceShip::changeX(bool clockwise){
 
-    if (rotation_delay_ > NOW) { return; }
+    if (rotation_delay_ > primitive::now()) { return; }
     double angle = M_PI/15;
 
     if (!clockwise){
@@ -234,7 +233,7 @@ void SpaceShip::changeX(bool clockwise){
     left_nozzle_->display();
     right_nozzle_->display();
 
-    rotation_delay_ = NOW + kRotationDelay;
+    rotation_delay_ = primitive::delay(kRotationDelay);
 }
 
 double SpaceShip::getTiltAngel(){
@@ -294,11 +293,11 @@ void SpaceShip::display(bool display_skeleton){
     factory.color({255, 0, 0, 255});
 }
 
-std::chrono::time_point<std::chrono::system_clock> Projectile::get_life_time(){ return life_time_; }
+primitive::Time Projectile::get_life_time(){ return life_time_; }
 
 Projectile * SpaceShip::shoot(){
-    if (this->shoot_delay_ > NOW) { return nullptr; }
-    shoot_delay_ = NOW + kShootingDelay;
+    if (this->shoot_delay_ > primitive::now()) { return nullptr; }
+    shoot_delay_ = primitive::delay(kShootingDelay);
 
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
@@ -311,7 +310,7 @@ Projectile * SpaceShip::shoot(){
 
 void Projectile::display(bool display_skeleton){
 
-    if (display_delay_ > NOW){ return; }
+    if (display_delay_ > primitive::now()){ return; }
 
     double error = (double) - kBlockSize;
     double tmp_x = (double) kBlockSize - 0.5;
@@ -364,7 +363,7 @@ void Projectile::display(bool display_skeleton){
     }
     this->x_ -= direction_x_;
     this->y_ -= direction_y_;
-    display_delay_ = NOW + (kDisplayDelay/5);
+    display_delay_ = primitive::delay(kDisplayDelay/5);
 }
 
 primitive::Point Asteroid::getCenterPoint(){

@@ -1,5 +1,7 @@
 #include "background.hpp"
 
+#include <cmath>
+
 #include "figure/factory_shape.hpp"
 #include "primitive/color.hpp"
 #include "primitive/point.hpp"
@@ -19,9 +21,9 @@ void Background::fillBackground(){
     constexpr auto g_finish = 0;
     constexpr auto b_finish = 60;
 
-    int r_step = abs(r_finish - r_start) / steps;
-    int g_step = abs(g_finish - g_start) / steps;
-    int b_step = abs(b_finish - b_start) / steps;
+    int r_step = std::abs(r_finish - r_start) / steps;
+    int g_step = std::abs(g_finish - g_start) / steps;
+    int b_step = std::abs(b_finish - b_start) / steps;
 
     primitive::Point point{0.0, 0.0};
     primitive::Size size{screen_size_.width, kCitizenSize * 10};

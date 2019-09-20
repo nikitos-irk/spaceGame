@@ -1,17 +1,17 @@
 #ifndef COLORSCHEMA_H
 #define COLORSCHEMA_H
 
-#include <chrono>
 #include <vector>
 
 #include "primitive/color.hpp"
+#include "primitive/time.hpp"
 
 class ColorSchema{
     int r_, g_, b_;
     bool flag_;
     primitive::Color color_a_, color_b_;
     double color_mix_ = 1.0;
-    std::chrono::time_point<std::chrono::system_clock> change_colorchema_delay_;
+    primitive::Time change_colorchema_delay_;
 public:
     ColorSchema(int, int, int);
     ColorSchema(primitive::Color, primitive::Color);

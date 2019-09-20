@@ -27,10 +27,6 @@ DirectionXY::DirectionXY(){
     this->y = 0;
 }
 
-Common::Common() {
-
-}
-
 std::pair<double, double> getXYOffsetOnVector(primitive::Point px1,
                                               primitive::Point px2,
                                               double offset_length) {

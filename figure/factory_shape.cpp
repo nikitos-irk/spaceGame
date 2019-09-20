@@ -38,6 +38,7 @@ Rectangle FactoryShape::rectangle(primitive::Point const& point,
         size.width, size.height
     }};
 }
+
 FactoryShape& FactoryShape::color(primitive::Color const& color)
 {
     if (SDL_SetRenderDrawColor(renderer_, color.red, color.green, color.blue,

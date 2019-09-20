@@ -1,11 +1,11 @@
 #ifndef EXPLOSION_HPP
 #define EXPLOSION_HPP
 
-#include <chrono>
 #include <vector>
 
 #include "common.hpp"
 #include "primitive/point.hpp"
+#include "primitive/time.hpp"
 
 struct SDL_Renderer;
 
@@ -17,9 +17,9 @@ public:
 private:
     primitive::Point p_;
     SDL_Renderer *renderer_;
-    std::chrono::time_point<std::chrono::system_clock> destroy_time_;
+    primitive::Time destroy_time_;
     class Fragment{
-        std::chrono::time_point<std::chrono::system_clock> fragment_shift_delay_;
+        primitive::Time fragment_shift_delay_;
         int dots_number_;
         double x_shift_;
         double y_shift_;

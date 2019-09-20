@@ -16,7 +16,7 @@ DirectionXY Speed::getOffsetXY(DirectionalVector dv){
     DirectionXY p1 = dv.p1;
     DirectionXY p2 = dv.p2;
 
-    double vl = sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+    double vl = std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
     current_a_ = (forward_offset_ - backward_offset_) / vl;
 
     return DirectionXY((p2.x - p1.x)*current_a_, (p2.y - p1.y)*current_a_);

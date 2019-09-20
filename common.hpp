@@ -10,7 +10,6 @@
 struct SDL_Renderer;
 class ColorGenerator;
 
-#define NOW std::chrono::system_clock::now()
 typedef std::complex<double> point;
 
 struct DirectionXY{
@@ -47,10 +46,5 @@ std::pair<primitive::Point, primitive::Point> getPerpendicularLineByPoint(
     primitive::Point, primitive::Point, primitive::Point, double);
 void updateSkeleton(ColorGenerator*, SDL_Renderer*, double, double, primitive::Point,
                     primitive::Point, primitive::Point, double, bool, bool);
-
-class Common {
-public:
-    Common();
-};
 
 #endif // COMMON_HPP

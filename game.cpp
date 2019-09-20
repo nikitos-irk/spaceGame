@@ -9,8 +9,6 @@
 #include "explosion.hpp"
 #include "space_ship.hpp"
 
-using namespace std::chrono;
-
 constexpr auto kAsteroidsRemovingDelay = 10ms;
 constexpr auto kChangePositionDelay = 30ms;
 constexpr auto kInertiaDelay = 10ms;
@@ -34,9 +32,9 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
   }
 
   // Initiating delays
-  change_position_delay_ = NOW + kChangePositionDelay;
-  inertia_delay_ = NOW + kInertiaDelay;
-  update_asteroids_delay_ = NOW + kAsteroidsRemovingDelay;
+  change_position_delay_ = primitive::delay(kChangePositionDelay);
+  inertia_delay_ = primitive::delay(kInertiaDelay);
+  update_asteroids_delay_ = primitive::delay(kAsteroidsRemovingDelay);
 }
 
 void Game::createAsteroid(){
@@ -55,7 +53,7 @@ void Game::createAsteroid(){
 }
 
 void Game::updateAsteroids(){
-    if (update_asteroids_delay_ >= NOW){ return; }
+    if (update_asteroids_delay_ >= primitive::now()){ return; }
     primitive::Point tmp_p = my_ship_->getMedianIntersaction();
     primitive::Point *ap = nullptr;
     double distance;
@@ -73,14 +71,14 @@ void Game::updateAsteroids(){
             ++iter;
         }
     }
-    update_asteroids_delay_ = NOW + kAsteroidsRemovingDelay;
+    update_asteroids_delay_ = primitive::delay(kAsteroidsRemovingDelay);
 }
 
 void Game::updateProjectiles(){
     auto iter = projectiles_.begin();
     while (iter != projectiles_.end())
     {
-        if (dynamic_cast<Projectile*>(*iter)->get_life_time() < NOW){
+        if (dynamic_cast<Projectile*>(*iter)->get_life_time() < primitive::now()){
             SpaceObject *tmp = *iter;
             projectiles_.erase(iter++);
             delete tmp;
@@ -319,7 +317,7 @@ void Game::displayObjects(bool display_skeletons=false){
 
 void Game::changeObjectsPositions(){
 
-    if (change_position_delay_ > NOW){ return; }
+    if (change_position_delay_ > primitive::now()){ return; }
 
     DirectionXY directionXY = my_ship_->getOffset();
 
@@ -335,7 +333,7 @@ void Game::changeObjectsPositions(){
         }
     }
 
-    change_position_delay_ = NOW + kChangePositionDelay;
+    change_position_delay_ = primitive::delay(kChangePositionDelay);
 }
 
 void Game::displayLifeAmount(){

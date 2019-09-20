@@ -2,14 +2,11 @@
 
 #include <cstdlib>
 
-using namespace std::chrono;
-
 constexpr auto kColorModificationDelay = 10ms;
 
 void ColorSchema::update(){
-    auto now = std::chrono::system_clock::now();
-    if (now <= change_colorchema_delay_) { return; }
-    change_colorchema_delay_ = now + kColorModificationDelay;
+    if (primitive::now() <= change_colorchema_delay_) { return; }
+    change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
 
     if (flag_){
         if (color_mix_ >= 1){ flag_ = !flag_; return;}
@@ -27,13 +24,12 @@ void ColorSchema::update(){
 }
 
 void ColorSchema::update(double current_a){
-    auto now = std::chrono::system_clock::now();
-    if (now <= change_colorchema_delay_) { return; }
-    change_colorchema_delay_ = now + kColorModificationDelay;
+    if (primitive::now() <= change_colorchema_delay_) { return; }
+    change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
 
-    r_ = color_a_.red + abs(color_a_.red - color_b_.red) * current_a;
-    g_ = color_a_.green + abs(color_a_.green - color_b_.green) * current_a;
-    b_ = color_a_.blue + abs(color_a_.blue - color_b_.blue) * current_a;
+    r_ = color_a_.red + std::abs(color_a_.red - color_b_.red) * current_a;
+    g_ = color_a_.green + std::abs(color_a_.green - color_b_.green) * current_a;
+    b_ = color_a_.blue + std::abs(color_a_.blue - color_b_.blue) * current_a;
 }
 
 ColorSchema::ColorSchema(int r, int g, int b){
@@ -41,8 +37,7 @@ ColorSchema::ColorSchema(int r, int g, int b){
     this->g_ = g;
     this->b_ = b;
     flag_ = false;
-    auto now = std::chrono::system_clock::now();
-    change_colorchema_delay_ = now + kColorModificationDelay;
+    change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
 }
 
 ColorSchema::ColorSchema(primitive::Color a, primitive::Color b)

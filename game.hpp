@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <chrono>
 #include <exception>
 #include <list>
 #include <mutex>
@@ -10,6 +9,7 @@
 #include <SDL2/SDL.h>
 
 #include "primitive/size.hpp"
+#include "primitive/time.hpp"
 
 class Asteroid;
 class Background;
@@ -46,9 +46,9 @@ private:
     primitive::Size screen_size_;
     int live_amount_;
 
-    std::chrono::time_point<std::chrono::system_clock> change_position_delay_;
-    std::chrono::time_point<std::chrono::system_clock> inertia_delay_;
-    std::chrono::time_point<std::chrono::system_clock> update_asteroids_delay_;
+    primitive::Time change_position_delay_;
+    primitive::Time inertia_delay_;
+    primitive::Time update_asteroids_delay_;
 
     std::mutex asteroids_mutex_;
     std::mutex projectiles_mutex_;

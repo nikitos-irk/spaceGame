@@ -3,8 +3,6 @@
 #include "common.hpp"
 #include "space_ship.hpp"
 
-using namespace std::chrono;
-
 constexpr auto kFragmentShiftDelay = 50ms;
 constexpr auto kExplosionLifeTime = 1s;
 
@@ -22,7 +20,7 @@ Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p, primitive::Poin
     for (int i = 0; i < this->dots_number_; ++i){
         dots.push_back(get_rotated_point(initial_p_, primitive::Point{initial_p_.x + rand() % distribution_value, initial_p_.y}));
     }
-    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
 Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p1, primitive::Point p2,
@@ -39,7 +37,7 @@ Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p1, primitive::Poi
     dots.push_back(p1);
     dots.push_back(p2);
     dots.push_back(p3);
-    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
 void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton){
@@ -56,7 +54,7 @@ void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton)
 
 void Explosion::Fragment::shift(){
 
-    if (fragment_shift_delay_ > NOW) { return; }
+    if (fragment_shift_delay_ > primitive::now()) { return; }
 
     double center_x = 0.0;
     double center_y = 0.0;
@@ -73,12 +71,12 @@ void Explosion::Fragment::shift(){
         *iter = get_rotated_point(*iter, primitive::Point{center_x, center_y}, this->angle_);
     }
 
-    fragment_shift_delay_ = NOW + kFragmentShiftDelay;
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
 Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer, Asteroid *ast){
 
-    destroy_time_ = NOW + kExplosionLifeTime;
+    destroy_time_ = primitive::delay(kExplosionLifeTime);
     this->p_ = p;
     this->renderer_ = renderer;
     primitive::Point p_center = ast->getCenterPoint();
@@ -108,7 +106,7 @@ void Explosion::display(bool display_Skeleton){
     }
 }
 
-bool Explosion::isAlive(){ return NOW < destroy_time_; }
+bool Explosion::isAlive(){ return primitive::now() < destroy_time_; }
 
 void Explosion::shift(DirectionXY shift_value){
 
