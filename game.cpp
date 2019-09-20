@@ -377,7 +377,7 @@ void Game::run(){
             }
             catch (const std::exception &ex)
             {
-              std::cout << "Gema Over!" << std::endl;
+              std::cout << "Game Over!" << std::endl;
               quit = false;
             }
           }

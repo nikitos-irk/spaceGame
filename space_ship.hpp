@@ -7,6 +7,7 @@
 #include "figure/factory_shape.hpp"
 #include "primitive/size.hpp"
 #include "primitive/color.hpp"
+#include "primitive/point.hpp"
 #include "speed.hpp"
 
 struct Nozzle{

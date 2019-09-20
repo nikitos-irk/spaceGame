@@ -109,11 +109,11 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int ma
     cg = new ColorGeneratorShip();
 
     // spaceship coordination
-    pp.push_back(primitive::Point{double(screen_size.width/2), double(screen_size.height/2)});
-    pp.push_back(primitive::Point{double(screen_size.width/2 - space_size_.width/2),
-                                  double(screen_size.height/2 + space_size_.height)});
-    pp.push_back(primitive::Point{double(screen_size.width/2 + space_size_.width/2),
-                                  double(screen_size.height/2 + space_size_.height)});
+    pp.push_back(primitive::Point{double(screen_size.width)/2, double(screen_size.height)/2});
+    pp.push_back(primitive::Point{double(screen_size.width)/2 - double(space_size_.width)/2,
+                                  double(screen_size.height)/2 + double(space_size_.height)});
+    pp.push_back(primitive::Point{double(screen_size.width)/2 + double(space_size_.width)/2,
+                                  double(screen_size.height)/2 + double(space_size_.height)});
 
     left_nozzle_ = new Nozzle(
                 renderer,
