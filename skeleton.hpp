@@ -4,16 +4,16 @@
 #include <utility>
 
 #include "primitive/point.hpp"
+#include "colorschema.hpp"
 
 struct SDL_Renderer;
-class ColorGenerator;
 
 class Skeleton {
 public:
     explicit Skeleton(SDL_Renderer* renderer,
-                      ColorGenerator* cg)
+                      ColorGenerator colors)
         : renderer_{renderer},
-          color_generator_{cg} {}
+          color_generator_{std::move(colors)} {}
 
     void update(double angle,
         double length_of_base, primitive::Point top_point, primitive::Point down_point,
@@ -30,7 +30,7 @@ private:
         primitive::Point px, primitive::Point tp1, primitive::Point tp2, double length_of_base);
 
     SDL_Renderer* renderer_{nullptr};
-    ColorGenerator* color_generator_{nullptr};
+    ColorGenerator color_generator_;
 };
 
 #endif /* SKELETON_HPP_ */

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "colorschema.hpp"
 #include "primitive/line.hpp"
 #include "skeleton.hpp"
 
@@ -49,13 +50,15 @@ Projectile::~Projectile(){
 Asteroid::Asteroid(SDL_Renderer *renderer,
                    primitive::Size screen_size,
                    primitive::Point coordinate)
-    : SpaceObject(renderer, screen_size, coordinate) {
+    : SpaceObject(renderer, screen_size, coordinate),
+      cg_{{160, 177, 188}, {119, 98, 84}, {128, 0, 0}, {81, 81, 81},
+          {76, 62, 54}, {139, 69, 19}}
+{
     //TODO: think about direction_x;direction_y
 
     int error_x = rand() % 10;
     int error_y = rand() % 10;
     int size = rand() % 20;
-    cg = new ColorGeneratorAsteroid();
 
     pp_.push_back(new primitive::Point{coordinate_.x + error_x, coordinate_.y + error_y});
     pp_.push_back(new primitive::Point{coordinate_.x - size + rand() % 5, coordinate_.y + size + rand() % 5});
@@ -105,7 +108,6 @@ SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int ma
 //    nozzleMaxHeight = 25;
 
     cs_ = new ColorSchema(primitive::Color{255, 255, 0}, primitive::Color{255,8,0});
-    cg = new ColorGeneratorShip();
 
     // spaceship coordination
     pp.push_back(primitive::Point{double(screen_size.width)/2, double(screen_size.height)/2});
@@ -253,7 +255,9 @@ void SpaceShip::display(bool display_skeleton){
 
     double lengthOfBase = getLengthOfBase();
 
-    Skeleton skeleton{renderer_, cg};
+    Skeleton skeleton{renderer_, ColorGenerator{{220,220,220}, {192,192,192},
+                                                {105,105,105}, {211,211,211},
+                                                {119,136,153}}};
     skeleton.update(getTiltAngel(), lengthOfBase, pp[0],
                    primitive::Point{pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2}, pp[2], 4, true, true);
     left_nozzle_->update();
@@ -369,7 +373,7 @@ void Asteroid::fill(){
     primitive::Point p1 = **iter;
     primitive::Point p2 = **iter_next;
     
-    Skeleton skeleton{renderer_, cg};
+    Skeleton skeleton{renderer_, cg_};
     while (iter_next != pp_.end()){
         p1 = **iter;
         p2 = **iter_next;

@@ -3,7 +3,6 @@
 #include <tuple>
 #include <vector>
 
-#include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/color.hpp"
 #include "primitive/line.hpp"
@@ -22,13 +21,10 @@ void Skeleton::update(double angle, double length_of_base,
   primitive::Point px1, px2;
   double Vx, Vy;
   double ribLength;
-  primitive::Color tmpColor;
-  color_generator_->setToEnd();
   figure::FactoryShape factory{renderer_};
   while (length >= 0){
       if (random_color){
-          tmpColor = color_generator_->getNextColor();
-          factory.color(tmpColor);
+          factory.color(color_generator_.get());
       }
       primitive::Point vertebra{top_point.x - Cx*index, top_point.y - Cy*index};
       putSquareOnPoint(vertebra, block_hypotenuse, angle);
@@ -43,8 +39,7 @@ void Skeleton::update(double angle, double length_of_base,
       int vIndex = 1;
       while (ribLength >= 0){
           if (random_color){
-              tmpColor = color_generator_->getNextColor();
-              factory.color(tmpColor);
+              factory.color(color_generator_.get());
           }
           primitive::Point tmpVertebraRight{px1.x - Vx*vIndex, px1.y - Vy*vIndex};
           putSquareOnPoint(tmpVertebraRight, block_hypotenuse, angle);

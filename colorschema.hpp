@@ -25,36 +25,23 @@ public:
 class ColorGenerator {
 public:
     explicit ColorGenerator(std::initializer_list<primitive::Color> colors)
-        : available_colors_{colors},
-          color_iter_{available_colors_.end()} {}
-    virtual ~ColorGenerator() = default;
-    virtual primitive::Color getRandomColor();
-    primitive::Color getNextColor();
-    void setToEnd();
+        : colors_{colors} {}
+
+    ColorGenerator(ColorGenerator&&) = default;
+    ColorGenerator& operator=(ColorGenerator&&) = default;
+    ColorGenerator(ColorGenerator const&) = default;
+    ColorGenerator& operator=(ColorGenerator const&) = default;
+    ~ColorGenerator() = default;
+
+    const primitive::Color& get() const
+    {
+        index_ = (index_ + 1) % colors_.size();
+        return colors_.at(index_);
+    }
 
 private:
-    std::vector<primitive::Color> available_colors_;
-    std::vector<primitive::Color>::iterator color_iter_;
+    const std::vector<primitive::Color> colors_;
+    mutable ssize_t index_{-1};
 };
-
-class ColorGeneratorShip: public ColorGenerator {
-public:
-    ColorGeneratorShip() : ColorGenerator{primitive::Color{220,220,220},
-                                          primitive::Color{192,192,192},
-                                          primitive::Color{105,105,105},
-                                          primitive::Color{211,211,211},
-                                          primitive::Color{119,136,153}} {}
-};
-
-class ColorGeneratorAsteroid: public ColorGenerator {
-public:
-    ColorGeneratorAsteroid() : ColorGenerator{primitive::Color{160, 177, 188},
-                                              primitive::Color{119, 98, 84},
-                                              primitive::Color{128, 0, 0},
-                                              primitive::Color{81, 81, 81},
-                                              primitive::Color{76, 62, 54},
-                                              primitive::Color{139, 69, 19}} {}
-};
-
 
 #endif // COLORSCHEMA_H

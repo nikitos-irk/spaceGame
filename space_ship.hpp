@@ -110,7 +110,6 @@ private:
     Nozzle *right_nozzle_;
 
 public:
-    ColorGeneratorShip *cg;
     std::vector<primitive::Point> pp;
     void updateNozzles();
     primitive::Point getMedianIntersaction();
@@ -136,7 +135,7 @@ private:
     std::vector<primitive::Point*> pp_;
     void fill();
 public:
-    ColorGeneratorAsteroid *cg;
+    ColorGenerator cg_;
     primitive::Point getCenterPoint();
     void display(bool);
     std::vector<primitive::Point*>& get_points();

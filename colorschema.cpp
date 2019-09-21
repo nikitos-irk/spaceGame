@@ -34,29 +34,3 @@ void ColorSchema::update(double current_a){
     color_.green = color_a_.green + std::abs(color_a_.green - color_b_.green) * current_a;
     color_.blue = color_a_.blue + std::abs(color_a_.blue - color_b_.blue) * current_a;
 }
-
-
-primitive::Color ColorGenerator::getNextColor(){
-  primitive::Color result;
-    if (color_iter_ == available_colors_.end()) { color_iter_ = available_colors_.begin();}
-    result = *color_iter_;
-    color_iter_++;
-    return result;
-}
-
-void ColorGenerator::setToEnd(){
-    color_iter_ = available_colors_.end();
-}
-
-primitive::Color ColorGenerator::getRandomColor(){
-    primitive::Color randomColor;
-    switch (rand() % 5){
-        case 1: randomColor = primitive::Color{220,220,220}; break;
-        case 2: randomColor = primitive::Color{192,192,192}; break;
-        case 3: randomColor = primitive::Color{105,105,105}; break;
-        case 4: randomColor = primitive::Color{211,211,211}; break;
-        case 5: randomColor = primitive::Color{119,136,153}; break;
-        default: break;
-    }
-    return randomColor;
-}
