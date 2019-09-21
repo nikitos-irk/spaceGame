@@ -42,7 +42,7 @@ Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p1, primitive::Poi
     fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
-void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton){
+void Explosion::Fragment::display(SDL_Renderer *renderer){
 
     int blocksize = 3;
     primitive::Point p1 = *dots.begin();
@@ -102,9 +102,9 @@ Explosion::~Explosion(){
     delete this->ast;
 }
 
-void Explosion::display(bool display_Skeleton){
+void Explosion::display(){
     for (auto iter = fragments_.begin(); iter != fragments_.end(); ++iter){
-        iter->display(renderer_, display_Skeleton);
+        iter->display(renderer_);
     }
 }
 

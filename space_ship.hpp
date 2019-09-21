@@ -69,7 +69,7 @@ protected:
 
 public:
     SpaceObject(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
-    virtual void display(bool) = 0;
+    virtual void display() = 0;
     virtual void changePosition(primitive::Direction) = 0;
     virtual ~SpaceObject();
     bool isAlive();
@@ -85,8 +85,8 @@ private:
 public:
     Projectile(SDL_Renderer*, primitive::Size, primitive::Direction,
         primitive::Point);
-    void changePosition(primitive::Direction);
-    void display(bool);
+    void changePosition(primitive::Direction) override;
+    void display() override;
     primitive::Point* getXY();
     std::pair<primitive::Point, primitive::Point> getLine();
     primitive::Time get_life_time();
@@ -123,7 +123,7 @@ public:
     std::vector<Projectile*> projectiles;
     primitive::Direction getDirection();
     primitive::Direction getOffset();
-    void display(bool) override;
+    void display() override;
     void changeX(bool);
     void changeY(bool);
     void changePosition(primitive::Direction) override {}
@@ -137,10 +137,10 @@ private:
 public:
     ColorGenerator cg_;
     primitive::Point getCenterPoint();
-    void display(bool);
+    void display() override;
     std::vector<primitive::Point*>& get_points();
     Asteroid(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
-    void changePosition(primitive::Direction);
+    void changePosition(primitive::Direction) override;
     primitive::Point* getFirstPoint();
     ~Asteroid();
 };

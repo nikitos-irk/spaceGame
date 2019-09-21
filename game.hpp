@@ -10,6 +10,7 @@
 
 #include "primitive/size.hpp"
 #include "primitive/time.hpp"
+#include "space_ship.hpp"
 
 class Asteroid;
 class Background;
@@ -53,9 +54,6 @@ private:
     std::mutex asteroids_mutex_;
     std::mutex projectiles_mutex_;
 
-    // Background class
-    Background *my_background_{nullptr};
-
     // For event handling
     SDL_Event e_;
 
@@ -64,7 +62,7 @@ private:
     std::list<SpaceObject*> projectiles_;
     std::list<Explosion*> explosions_;
 
-    SpaceShip *my_ship_{nullptr};
+    SpaceShip my_ship_;
 
     // Continuous buttom pushing flags
     bool space_pushed_{false};
@@ -78,7 +76,7 @@ private:
     int inertia_counter_up_{0};
     int inertia_counter_down_{0};
 
-    void displayObjects(bool);
+    void displayObjects();
     void changeObjectsPositions();
 
     void createAsteroid();

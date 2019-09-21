@@ -9,7 +9,7 @@
 constexpr auto kCoef = 5;  // TODO: Is it coefficient?
 constexpr auto kCitizenSize = 5 * kCoef;
 
-void Background::fillBackground(){
+void Background::fill(){
     constexpr int gradient_size = 1;
     int steps = 1 + (screen_size_.width / (kCitizenSize * gradient_size));
 
@@ -38,9 +38,13 @@ void Background::fillBackground(){
         point.x = 0.0;
         point.y += kCitizenSize * gradient_size;
     }
+    drawGrid();
 }
 
-void Background::drawGrid(){
+void Background::drawGrid()
+{
+    if (!grid_) return;
+
     figure::FactoryShape factory{renderer_};
     factory.color({192, 192, 192, 255});
     for (int i = 0; i < screen_size_.height; i = i + kCitizenSize) {

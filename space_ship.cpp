@@ -240,7 +240,8 @@ double SpaceShip::getTiltAngel(){
 // Length of base of the SpaceShip
 double SpaceShip::getLengthOfBase(){ return primitive::Line{pp[1], pp[2]}.length(); }
 
-void SpaceShip::display(bool display_skeleton){
+void SpaceShip::display()
+{
     figure::FactoryShape factory{renderer_};
     factory.color({255, 0, 0, 255});
     factory.color(cs_->get_color());
@@ -295,8 +296,8 @@ Projectile * SpaceShip::shoot(){
     return projectile;
 }
 
-void Projectile::display(bool display_skeleton){
-
+void Projectile::display()
+{
     if (display_delay_ > primitive::now()){ return; }
 
     double error = (double) - kBlockSize;
@@ -390,23 +391,20 @@ void Asteroid::fill(){
                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 
-void Asteroid::display(bool display_skeleton){
-
-    if (display_skeleton){
-        auto iter = pp_.begin();
-        primitive::Point *p1;
-        primitive::Point *p2;
-        figure::FactoryShape factory{renderer_};
-        factory.color({0, 0, 255, 255});
-        for (; iter != pp_.end()-1; ++iter){
-            p1 = *iter;
-            p2 = *(iter+1);
-            factory.line(*p1, *p2).draw();
-        }
-        p1 = *pp_.begin();
+void Asteroid::display()
+{
+    auto iter = pp_.begin();
+    primitive::Point *p1;
+    primitive::Point *p2;
+    figure::FactoryShape factory{renderer_};
+    factory.color({0, 0, 255, 255});
+    for (; iter != pp_.end()-1; ++iter){
+        p1 = *iter;
+        p2 = *(iter+1);
         factory.line(*p1, *p2).draw();
     }
-
+    p1 = *pp_.begin();
+    factory.line(*p1, *p2).draw();
     fill();
 }
 

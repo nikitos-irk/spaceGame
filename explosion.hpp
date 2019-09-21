@@ -26,7 +26,7 @@ private:
         double angle_;
     public:
         std::vector<primitive::Point> dots;
-        void display(SDL_Renderer *, bool);
+        void display(SDL_Renderer *);
         void shift();
         Fragment(Asteroid*, primitive::Point, primitive::Point, int);
         Fragment(Asteroid*, primitive::Point, primitive::Point, primitive::Point);
@@ -36,7 +36,7 @@ private:
 public:
     Explosion(primitive::Point p, SDL_Renderer*, Asteroid*);
     void shift(primitive::Direction);
-    void display(bool);
+    void display();
     bool isAlive();
     ~Explosion();
 };
