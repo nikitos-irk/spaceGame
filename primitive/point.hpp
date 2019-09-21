@@ -15,6 +15,7 @@ namespace primitive
 struct Point{
     double x{0.0};
     double y{0.0};
+    Point& rotate(Point const& center, double angle);
 };
 
 inline bool operator==(const Point& p1, const Point& p2) {

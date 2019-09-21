@@ -210,8 +210,8 @@ void SpaceShip::changeY(bool forward){
 
 void rotatePointsInVector(std::vector<primitive::Point> &points,
                           primitive::Point initial_median_intersection, double angle){
-    for (auto iter = points.begin(); iter != points.end(); ++iter){
-        *iter = get_rotated_point(*iter, initial_median_intersection, angle);
+    for (auto iter = points.begin(); iter != points.end(); ++iter) {
+        iter->rotate(initial_median_intersection, angle);
     }
 }
 

@@ -42,14 +42,8 @@ void Game::createAsteroid(){
     primitive::Point ship_center = my_ship_->getMedianIntersaction();
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
-
-    point P(tmp_x, tmp_y);
-    point Q(ship_center.x, ship_center.y);
-    point P_rotated = (P-Q) * std::polar(1.0, theta) + Q;
-    tmp_x = P_rotated.real();
-    tmp_y = P_rotated.imag();
-
-    asteroids_.push_back(new Asteroid(renderer_, screen_size_, {tmp_x, tmp_y}));
+    primitive::Point p{tmp_x, tmp_y};
+    asteroids_.push_back(new Asteroid(renderer_, screen_size_, p.rotate(ship_center, theta)));
 }
 
 void Game::updateAsteroids(){

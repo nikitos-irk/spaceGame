@@ -6,17 +6,6 @@
 #include "figure/factory_shape.hpp"
 #include "primitive/point.hpp"
 
-primitive::Point get_rotated_point(primitive::Point center_point,
-                                   primitive::Point rotated_point, double angle) {
-    if (0 == angle){
-        angle = (rand() % 360)/M_PI;
-    }
-    point P(center_point.x, center_point.y);
-    point Q(rotated_point.x, rotated_point.y);
-    point P_rotated = (P-Q) * std::polar(1.0, angle) + Q;
-    return {P_rotated.real(), P_rotated.imag()};
-}
-
 DirectionXY::DirectionXY(double x, double y){
     this->x = x;
     this->y = y;
@@ -65,7 +54,8 @@ void putSquareOnPoint(SDL_Renderer* renderer, primitive::Point center_point,
 
     for (int i = 0; i < 4; ++i){
         double theta = M_PI/4 + i*M_PI/2 - angle; // getTiltAngel();
-        littleSqare.push_back(get_rotated_point(tmp, center_point, theta));
+        auto p = tmp;
+        littleSqare.push_back(std::move(p.rotate(center_point, theta)));
     }
     auto iter = littleSqare.begin();
     figure::FactoryShape factory{renderer};
@@ -101,8 +91,8 @@ std::pair<primitive::Point, primitive::Point> getPerpendicularLineByPoint(
 
     std::tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, length_of_base); // to make sure pz will be found
 
-    primitive::Point px2 = get_rotated_point(primitive::Point{tp1.x - Cx, tp1.y - Cy}, px, angle);
-    primitive::Point pz = getTwoLinesIntersaction(px, px2, tp1, tp2);
+    primitive::Point px2{tp1.x - Cx, tp1.y - Cy};
+    primitive::Point pz = getTwoLinesIntersaction(px, px2.rotate(px, angle), tp1, tp2);
 
     return std::make_pair(px, pz);
 }

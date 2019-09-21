@@ -23,7 +23,6 @@ private:
         int dots_number_;
         double x_shift_;
         double y_shift_;
-        primitive::Point initial_p_;
         primitive::Point next_p_;
         double angle_;
     public:

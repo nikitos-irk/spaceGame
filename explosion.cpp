@@ -1,6 +1,5 @@
 #include "explosion.hpp"
 
-#include "common.hpp"
 #include "space_ship.hpp"
 
 constexpr auto kFragmentShiftDelay = 50ms;
@@ -9,7 +8,6 @@ constexpr auto kExplosionLifeTime = 1s;
 Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p, primitive::Point next_p,
                               int dots_number=3) {
 
-    this->initial_p_ = p;
     this->dots_number_ = dots_number;
     this->x_shift_ = p.x - next_p.x;
     this->y_shift_ = p.y - next_p.y;
@@ -18,7 +16,9 @@ Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p, primitive::Poin
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number_; ++i){
-        dots.push_back(get_rotated_point(initial_p_, primitive::Point{initial_p_.x + rand() % distribution_value, initial_p_.y}));
+        auto rotated = p;
+        rotated.rotate({p.x + rand() % distribution_value, p.y}, (rand() % 360)/M_PI);
+        dots.push_back(std::move(rotated));
     }
     fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
@@ -68,7 +68,7 @@ void Explosion::Fragment::shift(){
     }
 
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
-        *iter = get_rotated_point(*iter, primitive::Point{center_x, center_y}, this->angle_);
+        iter->rotate({center_x, center_y}, angle_);
     }
 
     fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
