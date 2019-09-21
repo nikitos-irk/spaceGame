@@ -4,6 +4,9 @@
 
 constexpr auto kColorModificationDelay = 10ms;
 
+ColorSchema::ColorSchema(primitive::Color a, primitive::Color b)
+    : color_a_(a), color_b_(b) {}
+
 void ColorSchema::update(){
     if (primitive::now() <= change_colorchema_delay_) { return; }
     change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
@@ -11,15 +14,15 @@ void ColorSchema::update(){
     if (flag_){
         if (color_mix_ >= 1){ flag_ = !flag_; return;}
         color_mix_ += 0.01;
-        r_ = color_a_.red * (1-color_mix_) + color_b_.red * (color_mix_);
-        g_ = color_a_.green * (1-color_mix_) + color_b_.green * (color_mix_);
-        b_ = color_a_.blue * (1-color_mix_) + color_b_.blue * (color_mix_);
+        color_.red = color_a_.red * (1-color_mix_) + color_b_.red * (color_mix_);
+        color_.green = color_a_.green * (1-color_mix_) + color_b_.green * (color_mix_);
+        color_.blue = color_a_.blue * (1-color_mix_) + color_b_.blue * (color_mix_);
     } else {
         if (color_mix_ <= 0){ flag_ = !flag_; return;}
         color_mix_ -= 0.01;
-        r_ = color_a_.red * (1-color_mix_) + color_b_.red * (color_mix_);
-        g_ = color_a_.green * (1-color_mix_) + color_b_.green * (color_mix_);
-        b_ = color_a_.blue * (1-color_mix_) + color_b_.blue * (color_mix_);
+        color_.red = color_a_.red * (1-color_mix_) + color_b_.red * (color_mix_);
+        color_.green = color_a_.green * (1-color_mix_) + color_b_.green * (color_mix_);
+        color_.blue = color_a_.blue * (1-color_mix_) + color_b_.blue * (color_mix_);
     }
 }
 
@@ -27,44 +30,11 @@ void ColorSchema::update(double current_a){
     if (primitive::now() <= change_colorchema_delay_) { return; }
     change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
 
-    r_ = color_a_.red + std::abs(color_a_.red - color_b_.red) * current_a;
-    g_ = color_a_.green + std::abs(color_a_.green - color_b_.green) * current_a;
-    b_ = color_a_.blue + std::abs(color_a_.blue - color_b_.blue) * current_a;
+    color_.red = color_a_.red + std::abs(color_a_.red - color_b_.red) * current_a;
+    color_.green = color_a_.green + std::abs(color_a_.green - color_b_.green) * current_a;
+    color_.blue = color_a_.blue + std::abs(color_a_.blue - color_b_.blue) * current_a;
 }
 
-ColorSchema::ColorSchema(int r, int g, int b){
-    this->r_ = r;
-    this->g_ = g;
-    this->b_ = b;
-    flag_ = false;
-    change_colorchema_delay_ = primitive::delay(kColorModificationDelay);
-}
-
-ColorSchema::ColorSchema(primitive::Color a, primitive::Color b)
-    : color_a_(a), color_b_(b){}
-
-int ColorSchema::get_r(){ return r_; }
-int ColorSchema::get_g(){ return g_; }
-int ColorSchema::get_b(){ return b_; }
-
-ColorGeneratorShip::ColorGeneratorShip(){
-    available_colors_.push_back(primitive::Color{220,220,220});
-    available_colors_.push_back(primitive::Color{192,192,192});
-    available_colors_.push_back(primitive::Color{105,105,105});
-    available_colors_.push_back(primitive::Color{211,211,211});
-    available_colors_.push_back(primitive::Color{119,136,153});
-    color_iter_ = available_colors_.end();
-}
-
-ColorGeneratorAsteroid::ColorGeneratorAsteroid(){
-    available_colors_.push_back(primitive::Color{160, 177, 188});
-    available_colors_.push_back(primitive::Color{119, 98, 84});
-    available_colors_.push_back(primitive::Color{128, 0, 0});
-    available_colors_.push_back(primitive::Color{81, 81, 81});
-    available_colors_.push_back(primitive::Color{76, 62, 54});
-    available_colors_.push_back(primitive::Color{139, 69, 19});
-    color_iter_ = available_colors_.end();
-}
 
 primitive::Color ColorGenerator::getNextColor(){
   primitive::Color result;

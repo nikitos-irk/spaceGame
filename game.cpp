@@ -223,7 +223,6 @@ void Game::histLoop(){
                 std::pair<primitive::Point, primitive::Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
 
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
-                delete px;
                 if ( hitStatus ){
                     (*ast)->markAsDead();
                     (*pr)->markAsDead();

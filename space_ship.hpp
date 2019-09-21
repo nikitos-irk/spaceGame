@@ -30,7 +30,7 @@ struct Nozzle{
     void display(){
         cs->update(speed->get_current_a());
         figure::FactoryShape factory{renderer};
-        factory.color({cs->get_r(), cs->get_g(), cs->get_b(), 255});
+        factory.color(cs->get_color());
         factory.line(points[0], points[1]).draw();
         factory.line(points[0], points[2]).draw();
         factory.line(points[1], points[2]).draw();
@@ -80,8 +80,8 @@ class Projectile: public SpaceObject{
 private:
     int direction_x_;
     int direction_y_;
-    double x_previous_;
-    double y_previous_;
+    double x_previous_{};
+    double y_previous_{};
     primitive::Time life_time_;
 
 public:

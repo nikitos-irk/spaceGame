@@ -260,7 +260,7 @@ double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
 void SpaceShip::display(bool display_skeleton){
     figure::FactoryShape factory{renderer_};
     factory.color({255, 0, 0, 255});
-    factory.color({cs_->get_r(), cs_->get_g(), cs_->get_b(), 255});
+    factory.color(cs_->get_color());
     for (int k = 0; k < 1/*3*/; ++k){
         int i = 0;
         int kIndex = k*3;
