@@ -70,7 +70,7 @@ protected:
 public:
     SpaceObject(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
     virtual void display(bool) = 0;
-    virtual void changePosition(DirectionXY);
+    virtual void changePosition(primitive::Direction) = 0;
     virtual ~SpaceObject();
     bool isAlive();
     void markAsDead();
@@ -78,15 +78,14 @@ public:
 
 class Projectile: public SpaceObject{
 private:
-    int direction_x_;
-    int direction_y_;
-    double x_previous_{};
-    double y_previous_{};
+    primitive::Direction direction_;
+    primitive::Point previous_;
     primitive::Time life_time_;
 
 public:
-    Projectile(SDL_Renderer*, primitive::Size, int, int, primitive::Point);
-    void changePosition(DirectionXY);
+    Projectile(SDL_Renderer*, primitive::Size, primitive::Direction,
+        primitive::Point);
+    void changePosition(primitive::Direction);
     void display(bool);
     primitive::Point* getXY();
     std::pair<primitive::Point, primitive::Point> getLine();
@@ -123,12 +122,12 @@ public:
     SpaceShip(SDL_Renderer*, primitive::Size, int);
     Projectile * shoot();
     std::vector<Projectile*> projectiles;
-    DirectionXY getDirection();
-    DirectionXY getOffset();
-    void display(bool);
+    primitive::Direction getDirection();
+    primitive::Direction getOffset();
+    void display(bool) override;
     void changeX(bool);
     void changeY(bool);
-    DirectionalVector getDerectionalVector();
+    void changePosition(primitive::Direction) override {}
     ~SpaceShip();
 };
 
@@ -142,7 +141,7 @@ public:
     void display(bool);
     std::vector<primitive::Point*>& get_points();
     Asteroid(SDL_Renderer*, primitive::Size, primitive::Point coordinate);
-    void changePosition(DirectionXY);
+    void changePosition(primitive::Direction);
     primitive::Point* getFirstPoint();
     ~Asteroid();
 };

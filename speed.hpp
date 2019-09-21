@@ -1,7 +1,7 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-#include "common.hpp"
+#include "primitive/point.hpp"
 
 class Speed{
 private:
@@ -18,7 +18,8 @@ public:
     void accelarate();
     void backwardSlowdown();
     void backwardAccelarate();
-    DirectionXY getOffsetXY(DirectionalVector);
+    primitive::Direction getOffsetXY(primitive::Direction,
+                                     primitive::Direction);
     double get_current_a() const;
 };
 

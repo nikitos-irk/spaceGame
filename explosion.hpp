@@ -36,7 +36,7 @@ private:
     std::vector<Fragment> fragments_;
 public:
     Explosion(primitive::Point p, SDL_Renderer*, Asteroid*);
-    void shift(DirectionXY);
+    void shift(primitive::Direction);
     void display(bool);
     bool isAlive();
     ~Explosion();

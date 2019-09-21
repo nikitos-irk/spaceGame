@@ -14,4 +14,18 @@ Point& Point::rotate(Point const& center, double angle)
     return *this;
 }
 
+Point& Point::move(Direction const& d)
+{
+  x += d.x;
+  y += d.y;
+  return *this;
+}
+
+Direction& Direction::operator *=(int value)
+{
+    x *= value;
+    y *= value;
+    return *this;
+}
+
 }  // namespace primitive

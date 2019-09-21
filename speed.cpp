@@ -6,14 +6,13 @@ constexpr auto kAcceleration = 100;
 
 Speed::Speed(double max_offset) : max_offset_{max_offset} {}
 
-DirectionXY Speed::getOffsetXY(DirectionalVector dv){
-    DirectionXY p1 = dv.p1;
-    DirectionXY p2 = dv.p2;
-
+primitive::Direction Speed::getOffsetXY(primitive::Direction p1,
+                                        primitive::Direction p2)
+{
     double vl = std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
     current_a_ = (forward_offset_ - backward_offset_) / vl;
 
-    return DirectionXY((p2.x - p1.x)*current_a_, (p2.y - p1.y)*current_a_);
+    return {(p2.x - p1.x)*current_a_, (p2.y - p1.y)*current_a_};
 }
 
 double Speed::get_current_a() const { return std::abs(current_a_); }

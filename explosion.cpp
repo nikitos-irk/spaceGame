@@ -108,12 +108,11 @@ void Explosion::display(bool display_Skeleton){
 
 bool Explosion::isAlive(){ return primitive::now() < destroy_time_; }
 
-void Explosion::shift(DirectionXY shift_value){
+void Explosion::shift(primitive::Direction shift_value){
 
     for (auto fragment = fragments_.begin(); fragment != fragments_.end(); ++fragment){
         for(auto iter = fragment->dots.begin(); iter != fragment->dots.end(); ++iter){
-            iter->x += shift_value.x;
-            iter->y += shift_value.y;
+            iter->move(shift_value);
         }
     }
 

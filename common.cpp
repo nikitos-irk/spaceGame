@@ -6,16 +6,6 @@
 #include "figure/factory_shape.hpp"
 #include "primitive/point.hpp"
 
-DirectionXY::DirectionXY(double x, double y){
-    this->x = x;
-    this->y = y;
-}
-
-DirectionXY::DirectionXY(){
-    this->x = 0;
-    this->y = 0;
-}
-
 std::pair<double, double> getXYOffsetOnVector(primitive::Point px1,
                                               primitive::Point px2,
                                               double offset_length) {

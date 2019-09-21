@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "common.hpp"
+
 constexpr auto kBlockSize = 5;
 constexpr auto kRotationDelay = 60ms;
 constexpr auto kDisplayDelay = 10ms;
@@ -29,17 +31,15 @@ bool SpaceObject::isAlive(){ return alive_; }
 void SpaceObject::markAsDead() { alive_ = false; }
 
 Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
-                       int offset_x, int offset_y, primitive::Point coordinate)
+                       primitive::Direction offset, primitive::Point coordinate)
     : SpaceObject(renderer, screen_size, coordinate),
-      direction_x_{offset_x},
-      direction_y_{offset_y} {
+      direction_{offset} {
     life_time_ = primitive::delay(kProjLifetime);
 }
 
 primitive::Point* Projectile::getXY(){ return &coordinate_; }
 std::pair<primitive::Point, primitive::Point> Projectile::getLine()
-{ return std::make_pair(coordinate_,
-                        primitive::Point{x_previous_, y_previous_}); }
+{ return std::make_pair(coordinate_, previous_); }
 
 Projectile::~Projectile(){
     std::cout << "Projectile destructor" << std::endl;
@@ -150,44 +150,25 @@ void SpaceShip::backwardAccelarate(){
     speed->backwardAccelarate();
 }
 
-DirectionXY SpaceShip::getOffset(){
-    return speed->getOffsetXY(getDerectionalVector());
-}
-
-DirectionalVector::DirectionalVector(){
-    this->p1 = DirectionXY();
-    this->p2 = DirectionXY();
-}
-
-DirectionalVector::DirectionalVector(DirectionXY p1, DirectionXY p2){
-    this->p1 = p1;
-    this->p2 = p2;
-}
-
-DirectionalVector SpaceShip::getDerectionalVector(){
-
-    double mediana_x = pp[1].x/2 + pp[2].x/2;
-    double mediana_y = pp[1].y/2 + pp[2].y/2;
-
-    return DirectionalVector(DirectionXY(mediana_x, mediana_y),
-                             DirectionXY(pp[0].x, pp[0].y));
+primitive::Direction SpaceShip::getOffset()
+{
+  double mediana_x = pp[1].x/2 + pp[2].x/2;
+  double mediana_y = pp[1].y/2 + pp[2].y/2;
+    return speed->getOffsetXY({mediana_x, mediana_y}, {pp[0].x, pp[0].y});
 }
 
 SpaceShip::~SpaceShip(){
     std::cout << "SpaceShip destructor" << std::endl;
 }
 
-DirectionXY SpaceShip::getDirection(){
+primitive::Direction SpaceShip::getDirection(){
     double mediana_x = pp[1].x/2 + pp[2].x/2;
     double mediana_y = pp[1].y/2 + pp[2].y/2;
 
     double diff_x = (mediana_x - pp[0].x)/5;
     double diff_y = (mediana_y - pp[0].y)/5;
 
-    return DirectionXY(diff_x, diff_y);
-}
-
-void SpaceObject::changePosition(DirectionXY directionXY){
+    return {diff_x, diff_y};
 }
 
 void SpaceShip::changeY(bool forward){
@@ -305,7 +286,7 @@ Projectile * SpaceShip::shoot(){
     double diff_y = (mediana_y - pp[0].y)/5;
 
     Projectile *projectile = new Projectile(renderer_, primitive::Size{0, 0},
-        diff_x, diff_y, {pp[0].x - diff_x, pp[0].y - diff_y});
+        {-diff_x, -diff_y}, {pp[0].x - diff_x, pp[0].y - diff_y});
     return projectile;
 }
 
@@ -362,8 +343,7 @@ void Projectile::display(bool display_skeleton){
         factory.line({cx - dx, cy - dy + kBlockSize},
                      {cx + dx, cy - dy + kBlockSize}).draw();
     }
-    coordinate_.x -= direction_x_;
-    coordinate_.y -= direction_y_;
+    coordinate_.move(direction_);
     display_delay_ = primitive::delay(kDisplayDelay/5);
 }
 
@@ -424,12 +404,9 @@ void Asteroid::display(bool display_skeleton){
     fill();
 }
 
-void Asteroid::changePosition(DirectionXY direction_xy){
-    primitive::Point *p1;
+void Asteroid::changePosition(primitive::Direction direction_xy){
     for (auto iter = pp_.begin(); iter != pp_.end(); ++iter){
-        p1 = *iter;
-        p1->x += direction_xy.x;
-        p1->y += direction_xy.y;
+        (*iter)->move(direction_xy);
     }
 }
 
@@ -437,9 +414,7 @@ primitive::Point* Asteroid::getFirstPoint(){
     return pp_[0];
 }
 
-void Projectile::changePosition(DirectionXY direction_xy){
-    x_previous_ = coordinate_.x;
-    y_previous_ = coordinate_.y;
-    coordinate_.x += direction_xy.x;
-    coordinate_.y += direction_xy.y;
+void Projectile::changePosition(primitive::Direction direction_xy){
+    previous_ = coordinate_;
+    coordinate_.move(direction_xy);
 }

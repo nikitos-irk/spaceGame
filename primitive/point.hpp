@@ -12,10 +12,17 @@ bool doubleEquals(double a, double b, double epsilon = 0.000000001)
 
 namespace primitive
 {
+struct Direction {
+    double x{0.0};
+    double y{0.0};
+    Direction & operator *=(int value);
+};
+
 struct Point{
     double x{0.0};
     double y{0.0};
     Point& rotate(Point const& center, double angle);
+    Point& move(Direction const& d);
 };
 
 inline bool operator==(const Point& p1, const Point& p2) {

@@ -312,7 +312,7 @@ void Game::changeObjectsPositions(){
 
     if (change_position_delay_ > primitive::now()){ return; }
 
-    DirectionXY directionXY = my_ship_->getOffset();
+    auto directionXY = my_ship_->getOffset();
 
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
