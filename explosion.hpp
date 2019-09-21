@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "common.hpp"
 #include "primitive/point.hpp"
 #include "primitive/time.hpp"
 

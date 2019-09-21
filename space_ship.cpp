@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "common.hpp"
 #include "primitive/line.hpp"
+#include "skeleton.hpp"
 
 constexpr auto kBlockSize = 5;
 constexpr auto kRotationDelay = 60ms;
@@ -253,7 +253,8 @@ void SpaceShip::display(bool display_skeleton){
 
     double lengthOfBase = getLengthOfBase();
 
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, pp[0],
+    Skeleton skeleton{renderer_, cg};
+    skeleton.update(getTiltAngel(), lengthOfBase, pp[0],
                    primitive::Point{pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2}, pp[2], 4, true, true);
     left_nozzle_->update();
     right_nozzle_->update();
@@ -263,12 +264,12 @@ void SpaceShip::display(bool display_skeleton){
     a = left_nozzle_->points[0];
     b = left_nozzle_->points[1];
     c = left_nozzle_->points[2];
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b,
+    skeleton.update(getTiltAngel(), lengthOfBase, b,
                    primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
     a = right_nozzle_->points[0];
     b = right_nozzle_->points[1];
     c = right_nozzle_->points[2];
-    updateSkeleton(cg, renderer_, getTiltAngel(), lengthOfBase, b,
+    skeleton.update(getTiltAngel(), lengthOfBase, b,
                    primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
 
     factory.color({255, 0, 0, 255});
@@ -368,10 +369,11 @@ void Asteroid::fill(){
     primitive::Point p1 = **iter;
     primitive::Point p2 = **iter_next;
     
+    Skeleton skeleton{renderer_, cg};
     while (iter_next != pp_.end()){
         p1 = **iter;
         p2 = **iter_next;
-        updateSkeleton(cg, renderer_, 0.0, primitive::Line{p1, p2}.length(), center_point,
+        skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
                        primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
         ++iter;
         ++iter_next;
@@ -380,7 +382,7 @@ void Asteroid::fill(){
     iter_next = pp_.begin();
     p1 = **iter;
     p2 = **iter_next;
-    updateSkeleton(cg, renderer_, 0.0, primitive::Line{p1, p2}.length(), center_point,
+    skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 

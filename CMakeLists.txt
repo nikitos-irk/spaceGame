@@ -12,12 +12,12 @@ add_executable(${PROJECT_NAME}
     "figure/rectangle.cpp"
     "background.cpp"
     "colorschema.cpp"
-    "common.cpp"
     "explosion.cpp"
     "game.cpp"
     "main.cpp"
     "primitive/line.cpp"
     "primitive/point.cpp"
+    "skeleton.cpp"
     "space_ship.cpp"
     "speed.cpp"
 )
