@@ -36,8 +36,9 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    Game *space_game = new Game(renderer, kScreenSize, 5);
-    space_game->run();
+    {
+        Game{renderer, kScreenSize, 5}.run();
+    }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

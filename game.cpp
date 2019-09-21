@@ -118,8 +118,9 @@ bool intersect (primitive::Point a, primitive::Point b,
             && intersect_1 (a.y, b.y, c.y, d.y);
 }
 
-void Game::checkShipHits(){
-    while (true){
+void Game::checkShipHits()
+{
+    while (running_) {
         asteroids_mutex_.lock();
         shipHitsLoop();
         asteroids_mutex_.unlock();
@@ -175,9 +176,9 @@ void Game::shipHitsLoop(){
     cleanAsteroids();
 }
 
-void Game::checkHits(){
-    while (true)
-    {
+void Game::checkHits()
+{
+    while (running_) {
         projectiles_mutex_.lock();
         asteroids_mutex_.lock();
         histLoop();
@@ -341,6 +342,7 @@ void Game::displayLifeAmount(){
 
 void Game::run()
 {
+    running_ = true;
     Background background{renderer_, screen_size_};
     background.fill();
     displayObjects();
@@ -348,10 +350,7 @@ void Game::run()
     SDL_RenderClear(renderer_);
 
     std::thread hits_monitoring(&Game::checkHits, this);
-    hits_monitoring.detach();
-
     std::thread ship_hits_monitoring(&Game::checkShipHits, this);
-    ship_hits_monitoring.detach();
 
     int quit = 1;
     SpaceObject *tmp_space_obj;
@@ -470,5 +469,7 @@ void Game::run()
         SDL_RenderPresent(renderer_);
         SDL_RenderClear(renderer_);
     }
-
+    running_ = false;
+    hits_monitoring.join();
+    ship_hits_monitoring.join();
 }

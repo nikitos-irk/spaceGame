@@ -46,6 +46,7 @@ private:
     SDL_Renderer *renderer_{nullptr};
     primitive::Size screen_size_;
     int live_amount_;
+    std::atomic_bool running_{false};
 
     primitive::Time change_position_delay_;
     primitive::Time inertia_delay_;
