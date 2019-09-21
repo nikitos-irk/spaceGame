@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "common.hpp"
+#include "primitive/line.hpp"
 
 constexpr auto kBlockSize = 5;
 constexpr auto kRotationDelay = 60ms;
@@ -85,8 +86,7 @@ primitive::Point SpaceShip::getMedianIntersaction(){
     double x4 = (pp[0].x + pp[2].x)/2;
     double y4 = (pp[0].y + pp[2].y)/2;
 
-    return getTwoLinesIntersaction(primitive::Point{x1, y1}, primitive::Point{x2, y2},
-                                   primitive::Point{x3, y3}, primitive::Point{x4, y4});
+    return primitive::Line{{x1, y1}, {x2, y2}}.intersect({{x3, y3}, {x4, y4}});
 }
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int max_speed)
@@ -236,7 +236,7 @@ double SpaceShip::getTiltAngel(){
 }
 
 // Length of base of the SpaceShip
-double SpaceShip::getLengthOfBase(){ return getLengthOfVector(pp[1], pp[2]); }
+double SpaceShip::getLengthOfBase(){ return primitive::Line{pp[1], pp[2]}.length(); }
 
 void SpaceShip::display(bool display_skeleton){
     figure::FactoryShape factory{renderer_};
@@ -371,7 +371,7 @@ void Asteroid::fill(){
     while (iter_next != pp_.end()){
         p1 = **iter;
         p2 = **iter_next;
-        updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point,
+        updateSkeleton(cg, renderer_, 0.0, primitive::Line{p1, p2}.length(), center_point,
                        primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
         ++iter;
         ++iter_next;
@@ -380,7 +380,7 @@ void Asteroid::fill(){
     iter_next = pp_.begin();
     p1 = **iter;
     p2 = **iter_next;
-    updateSkeleton(cg, renderer_, 0.0, getLengthOfVector(p1, p2), center_point,
+    updateSkeleton(cg, renderer_, 0.0, primitive::Line{p1, p2}.length(), center_point,
                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 

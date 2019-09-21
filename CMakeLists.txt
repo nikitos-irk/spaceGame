@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     "explosion.cpp"
     "game.cpp"
     "main.cpp"
+    "primitive/line.cpp"
     "primitive/point.cpp"
     "space_ship.cpp"
     "speed.cpp"

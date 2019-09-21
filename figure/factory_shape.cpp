@@ -4,6 +4,7 @@
 
 #include "exception.hpp"
 #include "primitive/color.hpp"
+#include "primitive/line.hpp"
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 
@@ -28,6 +29,10 @@ Line FactoryShape::line(primitive::Point const& begin,
         static_cast<int>(begin.x), static_cast<int>(begin.y),
         static_cast<int>(end.x), static_cast<int>(end.y)
     };
+}
+
+Line FactoryShape::line(primitive::Line const& line) const {
+  return this->line(line.begin, line.end);
 }
 
 Rectangle FactoryShape::rectangle(primitive::Point const& point,

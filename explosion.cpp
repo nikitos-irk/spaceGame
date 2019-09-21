@@ -1,6 +1,7 @@
 #include "explosion.hpp"
 
 #include "space_ship.hpp"
+#include "primitive/line.hpp"
 
 constexpr auto kFragmentShiftDelay = 50ms;
 constexpr auto kExplosionLifeTime = 1s;
@@ -46,7 +47,7 @@ void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton)
     primitive::Point p1 = *dots.begin();
     primitive::Point p2 = *(dots.begin() + 1);
     primitive::Point p3 = *(dots.begin() + 2);
-    updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p3, p2), p2,
+    updateSkeleton(this->ast->cg, renderer, 0.0, primitive::Line{p3, p2}.length(), p2,
                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
     shift();
 

@@ -5,34 +5,31 @@
 #include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/point.hpp"
+#include "primitive/line.hpp"
 
 std::pair<double, double> getXYOffsetOnVector(primitive::Point px1,
                                               primitive::Point px2,
                                               double offset_length) {
-    double length = getLengthOfVector(px1, px2);
+    double length = primitive::Line{px1, px2}.length();
     double Cx = (px1.x - px2.x) / (length/(offset_length*2));
     double Cy = (px1.y - px2.y) / (length/(offset_length*2));
     return std::make_pair(Cx, Cy);
 }
 
-primitive::Point getTwoLinesIntersaction(primitive::Point p1, primitive::Point p2,
-                                         primitive::Point p3, primitive::Point p4) {
-    double x1 = p1.x;
-    double y1 = p1.y;
-
-    double x2 = p2.x;
-    double y2 = p2.y;
-
-    double x3 = p3.x;
-    double y3 = p3.y;
-
-    double x4 = p4.x;
-    double y4 = p4.y;
-
-    double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-    double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4))/((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-
-    return primitive::Point{px, py};
+void fillRect(SDL_Renderer* renderer, primitive::Point a, primitive::Point b,
+              primitive::Point c){
+    double Cx_ab, Cy_ab;
+    double step = 1;
+    double sideLength = primitive::Line{a, b}.length();
+    std::tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
+    int index = 1;
+    figure::FactoryShape factory{renderer};
+    while (sideLength >= 0){
+        factory.line({a.x - Cx_ab*index, a.y - Cy_ab*index},
+                     {c.x - Cx_ab*index, c.y - Cy_ab*index}).draw();
+        sideLength -= step;
+        ++index;
+    }
 }
 
 void putSquareOnPoint(SDL_Renderer* renderer, primitive::Point center_point,
@@ -58,22 +55,6 @@ void putSquareOnPoint(SDL_Renderer* renderer, primitive::Point center_point,
     fillRect(renderer, littleSqare[1], littleSqare[2], littleSqare[0]);
 }
 
-void fillRect(SDL_Renderer* renderer, primitive::Point a, primitive::Point b,
-              primitive::Point c){
-    double Cx_ab, Cy_ab;
-    double step = 1;
-    double sideLength = getLengthOfVector(a, b);
-    std::tie(Cx_ab, Cy_ab) = getXYOffsetOnVector(a, b, step/2);
-    int index = 1;
-    figure::FactoryShape factory{renderer};
-    while (sideLength >= 0){
-        factory.line({a.x - Cx_ab*index, a.y - Cy_ab*index},
-                     {c.x - Cx_ab*index, c.y - Cy_ab*index}).draw();
-        sideLength -= step;
-        ++index;
-    }
-}
-
 std::pair<primitive::Point, primitive::Point> getPerpendicularLineByPoint(
     primitive::Point px, primitive::Point tp1, primitive::Point tp2, double length_of_base) {
     double Cx, Cy;
@@ -82,7 +63,7 @@ std::pair<primitive::Point, primitive::Point> getPerpendicularLineByPoint(
     std::tie(Cx, Cy) = getXYOffsetOnVector(px, tp1, length_of_base); // to make sure pz will be found
 
     primitive::Point px2{tp1.x - Cx, tp1.y - Cy};
-    primitive::Point pz = getTwoLinesIntersaction(px, px2.rotate(px, angle), tp1, tp2);
+    auto pz = primitive::Line{px, px2.rotate(px, angle)}.intersect({tp1, tp2});
 
     return std::make_pair(px, pz);
 }
@@ -92,7 +73,7 @@ void updateSkeleton(ColorGenerator * cg, SDL_Renderer* renderer, double angle,
                     primitive::Point pz, double block_hypotenuse, bool symmetrical, bool random_color) {
 
     double blockSize = sqrt(pow(block_hypotenuse, 2)/2);
-    double length = getLengthOfVector(top_point, down_point);
+    double length = primitive::Line{top_point, down_point}.length();
     double Cx, Cy;
     std::tie(Cx, Cy) = getXYOffsetOnVector(top_point, down_point, blockSize);
 
@@ -118,7 +99,7 @@ void updateSkeleton(ColorGenerator * cg, SDL_Renderer* renderer, double angle,
         std::tie(px1, px2) = getPerpendicularLineByPoint(vertebra, top_point, pz, length_of_base);
         std::tie(Vx, Vy) = getXYOffsetOnVector(px1, px2, blockSize);
 
-        ribLength = getLengthOfVector(px1, px2);
+        ribLength = primitive::Line{px1, px2}.length();
         int vIndex = 1;
         while (ribLength >= 0){
             if (random_color){
