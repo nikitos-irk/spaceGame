@@ -10,6 +10,8 @@
 
 #include "primitive/size.hpp"
 #include "primitive/time.hpp"
+#include "scene/sdl_scene.hpp"
+#include "space/background.hpp"
 #include "space_ship.hpp"
 
 class Asteroid;
@@ -58,12 +60,14 @@ private:
     // For event handling
     SDL_Event e_;
 
+    space::Background background_;
+    SpaceShip my_ship_;
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
     std::list<SpaceObject*> projectiles_;
     std::list<Explosion*> explosions_;
 
-    SpaceShip my_ship_;
+    scene::SdlScene scene_;
 
     // Continuous buttom pushing flags
     bool space_pushed_{false};

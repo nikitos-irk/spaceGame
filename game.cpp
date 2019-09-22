@@ -7,8 +7,6 @@
 #include <unistd.h>
 
 #include "explosion.hpp"
-#include "scene/sdl_scene.hpp"
-#include "space/background.hpp"
 #include "space/grid.hpp"
 
 constexpr auto kAsteroidsRemovingDelay = 10ms;
@@ -19,9 +17,10 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
     : renderer_{renderer},
       screen_size_{size},
       live_amount_{live_amount},
-      my_ship_{renderer, screen_size_, 50}
+      my_ship_{renderer, screen_size_, 50},
+      scene_{renderer_, screen_size_}
 {
-  // Create ship
+//  background_.grid = std::make_unique<space::Grid>();
 
   // Create asteroids
   for (int i = 0; i < 10; ++i) {
@@ -288,6 +287,8 @@ void Game::cleanLoop(){
 
 void Game::displayObjects()
 {
+    background_.display(scene_);
+
     my_ship_.display();
 
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
@@ -307,6 +308,9 @@ void Game::displayObjects()
         }
     }
     cleanExplosions();
+    displayLifeAmount();
+    SDL_RenderPresent(renderer_);
+    SDL_RenderClear(renderer_);
 }
 
 void Game::changeObjectsPositions(){
@@ -345,15 +349,9 @@ void Game::displayLifeAmount(){
 
 void Game::run()
 {
-    scene::SdlScene scene{renderer_, screen_size_};
     running_ = true;
-    space::Background background;
-//    background.grid = std::make_unique<space::Grid>();
-    background.display(scene);
 
     displayObjects();
-    SDL_RenderPresent(renderer_);
-    SDL_RenderClear(renderer_);
 
     std::thread hits_monitoring(&Game::checkHits, this);
     std::thread ship_hits_monitoring(&Game::checkShipHits, this);
@@ -469,12 +467,7 @@ void Game::run()
         projectiles_mutex_.unlock();
         asteroids_mutex_.unlock();
 
-        background.display(scene);
-
         displayObjects();
-        displayLifeAmount();
-        SDL_RenderPresent(renderer_);
-        SDL_RenderClear(renderer_);
     }
     running_ = false;
     hits_monitoring.join();
