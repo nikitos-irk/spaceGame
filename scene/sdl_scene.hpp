@@ -19,8 +19,9 @@ public:
     SdlScene& operator=(SdlScene const&) = delete;
     ~SdlScene() = default;
 
-    void draw(space::Background* background) override;
-    void draw(space::Ship* ship) override;
+    void draw(space::Background const& background) override;
+    void draw(space::Grid const& grid) override;
+    void draw(space::Ship const& ship) override;
 
 private:
     SDL_Renderer* renderer_{nullptr};

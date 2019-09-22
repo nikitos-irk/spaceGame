@@ -1,6 +1,7 @@
 #include "game.hpp"
 
 #include <iostream>
+#include <memory>
 #include <thread>
 
 #include <unistd.h>
@@ -8,6 +9,7 @@
 #include "explosion.hpp"
 #include "scene/sdl_scene.hpp"
 #include "space/background.hpp"
+#include "space/grid.hpp"
 
 constexpr auto kAsteroidsRemovingDelay = 10ms;
 constexpr auto kChangePositionDelay = 30ms;
@@ -346,7 +348,7 @@ void Game::run()
     scene::SdlScene scene{renderer_, screen_size_};
     running_ = true;
     space::Background background;
-    background.grid = true;
+//    background.grid = std::make_unique<space::Grid>();
     background.display(scene);
 
     displayObjects();

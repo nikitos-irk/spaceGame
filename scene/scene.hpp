@@ -3,6 +3,7 @@
 
 namespace space {
 class Background;
+class Grid;
 class Ship;
 }  // namespace space
 
@@ -11,8 +12,9 @@ namespace scene {
 class Scene {
 public:
     virtual ~Scene() = default;
-    virtual void draw(space::Background* background) = 0;
-    virtual void draw(space::Ship* ship) = 0;
+    virtual void draw(space::Background const& background) = 0;
+    virtual void draw(space::Grid const& grid) = 0;
+    virtual void draw(space::Ship const& ship) = 0;
 };
 
 }  // namespace scene

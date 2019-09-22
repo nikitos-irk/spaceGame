@@ -10,7 +10,7 @@ namespace primitive
   public:
     class NegativeSize : public std::exception {};
 
-    constexpr explicit Size(int w, int h) : width{w}, height{h}
+    constexpr Size(int w, int h) : width{w}, height{h}
     {
       if (width < 0 || height < 0) throw NegativeSize{};
     }

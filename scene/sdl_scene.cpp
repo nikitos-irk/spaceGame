@@ -5,48 +5,53 @@
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "space/background.hpp"
+#include "space/grid.hpp"
 
 namespace scene {
 
-void SdlScene::draw(space::Background* background) {
+void SdlScene::draw(space::Background const& background)
+{
     constexpr auto kCitizenSize = 25;
 
+    const auto& start = background.gradient_start;
+    const auto& finish = background.gradient_finish;
+
     int steps = (size_.width / kCitizenSize) + 1;
+    int r_step = (finish.red - start.red) / steps;
+    int g_step = (finish.green - start.green) / steps;
+    int b_step = (finish.blue - start.blue) / steps;
 
-    auto start = background->gradient_start;
-    auto finish = background->gradient_finish;
-
-    int r_step = std::abs(finish.red - start.red) / steps;
-    int g_step = std::abs(finish.green - start.green) / steps;
-    int b_step = std::abs(finish.blue - start.blue) / steps;
-
-    primitive::Point point{0.0, 0.0};
-    primitive::Size size{size_.width, kCitizenSize};
     primitive::Color color = start;
     figure::FactoryShape factory{renderer_};
-    while (point.y < size_.height) {
-        color.red += (start.red < finish.red) ? r_step : - r_step;
-        color.green += (start.green < finish.green) ? g_step : - g_step;
-        color.blue += (start.blue < finish.blue) ? b_step : - b_step;
+    for (auto i = 0; i < steps; ++i) {
+        color.red += r_step;
+        color.green += g_step;
+        color.blue += b_step;
 
-        factory.color(color).rectangle(point, size).fill();
-        point.move({0.0, kCitizenSize});
+        factory.color(color)
+               .rectangle({0.0, double(kCitizenSize * i)},
+                          {size_.width, kCitizenSize})
+               .fill();
     }
-    if (background->grid) {
-      factory.color(background->grid_color);
-      for (int i = 0; i < size_.height; i = i + kCitizenSize) {
-          factory.line({0.0, double(i)},
-                       {double(size_.width), double(i)}).draw();
-      }
+    if (background.grid) this->draw(*background.grid);
+}
 
-      for (int i = 0; i < size_.width; i = i + kCitizenSize) {
-          factory.line({double(i), 0.0},
-                       {double(i), double(size_.height)}).draw();
-      }
+void SdlScene::draw(space::Grid const& grid)
+{
+    figure::FactoryShape factory{renderer_};
+    factory.color(grid.color);
+    auto i{0};
+    while (i < size_.height || i < size_.width) {
+        factory.line({0.0, double(i)},
+                     {double(size_.width), double(i)}).draw();
+        factory.line({double(i), 0.0},
+                     {double(i), double(size_.height)}).draw();
+        i += grid.cell_size;
     }
 }
 
-void SdlScene::draw(space::Ship* ship) {
+void SdlScene::draw(space::Ship const& ship)
+{
 }
 
 }  // namespace scene

@@ -1,6 +1,9 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
+#include <memory>
+
+#include "grid.hpp"
 #include "object.hpp"
 #include "primitive/color.hpp"
 #include "scene/scene.hpp"
@@ -11,10 +14,9 @@ class Background : public Object {
 public:
     static constexpr primitive::Color gradient_start{100, 100, 100};
     static constexpr primitive::Color gradient_finish{0, 0, 60};
-    static constexpr primitive::Color grid_color{192, 192, 192, 255};
-    bool grid{false};
+    std::unique_ptr<Grid> grid{nullptr};
 
-    void display(scene::Scene& scene) override { scene.draw(this); }
+    void display(scene::Scene& scene) override { scene.draw(*this); }
 };
 
 }  // namespace space
