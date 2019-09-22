@@ -5,8 +5,9 @@
 
 #include <unistd.h>
 
-#include "background.hpp"
 #include "explosion.hpp"
+#include "scene/sdl_scene.hpp"
+#include "space/background.hpp"
 
 constexpr auto kAsteroidsRemovingDelay = 10ms;
 constexpr auto kChangePositionDelay = 30ms;
@@ -342,9 +343,12 @@ void Game::displayLifeAmount(){
 
 void Game::run()
 {
+    scene::SdlScene scene{renderer_, screen_size_};
     running_ = true;
-    Background background{renderer_, screen_size_};
-    background.fill();
+    space::Background background;
+    background.grid = true;
+    background.display(scene);
+
     displayObjects();
     SDL_RenderPresent(renderer_);
     SDL_RenderClear(renderer_);
@@ -463,7 +467,8 @@ void Game::run()
         projectiles_mutex_.unlock();
         asteroids_mutex_.unlock();
 
-        background.fill();
+        background.display(scene);
+
         displayObjects();
         displayLifeAmount();
         SDL_RenderPresent(renderer_);
