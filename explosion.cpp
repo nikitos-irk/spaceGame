@@ -1,16 +1,15 @@
 #include "explosion.hpp"
 
-#include <SDL2/SDL.h>
-
-#include "common.hpp"
 #include "space_ship.hpp"
+#include "primitive/line.hpp"
+#include "skeleton.hpp"
 
-constexpr auto FRAGMENT_SHIFT_DELAY = 50;
-constexpr auto EXPLOSION_LIFE_TIME = 1000;
+constexpr auto kFragmentShiftDelay = 50ms;
+constexpr auto kExplosionLifeTime = 1s;
 
-Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_number=3){
+Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p, primitive::Point next_p,
+                              int dots_number=3) {
 
-    this->initial_p_ = p;
     this->dots_number_ = dots_number;
     this->x_shift_ = p.x - next_p.x;
     this->y_shift_ = p.y - next_p.y;
@@ -19,12 +18,15 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p, Point next_p, int dots_num
 
     int distribution_value = 25;
     for (int i = 0; i < this->dots_number_; ++i){
-        dots.push_back(get_rotated_point(initial_p_, Point(initial_p_.x + rand() % distribution_value, initial_p_.y)));
+        auto rotated = p;
+        rotated.rotate({p.x + rand() % distribution_value, p.y}, (rand() % 360)/M_PI);
+        dots.push_back(std::move(rotated));
     }
-    fragment_shift_delay_ = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
-Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
+Explosion::Fragment::Fragment(Asteroid *ast, primitive::Point p1, primitive::Point p2,
+                              primitive::Point p3){
 
     double tmp_x = p1.x/3 + p2.x/3 + p3.x/3;
     double tmp_y = p1.y/3 + p2.y/3 + p3.y/3;
@@ -37,23 +39,24 @@ Explosion::Fragment::Fragment(Asteroid *ast, Point p1, Point p2, Point p3){
     dots.push_back(p1);
     dots.push_back(p2);
     dots.push_back(p3);
-    fragment_shift_delay_ = NOW + static_cast<std::chrono::milliseconds> (FRAGMENT_SHIFT_DELAY);
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
-void Explosion::Fragment::display(SDL_Renderer *renderer, bool display_skeleton){
+void Explosion::Fragment::display(SDL_Renderer *renderer){
 
     int blocksize = 3;
-    Point p1 = *dots.begin();
-    Point p2 = *(dots.begin() + 1);
-    Point p3 = *(dots.begin() + 2);
-    updateSkeleton(this->ast->cg, renderer, 0.0, getLengthOfVector(p3, p2), p2, Point((p1.x + p2.x)/2, (p1.y + p2.y)/2), p1, blocksize, false, true);
+    primitive::Point p1 = *dots.begin();
+    primitive::Point p2 = *(dots.begin() + 1);
+    primitive::Point p3 = *(dots.begin() + 2);
+    Skeleton{renderer, ast->cg_}.update(0.0, primitive::Line{p3, p2}.length(), p2,
+                   primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
     shift();
 
 }
 
 void Explosion::Fragment::shift(){
 
-    if (fragment_shift_delay_ > NOW) { return; }
+    if (fragment_shift_delay_ > primitive::now()) { return; }
 
     double center_x = 0.0;
     double center_y = 0.0;
@@ -67,18 +70,18 @@ void Explosion::Fragment::shift(){
     }
 
     for(auto iter = dots.begin(); iter != dots.end(); ++iter){
-        *iter = get_rotated_point(*iter, Point(center_x, center_y), this->angle_);
+        iter->rotate({center_x, center_y}, angle_);
     }
 
-    fragment_shift_delay_ = NOW + (std::chrono::milliseconds) FRAGMENT_SHIFT_DELAY;
+    fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
-Explosion::Explosion(Point p, SDL_Renderer *renderer, Asteroid *ast){
+Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer, Asteroid *ast){
 
-    destroy_time_ = NOW + static_cast<std::chrono::milliseconds> (EXPLOSION_LIFE_TIME);
+    destroy_time_ = primitive::delay(kExplosionLifeTime);
     this->p_ = p;
     this->renderer_ = renderer;
-    Point p_center = ast->getCenterPoint();
+    primitive::Point p_center = ast->getCenterPoint();
     this->ast = ast;
 
     int random_number_of_ragments = 5 + rand() % 10;
@@ -99,20 +102,19 @@ Explosion::~Explosion(){
     delete this->ast;
 }
 
-void Explosion::display(bool display_Skeleton){
+void Explosion::display(){
     for (auto iter = fragments_.begin(); iter != fragments_.end(); ++iter){
-        iter->display(renderer_, display_Skeleton);
+        iter->display(renderer_);
     }
 }
 
-bool Explosion::isAlive(){ return NOW < destroy_time_; }
+bool Explosion::isAlive(){ return primitive::now() < destroy_time_; }
 
-void Explosion::shift(DirectionXY shift_value){
+void Explosion::shift(primitive::Direction shift_value){
 
     for (auto fragment = fragments_.begin(); fragment != fragments_.end(); ++fragment){
         for(auto iter = fragment->dots.begin(); iter != fragment->dots.end(); ++iter){
-            iter->x += shift_value.x;
-            iter->y += shift_value.y;
+            iter->move(shift_value);
         }
     }
 

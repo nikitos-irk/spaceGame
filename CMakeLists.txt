@@ -6,12 +6,19 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
 add_executable(${PROJECT_NAME}
-    "background.cpp"
+    "application.cpp"
+    "figure/factory_shape.cpp"
+    "figure/line.cpp"
+    "figure/point.cpp"
+    "figure/rectangle.cpp"
     "colorschema.cpp"
-    "common.cpp"
     "explosion.cpp"
     "game.cpp"
     "main.cpp"
+    "primitive/line.cpp"
+    "primitive/point.cpp"
+    "scene/sdl_scene.cpp"
+    "skeleton.cpp"
     "space_ship.cpp"
     "speed.cpp"
 )
@@ -22,3 +29,19 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}
 )
+
+enable_testing()
+
+set(UNIT_TEST ${PROJECT_NAME}_unittest)
+add_executable(${UNIT_TEST}
+    "primitive/point.cpp"
+    "primitive/point_test.cpp"
+)
+target_compile_features(${UNIT_TEST} PRIVATE cxx_std_17)
+target_compile_options(${UNIT_TEST} PRIVATE  -fprofile-arcs -ftest-coverage)
+target_link_libraries(${UNIT_TEST}
+    CONAN_PKG::gtest
+    -fprofile-arcs
+    -ftest-coverage
+)
+add_test(NAME ${UNIT_TEST} COMMAND ${UNIT_TEST})

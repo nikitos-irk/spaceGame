@@ -1,12 +1,10 @@
 #ifndef EXPLOSION_HPP
 #define EXPLOSION_HPP
 
-#include <chrono>
 #include <vector>
 
-#include <SDL2/SDL.h>
-
-#include "common.hpp"
+#include "primitive/point.hpp"
+#include "primitive/time.hpp"
 
 struct SDL_Renderer;
 
@@ -16,30 +14,29 @@ class Explosion{
 public:
     Asteroid* ast;
 private:
-    Point p_;
+    primitive::Point p_;
     SDL_Renderer *renderer_;
-    std::chrono::time_point<std::chrono::system_clock> destroy_time_;
+    primitive::Time destroy_time_;
     class Fragment{
-        std::chrono::time_point<std::chrono::system_clock> fragment_shift_delay_;
+        primitive::Time fragment_shift_delay_;
         int dots_number_;
         double x_shift_;
         double y_shift_;
-        Point initial_p_;
-        Point next_p_;
+        primitive::Point next_p_;
         double angle_;
     public:
-        std::vector<Point> dots;
-        void display(SDL_Renderer *, bool);
+        std::vector<primitive::Point> dots;
+        void display(SDL_Renderer *);
         void shift();
-        Fragment(Asteroid*, Point, Point, int);
-        Fragment(Asteroid*, Point, Point, Point);
+        Fragment(Asteroid*, primitive::Point, primitive::Point, int);
+        Fragment(Asteroid*, primitive::Point, primitive::Point, primitive::Point);
         Asteroid *ast;
     };
     std::vector<Fragment> fragments_;
 public:
-    Explosion(Point p, SDL_Renderer*, Asteroid*);
-    void shift(DirectionXY);
-    void display(bool);
+    Explosion(primitive::Point p, SDL_Renderer*, Asteroid*);
+    void shift(primitive::Direction);
+    void display();
     bool isAlive();
     ~Explosion();
 };
