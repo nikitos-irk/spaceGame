@@ -13,6 +13,7 @@
 #include "primitive/time.hpp"
 #include "scene/sdl_scene.hpp"
 #include "space/background.hpp"
+#include "space/ship.hpp"
 #include "space_ship.hpp"
 
 class Asteroid;
@@ -62,6 +63,7 @@ private:
     SDL_Event e_;
 
     space::Background background_;
+    space::Ship ship_;
     SpaceShip my_ship_;
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;

@@ -7,7 +7,7 @@
 #include "primitive/color.hpp"
 #include "primitive/time.hpp"
 
-class ColorSchema{
+class ColorSchema {
     const primitive::Color color_a_;
     const primitive::Color color_b_;
     primitive::Color color_;

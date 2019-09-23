@@ -1,11 +1,15 @@
 #include "sdl_scene.hpp"
 
+#include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/color.hpp"
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
+#include "skeleton.hpp"
 #include "space/background.hpp"
 #include "space/grid.hpp"
+#include "space/nozzle.hpp"
+#include "space/ship.hpp"
 
 namespace scene {
 
@@ -52,6 +56,34 @@ void SdlScene::draw(space::Grid const& grid)
 
 void SdlScene::draw(space::Ship const& ship)
 {
+    figure::FactoryShape factory{renderer_};
+    const auto& border = ship.get_border();
+    factory.color(ship.colors.get_color()).polygon(border).draw();
+
+    Skeleton skeleton{renderer_, ColorGenerator{{220,220,220}, {192,192,192},
+                                                {105,105,105}, {211,211,211},
+                                                {119,136,153}}};
+    skeleton.update(ship.getTiltAngel(), size_.width, border[0],
+                   primitive::Point{border[1].x/2 + border[2].x/2,
+                                    border[1].y/2 + border[2].y/2},
+                   border[2], 4, true, true);
+    this->draw(ship.get_left_nozzle());
+    this->draw(ship.get_right_nozzle());
+}
+
+void SdlScene::draw(space::Nozzle const& nozzle)
+{
+    figure::FactoryShape factory{renderer_};
+    const auto& border = nozzle.get_border();
+    factory.color(nozzle.colors.get_color()).polygon(border).draw();
+
+    Skeleton skeleton{renderer_, ColorGenerator{{220,220,220}, {192,192,192},
+                                                {105,105,105}, {211,211,211},
+                                                {119,136,153}}};
+    skeleton.update(nozzle.getTiltAngel(), size_.width, border[0],
+                    primitive::Point{border[1].x/2 + border[2].x/2,
+                                     border[1].y/2 + border[2].y/2},
+                    border[2], 1, true, false);
 }
 
 }  // namespace scene

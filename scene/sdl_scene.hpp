@@ -22,6 +22,7 @@ public:
     void draw(space::Background const& background) override;
     void draw(space::Grid const& grid) override;
     void draw(space::Ship const& ship) override;
+    void draw(space::Nozzle const& nozzle) override;
 
 private:
     SDL_Renderer* renderer_{nullptr};

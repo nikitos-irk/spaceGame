@@ -4,6 +4,7 @@
 #include "line.hpp"
 #include "point.hpp"
 #include "rectangle.hpp"
+#include "polygon.hpp"
 
 struct SDL_Renderer;
 
@@ -26,6 +27,7 @@ public:
     Line line(primitive::Line const& line) const;
     Rectangle rectangle(primitive::Point const& point,
                         primitive::Size const& size) const;
+    Polygon polygon(std::vector<primitive::Point> const& points) const;
 
 private:
     SDL_Renderer* renderer_;

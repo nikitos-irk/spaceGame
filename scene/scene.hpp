@@ -4,6 +4,7 @@
 namespace space {
 class Background;
 class Grid;
+class Nozzle;
 class Ship;
 }  // namespace space
 
@@ -15,6 +16,7 @@ public:
     virtual void draw(space::Background const& background) = 0;
     virtual void draw(space::Grid const& grid) = 0;
     virtual void draw(space::Ship const& ship) = 0;
+    virtual void draw(space::Nozzle const& nozzle) = 0;
 };
 
 }  // namespace scene

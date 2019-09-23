@@ -12,7 +12,6 @@ constexpr auto kRotationDelay = 60ms;
 constexpr auto kDisplayDelay = 10ms;
 constexpr auto kShootingDelay = 100ms;
 constexpr auto kProjLifetime = 5s;
-constexpr auto kShipColorChange = 50ms;
 
 SpaceObject::SpaceObject(SDL_Renderer *renderer,
                          primitive::Size screen_size,
@@ -94,46 +93,42 @@ primitive::Point SpaceShip::getMedianIntersaction(){
 
 SpaceShip::SpaceShip(SDL_Renderer *renderer, primitive::Size screen_size, int max_speed)
     : SpaceObject(renderer, screen_size,
-        {double(screen_size.width)/2, double(screen_size.height)/2}),
-      space_size_{30, screen_size.height / 8},
-      nozzle_size_{8, 0}
+        {double(screen_size.width)/2, double(screen_size.height)/2})
 {
+    constexpr primitive::Size space_size{30, 60};
+    constexpr primitive::Size nozzle_size{8, 0};
 
     shoot_delay_ = primitive::delay(kShootingDelay);
-    ship_color_change_ = primitive::delay(kShipColorChange);
 
     speed = new Speed(max_speed);
 
-    nozzle_min_height_ = 25;
-//    nozzleMaxHeight = 25;
-
-    cs_ = new ColorSchema(primitive::Color{255, 255, 0}, primitive::Color{255,8,0});
+    auto nozzle_min_height = 25.0;
 
     // spaceship coordination
-    pp.push_back(primitive::Point{double(screen_size.width)/2, double(screen_size.height)/2});
-    pp.push_back(primitive::Point{double(screen_size.width)/2 - double(space_size_.width)/2,
-                                  double(screen_size.height)/2 + double(space_size_.height)});
-    pp.push_back(primitive::Point{double(screen_size.width)/2 + double(space_size_.width)/2,
-                                  double(screen_size.height)/2 + double(space_size_.height)});
+    pp.push_back({double(screen_size.width)/2, double(screen_size.height)/2});
+    pp.push_back({double(screen_size.width)/2 - double(space_size.width)/2,
+                  double(screen_size.height)/2 + double(space_size.height)});
+    pp.push_back({double(screen_size.width)/2 + double(space_size.width)/2,
+                  double(screen_size.height)/2 + double(space_size.height)});
 
     left_nozzle_ = new Nozzle(
                 renderer,
-                primitive::Point{double(screen_size.width/2 + space_size_.width/2 + nozzle_size_.width),
-                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
-                primitive::Point{double(screen_size.width/2 + space_size_.width/2),
-                                 double(screen_size.height/2 + space_size_.height)},
-                primitive::Point{double(screen_size.width/2 + space_size_.width/2 - nozzle_size_.width),
-                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
+                {double(screen_size.width/2 + space_size.width/2 + nozzle_size.width),
+                 double(screen_size.height/2 + space_size.height + nozzle_min_height)},
+                {double(screen_size.width/2 + space_size.width/2),
+                 double(screen_size.height/2 + space_size.height)},
+                {double(screen_size.width/2 + space_size.width/2 - nozzle_size.width),
+                 double(screen_size.height/2 + space_size.height + nozzle_min_height)},
                 speed
     );
     right_nozzle_ = new Nozzle(
                 renderer,
-                primitive::Point{double(screen_size.width/2 - space_size_.width/2 - nozzle_size_.width),
-                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
-                primitive::Point{double(screen_size.width/2 - space_size_.width/2),
-                                 double(screen_size.height/2 + space_size_.height)},
-                primitive::Point{double(screen_size.width/2 - space_size_.width/2 + nozzle_size_.width),
-                                 double(screen_size.height/2 + space_size_.height + nozzle_min_height_)},
+                {double(screen_size.width/2 - space_size.width/2 - nozzle_size.width),
+                 double(screen_size.height/2 + space_size.height + nozzle_min_height)},
+                {double(screen_size.width/2 - space_size.width/2),
+                 double(screen_size.height/2 + space_size.height)},
+                {double(screen_size.width/2 - space_size.width/2 + nozzle_size.width),
+                 double(screen_size.height/2 + space_size.height + nozzle_min_height)},
                 speed
     );
     initial_median_intersection_ = getMedianIntersaction();
@@ -191,7 +186,7 @@ void SpaceShip::changeY(bool forward){
     }
 }
 
-void rotatePointsInVector(std::vector<primitive::Point> &points,
+void SpaceShip::rotatePointsInVector(std::vector<primitive::Point> &points,
                           primitive::Point initial_median_intersection, double angle){
     for (auto iter = points.begin(); iter != points.end(); ++iter) {
         iter->rotate(initial_median_intersection, angle);
@@ -237,24 +232,12 @@ double SpaceShip::getTiltAngel(){
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
 }
 
-// Length of base of the SpaceShip
-double SpaceShip::getLengthOfBase(){ return primitive::Line{pp[1], pp[2]}.length(); }
-
 void SpaceShip::display()
 {
     figure::FactoryShape factory{renderer_};
-    factory.color({255, 0, 0, 255});
-    factory.color(cs_->get_color());
-    for (int k = 0; k < 1/*3*/; ++k){
-        int i = 0;
-        int kIndex = k*3;
-        for (; i < 2; ++i){
-            factory.line(pp[i + kIndex], pp[i + kIndex + 1]).draw();
-        }
-        factory.line(pp[kIndex + 2], pp[kIndex]).draw();
-    }
+    factory.color(colors_.get_color()).polygon(pp).draw();
 
-    double lengthOfBase = getLengthOfBase();
+    double lengthOfBase{30.0};  // space_size.width
 
     Skeleton skeleton{renderer_, ColorGenerator{{220,220,220}, {192,192,192},
                                                 {105,105,105}, {211,211,211},
@@ -276,14 +259,12 @@ void SpaceShip::display()
     c = right_nozzle_->points[2];
     skeleton.update(getTiltAngel(), lengthOfBase, b,
                    primitive::Point{a.x/2 + c.x/2, a.y/2 + c.y/2}, a, 1, true, false);
-
-    factory.color({255, 0, 0, 255});
 }
 
 primitive::Time Projectile::get_life_time(){ return life_time_; }
 
 Projectile * SpaceShip::shoot(){
-    if (this->shoot_delay_ > primitive::now()) { return nullptr; }
+    if (shoot_delay_ > primitive::now()) { return nullptr; }
     shoot_delay_ = primitive::delay(kShootingDelay);
 
     double mediana_x = pp[1].x/2 + pp[2].x/2;

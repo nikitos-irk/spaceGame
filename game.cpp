@@ -18,6 +18,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
       screen_size_{size},
       live_amount_{live_amount},
       my_ship_{renderer, screen_size_, 50},
+      ship_{{double(screen_size_.width)/2, double(screen_size_.height)/2}},
       scene_{renderer_, screen_size_}
 {
 //  background_.grid = std::make_unique<space::Grid>();
@@ -288,6 +289,7 @@ void Game::cleanLoop(){
 void Game::displayObjects()
 {
     background_.display(scene_);
+    ship_.display(scene_);
 
     my_ship_.display();
 

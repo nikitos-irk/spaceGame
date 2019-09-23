@@ -95,38 +95,32 @@ public:
 
 class SpaceShip: public SpaceObject{
 private:
-    ColorSchema *cs_;
-    std::vector<primitive::Point> skeleton_;
+    const ColorSchema colors_{{255, 255, 0}, {255,8,0}};
     primitive::Time shoot_delay_;
-    primitive::Time ship_color_change_;
     primitive::Point initial_median_intersection_;
     double getTiltAngel();
-    double getLengthOfBase();
-    primitive::Size space_size_;
-    double nozzle_min_height_;
-    double nozzle_max_height_;
-    primitive::Size nozzle_size_;
     Nozzle *left_nozzle_;
     Nozzle *right_nozzle_;
+    Speed *speed;
 
 public:
     std::vector<primitive::Point> pp;
     void updateNozzles();
     primitive::Point getMedianIntersaction();
-    Speed *speed;
     void slowdown();
     void accelarate();
     void backwardSlowdown();
     void backwardAccelarate();
     SpaceShip(SDL_Renderer*, primitive::Size, int);
     Projectile * shoot();
-    std::vector<Projectile*> projectiles;
     primitive::Direction getDirection();
     primitive::Direction getOffset();
     void display() override;
     void changeX(bool);
     void changeY(bool);
     void changePosition(primitive::Direction) override {}
+    void rotatePointsInVector(std::vector<primitive::Point> &points,
+                              primitive::Point initial_median_intersection, double angle);
     ~SpaceShip();
 };
 

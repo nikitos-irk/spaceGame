@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     "figure/factory_shape.cpp"
     "figure/line.cpp"
     "figure/point.cpp"
+    "figure/polygon.cpp"
     "figure/rectangle.cpp"
     "colorschema.cpp"
     "explosion.cpp"
@@ -19,6 +20,8 @@ add_executable(${PROJECT_NAME}
     "primitive/point.cpp"
     "scene/sdl_scene.cpp"
     "skeleton.cpp"
+    "space/nozzle.cpp"
+    "space/ship.cpp"
     "space_ship.cpp"
     "speed.cpp"
 )
