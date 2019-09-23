@@ -40,8 +40,8 @@ public:
     }
 
 private:
-    const std::vector<primitive::Color> colors_;
-    mutable ssize_t index_{-1};
+    std::vector<primitive::Color> colors_;
+    mutable int index_{-1};
 };
 
 #endif // COLORSCHEMA_H
