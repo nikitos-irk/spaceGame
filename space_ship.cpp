@@ -149,6 +149,8 @@ void SpaceShip::backwardAccelarate(){
 
 primitive::Direction SpaceShip::getOffset()
 {
+  left_nozzle_->update();
+  right_nozzle_->update();
   double mediana_x = pp[1].x/2 + pp[2].x/2;
   double mediana_y = pp[1].y/2 + pp[2].y/2;
     return speed->getOffsetXY({mediana_x, mediana_y}, {pp[0].x, pp[0].y});
@@ -205,12 +207,6 @@ void SpaceShip::changeX(bool clockwise){
     rotatePointsInVector(left_nozzle_->origin_points, initial_median_intersection_, angle);
     rotatePointsInVector(right_nozzle_->origin_points, initial_median_intersection_, angle);
 
-
-    left_nozzle_->update();
-    right_nozzle_->update();
-    left_nozzle_->display();
-    right_nozzle_->display();
-
     rotation_delay_ = primitive::delay(kRotationDelay);
 }
 
@@ -244,8 +240,6 @@ void SpaceShip::display()
                                                 {119,136,153}}};
     skeleton.update(getTiltAngel(), lengthOfBase, pp[0],
                    primitive::Point{pp[1].x/2 + pp[2].x/2, pp[1].y/2 + pp[2].y/2}, pp[2], 4, true, true);
-    left_nozzle_->update();
-    right_nozzle_->update();
     left_nozzle_->display();
     right_nozzle_->display();
     primitive::Point a,b,c;

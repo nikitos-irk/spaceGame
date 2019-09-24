@@ -321,6 +321,8 @@ void Game::changeObjectsPositions(){
 
     auto directionXY = my_ship_.getOffset();
 
+    ship_.update();
+
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
     }
@@ -438,16 +440,22 @@ void Game::run()
         if (up_pushed_) {
           my_ship_.backwardAccelarate();
           my_ship_.slowdown();
+          ship_.backwardAccelarate();
+          ship_.slowdown();
         }
         else if (up_unpushed_) {
           my_ship_.backwardSlowdown();
+          ship_.backwardSlowdown();
         }
         if (down_pushed_) {
           my_ship_.accelarate();
           my_ship_.backwardSlowdown();
+          ship_.accelarate();
+          ship_.backwardSlowdown();
         }
         else if (down_unpushed_) {
           my_ship_.slowdown();
+          ship_.slowdown();
         }
 
         if (left_pushed_)     { my_ship_.changeX(false); }

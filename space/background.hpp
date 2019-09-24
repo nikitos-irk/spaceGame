@@ -16,6 +16,7 @@ public:
     static constexpr primitive::Color gradient_finish{0, 0, 60};
     std::unique_ptr<Grid> grid{nullptr};
 
+    void update() override {}
     void display(scene::Scene& scene) override { scene.draw(*this); }
 };
 

@@ -28,7 +28,6 @@ struct Nozzle{
           speed{speed} {}
 
     void display(){
-        cs->update(speed->get_current_a());
         figure::FactoryShape factory{renderer};
         factory.color(cs->get_color());
         factory.line(points[0], points[1]).draw();
@@ -39,6 +38,7 @@ struct Nozzle{
 
     void update(){
         double offsetLength = speed->get_current_a();
+        cs->update(offsetLength);
         points.clear();
         copy(origin_points.begin(), origin_points.end(), back_inserter(points));
 

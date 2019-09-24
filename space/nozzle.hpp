@@ -18,14 +18,17 @@ public:
   static constexpr primitive::Size size{15, 25};
   ColorSchema colors{{255, 17, 0}, {255, 237, 0}};
 
-  explicit Nozzle(primitive::Point coordinate);
+  Nozzle(Ship const& ship, primitive::Point coordinate);
   Border const& get_border() const { return border_; }
   double getTiltAngel() const;
-  void update(); // anywhere need invoke this
+
+  void update() override;
   void display(scene::Scene& scene) override { scene.draw(*this); }
 
 private:
+  Ship const& ship_;
   Border border_;
+  Border border_origin_;
 };
 
 }  // namespace space

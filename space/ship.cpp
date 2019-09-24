@@ -8,9 +8,9 @@ Ship::Ship(primitive::Point coordinate)
                coordinate.y + double(size.height)},
               {coordinate.x + double(size.width)/2,
                coordinate.y + double(size.height)}},
-      left_nozzle_{{coordinate.x - double(size.width)/2,
+      left_nozzle_{*this, {coordinate.x - double(size.width)/2,
                     coordinate.y + double(size.height)}},
-      right_nozzle_{{coordinate.x + double(size.width)/2,
+      right_nozzle_{*this, {coordinate.x + double(size.width)/2,
                     coordinate.y + double(size.height)}} {}
 
 double Ship::getTiltAngel() const
@@ -30,6 +30,28 @@ double Ship::getTiltAngel() const
     double y4 = middle.y;
 
     return atan((y2 - y1)/(x2 - x1)) - atan((y4 - y3)/(x4 - x3));
+}
+
+void Ship::update()
+{
+    double mediana_x = border_[1].x/2 + border_[2].x/2;
+    double mediana_y = border_[1].y/2 + border_[2].y/2;
+    speed_.getOffsetXY({mediana_x, mediana_y}, {border_[0].x, border_[0].y});
+    left_nozzle_.update();
+    right_nozzle_.update();
+}
+
+void Ship::slowdown(){
+    speed_.slowdown();
+}
+void Ship::accelarate(){
+    speed_.accelarate();
+}
+void Ship::backwardSlowdown(){
+    speed_.backwardSlowdown();
+}
+void Ship::backwardAccelarate(){
+    speed_.backwardAccelarate();
 }
 
 }  // namespace space
