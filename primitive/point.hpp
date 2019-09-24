@@ -31,6 +31,12 @@ inline bool operator==(const Point& p1, const Point& p2) {
 inline bool operator!=(const Point& p1, const Point& p2) {
     return !(p1 == p2);
 }
+
+inline Point median(Point const& p1, Point const& p2)
+{
+  return {p1.x/2 + p2.x/2, p1.y/2 + p2.y/2};
+}
+
 }  // namespace primitive
 
 #endif /* PRIMITIVE_POINT_HPP_ */

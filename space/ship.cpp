@@ -34,9 +34,8 @@ double Ship::getTiltAngel() const
 
 void Ship::update()
 {
-    double mediana_x = border_[1].x/2 + border_[2].x/2;
-    double mediana_y = border_[1].y/2 + border_[2].y/2;
-    speed_.getOffsetXY({mediana_x, mediana_y}, {border_[0].x, border_[0].y});
+    auto mediana = primitive::median(border_[1], border_[2]);
+    speed_.getOffsetXY({mediana.x, mediana.y}, {border_[0].x, border_[0].y});
     left_nozzle_.update();
     right_nozzle_.update();
 }

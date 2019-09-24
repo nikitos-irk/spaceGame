@@ -151,9 +151,8 @@ primitive::Direction SpaceShip::getOffset()
 {
   left_nozzle_->update();
   right_nozzle_->update();
-  double mediana_x = pp[1].x/2 + pp[2].x/2;
-  double mediana_y = pp[1].y/2 + pp[2].y/2;
-    return speed->getOffsetXY({mediana_x, mediana_y}, {pp[0].x, pp[0].y});
+  auto mediana = primitive::median(pp[1], pp[2]);
+  return speed->getOffsetXY({mediana.x, mediana.y}, {pp[0].x, pp[0].y});
 }
 
 SpaceShip::~SpaceShip(){
@@ -161,21 +160,19 @@ SpaceShip::~SpaceShip(){
 }
 
 primitive::Direction SpaceShip::getDirection(){
-    double mediana_x = pp[1].x/2 + pp[2].x/2;
-    double mediana_y = pp[1].y/2 + pp[2].y/2;
+    auto mediana = primitive::median(pp[1], pp[2]);
 
-    double diff_x = (mediana_x - pp[0].x)/5;
-    double diff_y = (mediana_y - pp[0].y)/5;
+    double diff_x = (mediana.x - pp[0].x)/5;
+    double diff_y = (mediana.y - pp[0].y)/5;
 
     return {diff_x, diff_y};
 }
 
 void SpaceShip::changeY(bool forward){
-    double mediana_x = pp[1].x/2 + pp[2].x/2;
-    double mediana_y = pp[1].y/2 + pp[2].y/2;
+    auto mediana = primitive::median(pp[1], pp[2]);
 
-    double diff_x = (mediana_x - pp[0].x) / 5;
-    double diff_y = (mediana_y - pp[0].y) / 5;
+    double diff_x = (mediana.x - pp[0].x) / 5;
+    double diff_y = (mediana.y - pp[0].y) / 5;
 
     if (!forward){
       diff_x *= -1;
@@ -261,10 +258,9 @@ Projectile * SpaceShip::shoot(){
     if (shoot_delay_ > primitive::now()) { return nullptr; }
     shoot_delay_ = primitive::delay(kShootingDelay);
 
-    double mediana_x = pp[1].x/2 + pp[2].x/2;
-    double mediana_y = pp[1].y/2 + pp[2].y/2;
-    double diff_x = (mediana_x - pp[0].x)/5;
-    double diff_y = (mediana_y - pp[0].y)/5;
+    auto mediana = primitive::median(pp[1], pp[2]);
+    double diff_x = (mediana.x - pp[0].x)/5;
+    double diff_y = (mediana.y - pp[0].y)/5;
 
     Projectile *projectile = new Projectile(renderer_, primitive::Size{0, 0},
         {-diff_x, -diff_y}, {pp[0].x - diff_x, pp[0].y - diff_y});
