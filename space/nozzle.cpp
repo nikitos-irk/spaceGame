@@ -37,4 +37,11 @@ void Nozzle::update()
     border_[2].x -= Cx2;
     border_[2].y -= Cy2;
 }
+
+void Nozzle::rotate(bool clockwise)
+{
+    int sign = clockwise ? 1 : -1;
+    ship_.rotatePointsInVector(border_origin_,
+        ship_.get_initial_median_intersaction(), sign * kAngle);
+}
 }  // namespace space

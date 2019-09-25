@@ -458,8 +458,14 @@ void Game::run()
           ship_.slowdown();
         }
 
-        if (left_pushed_)     { my_ship_.changeX(false); }
-        if (right_pushed_)     { my_ship_.changeX(true); }
+        if (left_pushed_) {
+          my_ship_.changeX(false);
+          ship_.rotate(false);
+        }
+        if (right_pushed_) {
+          my_ship_.changeX(true);
+          ship_.rotate(true);
+        }
         {
         if (space_pushed_)     {
             tmp_space_obj = my_ship_.shoot();
