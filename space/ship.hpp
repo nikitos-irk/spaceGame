@@ -1,6 +1,7 @@
 #ifndef SPACE_SHIP_HPP_
 #define SPACE_SHIP_HPP_
 
+#include <memory>
 #include <vector>
 
 #include "colorschema.hpp"
