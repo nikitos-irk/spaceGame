@@ -254,7 +254,7 @@ void SpaceShip::display()
 
 primitive::Time Projectile::get_life_time(){ return life_time_; }
 
-Projectile * SpaceShip::shoot(){
+std::unique_ptr<Projectile> SpaceShip::shoot(){
     if (shoot_delay_ > primitive::now()) { return nullptr; }
     shoot_delay_ = primitive::delay(kShootingDelay);
 
@@ -262,9 +262,9 @@ Projectile * SpaceShip::shoot(){
     double diff_x = (mediana.x - pp[0].x)/5;
     double diff_y = (mediana.y - pp[0].y)/5;
 
-    Projectile *projectile = new Projectile(renderer_, primitive::Size{0, 0},
-        {-diff_x, -diff_y}, {pp[0].x - diff_x, pp[0].y - diff_y});
-    return projectile;
+    auto ball = std::unique_ptr<Projectile>{new Projectile{renderer_, primitive::Size{0, 0},
+        {-diff_x, -diff_y}, {pp[0].x - diff_x, pp[0].y - diff_y}}};
+    return ball;
 }
 
 void Projectile::display()

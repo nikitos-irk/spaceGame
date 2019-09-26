@@ -64,10 +64,9 @@ private:
 
     space::Background background_;
     space::Ship ship_;
-    SpaceShip my_ship_;
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
-    std::list<SpaceObject*> projectiles_;
+    std::list<std::unique_ptr<Projectile>> projectiles_;
     std::list<Explosion*> explosions_;
 
     scene::SdlScene scene_;

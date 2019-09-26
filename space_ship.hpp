@@ -1,6 +1,7 @@
 #ifndef SPACESHIP_H
 #define SPACESHIP_H
 
+#include <memory>
 #include <vector>
 
 #include "colorschema.hpp"
@@ -112,7 +113,7 @@ public:
     void backwardSlowdown();
     void backwardAccelarate();
     SpaceShip(SDL_Renderer*, primitive::Size, int);
-    Projectile * shoot();
+    std::unique_ptr<Projectile> shoot();
     primitive::Direction getDirection();
     primitive::Direction getOffset();
     void display() override;

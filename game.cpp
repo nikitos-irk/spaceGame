@@ -17,10 +17,10 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
     : renderer_{renderer},
       screen_size_{size},
       live_amount_{live_amount},
-      my_ship_{renderer, screen_size_, 50},
       ship_{{double(screen_size_.width)/2, double(screen_size_.height)/2}},
       scene_{renderer_, screen_size_}
 {
+//  Uncomment to show grid
 //  background_.grid = std::make_unique<space::Grid>();
 
   // Create asteroids
@@ -38,7 +38,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
 
 void Game::createAsteroid(){
     double theta = (rand() % 360)/M_PI;
-    primitive::Point ship_center = my_ship_.getMedianIntersaction();
+    auto ship_center = ship_.CalcMedianIntersaction();
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
@@ -47,7 +47,7 @@ void Game::createAsteroid(){
 
 void Game::updateAsteroids(){
     if (update_asteroids_delay_ >= primitive::now()){ return; }
-    primitive::Point tmp_p = my_ship_.getMedianIntersaction();
+    auto tmp_p = ship_.CalcMedianIntersaction();
     primitive::Point *ap = nullptr;
     double distance;
     double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
@@ -71,10 +71,8 @@ void Game::updateProjectiles(){
     auto iter = projectiles_.begin();
     while (iter != projectiles_.end())
     {
-        if (dynamic_cast<Projectile*>(*iter)->get_life_time() < primitive::now()){
-            SpaceObject *tmp = *iter;
+        if ((*iter)->get_life_time() < primitive::now()) {
             projectiles_.erase(iter++);
-            delete tmp;
         } else {
             ++iter;
         }
@@ -151,11 +149,12 @@ void Game::shipHitsLoop(){
                 } else {
                     p2 = *(p + 1);
                 }
-                for (auto spacePointsIter = my_ship_.pp.begin(); spacePointsIter != my_ship_.pp.end() - 1; ++spacePointsIter){
+                auto border = ship_.get_border();
+                for (auto spacePointsIter = border.begin(); spacePointsIter != border.end() - 1; ++spacePointsIter){
                     sp1 = *spacePointsIter;
                     sp2 = *(spacePointsIter+1);
-                    if (my_ship_.pp.end()-1 == spacePointsIter){
-                        sp2 = *my_ship_.pp.begin();
+                    if (border.end()-1 == spacePointsIter){
+                        sp2 = *border.begin();
                     } else {
                         sp2 = *(spacePointsIter + 1);
                     }
@@ -213,8 +212,8 @@ void Game::histLoop(){
                     p2 = *(p + 1);
                 }
 
-                px = dynamic_cast<Projectile*>(*pr)->getXY();
-                std::pair<primitive::Point, primitive::Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+                px = (*pr)->getXY();
+                std::pair<primitive::Point, primitive::Point> pLine = (*pr)->getLine();
 
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
                 if ( hitStatus ){
@@ -259,9 +258,7 @@ void Game::cleanProjectiles(){
     auto pr = projectiles_.begin();
     while (pr != projectiles_.end()){
         if (!(*pr)->isAlive()){
-            Projectile *tmp_pr = dynamic_cast<Projectile*>(*pr);
             projectiles_.erase(pr++);
-            delete tmp_pr;
         } else {
             ++pr;
         }
@@ -291,8 +288,6 @@ void Game::displayObjects()
     background_.display(scene_);
     ship_.display(scene_);
 
-    my_ship_.display();
-
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         if ((*spaceObject)->isAlive()){
             (*spaceObject)->display();
@@ -319,8 +314,7 @@ void Game::changeObjectsPositions(){
 
     if (change_position_delay_ > primitive::now()){ return; }
 
-    auto directionXY = my_ship_.getOffset();
-
+    auto directionXY = ship_.getOffset();
     ship_.update();
 
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
@@ -361,7 +355,6 @@ void Game::run()
     std::thread ship_hits_monitoring(&Game::checkShipHits, this);
 
     int quit = 1;
-    SpaceObject *tmp_space_obj;
     while(quit) {
 
         if (globalExceptionPtr)
@@ -403,9 +396,9 @@ void Game::run()
                         break;
                     case SDLK_SPACE:{
                             space_pushed_ = true;
-                            tmp_space_obj = my_ship_.shoot();
-                            if (nullptr != tmp_space_obj) {
-                                projectiles_.push_back(tmp_space_obj);
+                            auto ball = ship_.shoot(renderer_);
+                            if (ball) {
+                                projectiles_.push_back(std::move(ball));
                             }
                     }
                         break;
@@ -438,39 +431,31 @@ void Game::run()
         }
 
         if (up_pushed_) {
-          my_ship_.backwardAccelarate();
-          my_ship_.slowdown();
           ship_.backwardAccelarate();
           ship_.slowdown();
         }
         else if (up_unpushed_) {
-          my_ship_.backwardSlowdown();
           ship_.backwardSlowdown();
         }
         if (down_pushed_) {
-          my_ship_.accelarate();
-          my_ship_.backwardSlowdown();
           ship_.accelarate();
           ship_.backwardSlowdown();
         }
         else if (down_unpushed_) {
-          my_ship_.slowdown();
           ship_.slowdown();
         }
 
         if (left_pushed_) {
-          my_ship_.changeX(false);
           ship_.rotate(false);
         }
         if (right_pushed_) {
-          my_ship_.changeX(true);
           ship_.rotate(true);
         }
         {
         if (space_pushed_)     {
-            tmp_space_obj = my_ship_.shoot();
-            if (nullptr != tmp_space_obj) {
-                projectiles_.push_back(tmp_space_obj);
+            auto ball = ship_.shoot(renderer_);
+            if (ball) {
+                projectiles_.push_back(std::move(ball));
             }
         }
         changeObjectsPositions();

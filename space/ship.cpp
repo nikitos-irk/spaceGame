@@ -76,10 +76,14 @@ void Ship::rotatePointsInVector(std::vector<primitive::Point>& points,
 
 void Ship::update()
 {
-    auto mediana = primitive::median(border_[1], border_[2]);
-    speed_.getOffsetXY({mediana.x, mediana.y}, {border_[0].x, border_[0].y});
     left_nozzle_.update();
     right_nozzle_.update();
+}
+
+primitive::Direction Ship::getOffset()
+{
+    auto mediana = primitive::median(border_[1], border_[2]);
+    return speed_.getOffsetXY({mediana.x, mediana.y}, {border_[0].x, border_[0].y});
 }
 
 void Ship::slowdown(){
@@ -93,6 +97,20 @@ void Ship::backwardSlowdown(){
 }
 void Ship::backwardAccelarate(){
     speed_.backwardAccelarate();
+}
+
+std::unique_ptr<Projectile> Ship::shoot(SDL_Renderer* renderer)
+{
+    if (shoot_delay_ > primitive::now()) { return nullptr; }
+    shoot_delay_ = primitive::delay(kShootingDelay);
+
+    auto mediana = primitive::median(border_[1], border_[2]);
+    double diff_x = (mediana.x - border_[0].x)/5;
+    double diff_y = (mediana.y - border_[0].y)/5;
+
+    auto ball = std::unique_ptr<Projectile>{new Projectile{renderer, primitive::Size{0, 0},
+        {-diff_x, -diff_y}, {border_[0].x - diff_x, border_[0].y - diff_y}}};
+    return ball;
 }
 
 }  // namespace space

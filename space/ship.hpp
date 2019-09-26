@@ -12,6 +12,8 @@
 #include "scene/scene.hpp"
 #include "speed.hpp"
 
+#include "space_ship.hpp"
+
 namespace space {
 
 class Ship: public Object {
@@ -20,6 +22,7 @@ public:
 
   static constexpr double kAngle{M_PI/15};
   static constexpr auto kRotationDelay = 60ms;
+  static constexpr auto kShootingDelay = 100ms;
   static constexpr int kMaxSpeed{50};
   static constexpr primitive::Size size{30, 60};
   const ColorSchema colors{{255, 255, 0}, {255,8,0}};
@@ -40,18 +43,21 @@ public:
   void rotatePointsInVector(std::vector<primitive::Point> &points,
                             primitive::Point initial_median_intersection,
                             double angle) const;
+  std::unique_ptr<Projectile> shoot(SDL_Renderer* renderer);
+  primitive::Point CalcMedianIntersaction() const;
+  primitive::Direction getOffset();
 
   void update() override;
   void display(scene::Scene& scene) override { scene.draw(*this); }
 
 private:
-  primitive::Point CalcMedianIntersaction() const;
   Border border_;
   Nozzle left_nozzle_;
   Nozzle right_nozzle_;
   Speed speed_{kMaxSpeed};
   primitive::Time rotation_delay_;
   primitive::Point initial_median_intersection_;
+  primitive::Time shoot_delay_;
 };
 
 }  // namespace space
