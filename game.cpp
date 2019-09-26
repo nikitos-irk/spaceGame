@@ -7,6 +7,8 @@
 #include <unistd.h>
 
 #include "explosion.hpp"
+
+#include "figure/factory_shape.hpp"
 #include "space/grid.hpp"
 
 constexpr auto kAsteroidsRemovingDelay = 10ms;

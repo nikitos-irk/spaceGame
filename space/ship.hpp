@@ -4,15 +4,16 @@
 #include <vector>
 
 #include "colorschema.hpp"
+#include "space_object.hpp"
+#include "speed.hpp"
+
 #include "object.hpp"
 #include "nozzle.hpp"
 #include "primitive/color.hpp"
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "scene/scene.hpp"
-#include "speed.hpp"
 
-#include "space_ship.hpp"
 
 namespace space {
 

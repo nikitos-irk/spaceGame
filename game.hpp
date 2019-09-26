@@ -14,7 +14,8 @@
 #include "scene/sdl_scene.hpp"
 #include "space/background.hpp"
 #include "space/ship.hpp"
-#include "space_ship.hpp"
+
+#include "space_object.hpp"
 
 class Asteroid;
 class Background;

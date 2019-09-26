@@ -22,7 +22,7 @@ add_executable(${PROJECT_NAME}
     "skeleton.cpp"
     "space/nozzle.cpp"
     "space/ship.cpp"
-    "space_ship.cpp"
+    "space_object.cpp"
     "speed.cpp"
 )
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
