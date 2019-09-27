@@ -8,6 +8,8 @@
 #include "skeleton.hpp"
 #include "space/background.hpp"
 #include "space/grid.hpp"
+#include "space/life_amount.hpp"
+#include "space/projectile.hpp"
 #include "space/nozzle.hpp"
 #include "space/ship.hpp"
 
@@ -86,4 +88,22 @@ void SdlScene::draw(space::Nozzle const& nozzle)
                     border[2], 1, true, false);
 }
 
+void SdlScene::draw(space::Projectile const& projectile)
+{
+}
+
+void SdlScene::draw(space::LifeAmount const& lifes)
+{
+  figure::FactoryShape factory{renderer_};
+  factory.color({0, 255, 0, 255})
+      .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
+
+  factory.color({255, 0, 0, 255});
+  for (int i = 0; i < lifes.get_amount(); ++i) {
+      factory.rectangle({10.0 + i * 15, double(size_.height - 30)},
+                        lifes.kBarSize).fill();
+  }
+}
+
 }  // namespace scene
+

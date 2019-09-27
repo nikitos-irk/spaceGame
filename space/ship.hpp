@@ -45,7 +45,7 @@ public:
   void rotatePointsInVector(std::vector<primitive::Point> &points,
                             primitive::Point initial_median_intersection,
                             double angle) const;
-  std::unique_ptr<Projectile> shoot(SDL_Renderer* renderer);
+  std::unique_ptr<::Projectile> shoot(SDL_Renderer* renderer);
   primitive::Point CalcMedianIntersaction() const;
   primitive::Direction getOffset();
 

@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME}
     "scene/sdl_scene.cpp"
     "skeleton.cpp"
     "space/nozzle.cpp"
+    "space/projectile.cpp"
     "space/ship.cpp"
     "space_object.cpp"
     "speed.cpp"

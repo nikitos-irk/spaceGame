@@ -86,20 +86,27 @@ primitive::Direction Ship::getOffset()
     return speed_.getOffsetXY({mediana.x, mediana.y}, {border_[0].x, border_[0].y});
 }
 
-void Ship::slowdown(){
+void Ship::slowdown()
+{
     speed_.slowdown();
 }
-void Ship::accelarate(){
+
+void Ship::accelarate()
+{
     speed_.accelarate();
 }
-void Ship::backwardSlowdown(){
+
+void Ship::backwardSlowdown()
+{
     speed_.backwardSlowdown();
 }
-void Ship::backwardAccelarate(){
+
+void Ship::backwardAccelarate()
+{
     speed_.backwardAccelarate();
 }
 
-std::unique_ptr<Projectile> Ship::shoot(SDL_Renderer* renderer)
+std::unique_ptr<::Projectile> Ship::shoot(SDL_Renderer* renderer)
 {
     if (shoot_delay_ > primitive::now()) { return nullptr; }
     shoot_delay_ = primitive::delay(kShootingDelay);
@@ -108,7 +115,7 @@ std::unique_ptr<Projectile> Ship::shoot(SDL_Renderer* renderer)
     double diff_x = (mediana.x - border_[0].x)/5;
     double diff_y = (mediana.y - border_[0].y)/5;
 
-    auto ball = std::unique_ptr<Projectile>{new Projectile{renderer, primitive::Size{0, 0},
+    auto ball = std::unique_ptr<::Projectile>{new ::Projectile{renderer, primitive::Size{0, 0},
         {-diff_x, -diff_y}, {border_[0].x - diff_x, border_[0].y - diff_y}}};
     return ball;
 }
