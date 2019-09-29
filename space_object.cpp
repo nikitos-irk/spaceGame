@@ -10,9 +10,7 @@
 #include "primitive/color.hpp"
 #include "primitive/line.hpp"
 
-constexpr auto kBlockSize = 5;
 constexpr auto kDisplayDelay = 10ms;
-constexpr auto kProjLifetime = 5s;
 
 SpaceObject::SpaceObject(SDL_Renderer *renderer,
                          primitive::Point coordinate)
@@ -28,21 +26,6 @@ SpaceObject::~SpaceObject(){
 
 bool SpaceObject::isAlive(){ return alive_; }
 void SpaceObject::markAsDead() { alive_ = false; }
-
-Projectile::Projectile(SDL_Renderer *renderer, primitive::Direction offset,
-    primitive::Point coordinate)
-    : SpaceObject(renderer, coordinate),
-      direction_{offset} {
-    life_time_ = primitive::delay(kProjLifetime);
-}
-
-primitive::Point* Projectile::getXY(){ return &coordinate_; }
-std::pair<primitive::Point, primitive::Point> Projectile::getLine()
-{ return std::make_pair(coordinate_, previous_); }
-
-Projectile::~Projectile(){
-    std::cout << "Projectile destructor" << std::endl;
-}
 
 Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Point coordinate)
     : SpaceObject(renderer, coordinate),
@@ -71,65 +54,6 @@ Asteroid::~Asteroid(){
 
 void out(double x, double y){
     std::cout << x << ":" << y << std::endl;
-}
-
-primitive::Time Projectile::get_life_time(){ return life_time_; }
-
-void Projectile::display()
-{
-    if (display_delay_ > primitive::now()){ return; }
-
-    double error = (double) - kBlockSize;
-    double tmp_x = (double) kBlockSize - 0.5;
-    double tmp_y = (double) 0.5;
-
-    double cx = coordinate_.x - 0.5;
-    double cy = coordinate_.y - 0.5;
-
-    figure::FactoryShape factory{renderer_};
-    factory.color({255, 255, 0, 255});
-    while (tmp_x >= tmp_y){
-        factory.point({cx + tmp_x, cy + tmp_y}).draw();
-        factory.point({cx + tmp_y, cy + tmp_x}).draw();
-
-        if (tmp_x != 0){
-            factory.point({cx - tmp_x, cy + tmp_y}).draw();
-            factory.point({cx + tmp_y, cy - tmp_x}).draw();
-        }
-
-        if (tmp_y != 0){
-            factory.point({cx + tmp_x, cy - tmp_y}).draw();
-            factory.point({cx - tmp_y, cy + tmp_x}).draw();
-        }
-
-        if (tmp_x != 0 && tmp_y != 0){
-            factory.point({cx - tmp_x, cy - tmp_y}).draw();
-            factory.point({cx - tmp_y, cy - tmp_x}).draw();
-        }
-
-        error += tmp_y;
-        ++tmp_y;
-        error += tmp_y;
-
-        if (error >= 0){
-            --tmp_x;
-            error -= tmp_x;
-            error -= tmp_x;
-        }
-    }
-
-    factory.color({128, 0, 128, 255});
-    for (double dy = 1; dy <= kBlockSize; dy += 1.0){
-        double dx = floor(sqrt((2.0 * kBlockSize * dy) - (dy * dy)));
-        double cx = coordinate_.x;
-        double cy = coordinate_.y;
-        factory.line({cx - dx, cy + dy - kBlockSize},
-                     {cx + dx, cy + dy - kBlockSize}).draw();
-        factory.line({cx - dx, cy - dy + kBlockSize},
-                     {cx + dx, cy - dy + kBlockSize}).draw();
-    }
-    coordinate_.move(direction_);
-    display_delay_ = primitive::delay(kDisplayDelay/5);
 }
 
 primitive::Point Asteroid::getCenterPoint(){
@@ -195,9 +119,4 @@ void Asteroid::changePosition(primitive::Direction direction_xy){
 
 primitive::Point* Asteroid::getFirstPoint(){
     return pp_[0];
-}
-
-void Projectile::changePosition(primitive::Direction direction_xy){
-    previous_ = coordinate_;
-    coordinate_.move(direction_xy);
 }

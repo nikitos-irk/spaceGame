@@ -29,22 +29,6 @@ public:
     void markAsDead();
 };
 
-class Projectile: public SpaceObject{
-private:
-    primitive::Direction direction_;
-    primitive::Point previous_;
-    primitive::Time life_time_;
-
-public:
-    Projectile(SDL_Renderer*, primitive::Direction, primitive::Point);
-    void changePosition(primitive::Direction) override;
-    void display() override;
-    primitive::Point* getXY();
-    std::pair<primitive::Point, primitive::Point> getLine();
-    primitive::Time get_life_time();
-    ~Projectile();
-};
-
 class Asteroid: public SpaceObject {
 private:
     std::vector<primitive::Point*> pp_;
