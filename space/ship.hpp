@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "colorschema.hpp"
-#include "space_object.hpp"
 #include "speed.hpp"
 
 #include "object.hpp"
@@ -14,6 +13,7 @@
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "scene/scene.hpp"
+#include "space/projectile.hpp"
 
 
 namespace space {
@@ -45,7 +45,7 @@ public:
   void rotatePointsInVector(std::vector<primitive::Point> &points,
                             primitive::Point initial_median_intersection,
                             double angle) const;
-  std::unique_ptr<::Projectile> shoot(SDL_Renderer* renderer);
+  ProjectilePtr shoot();
   primitive::Point CalcMedianIntersaction() const;
   primitive::Direction getOffset();
 

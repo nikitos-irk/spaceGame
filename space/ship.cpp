@@ -106,7 +106,7 @@ void Ship::backwardAccelarate()
     speed_.backwardAccelarate();
 }
 
-std::unique_ptr<::Projectile> Ship::shoot(SDL_Renderer* renderer)
+ProjectilePtr Ship::shoot()
 {
     if (shoot_delay_ > primitive::now()) { return nullptr; }
     shoot_delay_ = primitive::delay(kShootingDelay);
@@ -115,9 +115,9 @@ std::unique_ptr<::Projectile> Ship::shoot(SDL_Renderer* renderer)
     double diff_x = (mediana.x - border_[0].x)/5;
     double diff_y = (mediana.y - border_[0].y)/5;
 
-    auto ball = std::unique_ptr<::Projectile>{new ::Projectile{renderer, primitive::Size{0, 0},
-        {-diff_x, -diff_y}, {border_[0].x - diff_x, border_[0].y - diff_y}}};
-    return ball;
+    return std::make_unique<Projectile>(primitive::Point{border_[0].x - diff_x,
+                                                         border_[0].y - diff_y},
+                                        primitive::Direction{-diff_x, -diff_y});
 }
 
 }  // namespace space
