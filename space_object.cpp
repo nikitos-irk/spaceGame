@@ -15,11 +15,9 @@ constexpr auto kDisplayDelay = 10ms;
 constexpr auto kProjLifetime = 5s;
 
 SpaceObject::SpaceObject(SDL_Renderer *renderer,
-                         primitive::Size screen_size,
                          primitive::Point coordinate)
     : renderer_{renderer},
-      coordinate_{coordinate},
-      screen_size_{screen_size}
+      coordinate_{coordinate}
 {
   display_delay_ = primitive::delay(kDisplayDelay);
 }
@@ -31,9 +29,9 @@ SpaceObject::~SpaceObject(){
 bool SpaceObject::isAlive(){ return alive_; }
 void SpaceObject::markAsDead() { alive_ = false; }
 
-Projectile::Projectile(SDL_Renderer *renderer, primitive::Size screen_size,
-                       primitive::Direction offset, primitive::Point coordinate)
-    : SpaceObject(renderer, screen_size, coordinate),
+Projectile::Projectile(SDL_Renderer *renderer, primitive::Direction offset,
+    primitive::Point coordinate)
+    : SpaceObject(renderer, coordinate),
       direction_{offset} {
     life_time_ = primitive::delay(kProjLifetime);
 }
@@ -46,10 +44,8 @@ Projectile::~Projectile(){
     std::cout << "Projectile destructor" << std::endl;
 }
 
-Asteroid::Asteroid(SDL_Renderer *renderer,
-                   primitive::Size screen_size,
-                   primitive::Point coordinate)
-    : SpaceObject(renderer, screen_size, coordinate),
+Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Point coordinate)
+    : SpaceObject(renderer, coordinate),
       cg_{{160, 177, 188}, {119, 98, 84}, {128, 0, 0}, {81, 81, 81},
           {76, 62, 54}, {139, 69, 19}}
 {

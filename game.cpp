@@ -29,7 +29,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
   for (int i = 0; i < 10; ++i) {
       double tmp_x = rand() % screen_size_.width;
       double tmp_y = rand() % screen_size_.height;
-      asteroids_.push_back(new Asteroid(renderer, screen_size_, {tmp_x, tmp_y}));
+      asteroids_.push_back(new Asteroid(renderer, {tmp_x, tmp_y}));
   }
 
   // Initiating delays
@@ -44,7 +44,7 @@ void Game::createAsteroid(){
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
-    asteroids_.push_back(new Asteroid(renderer_, screen_size_, p.rotate(ship_center, theta)));
+    asteroids_.push_back(new Asteroid(renderer_, p.rotate(ship_center, theta)));
 }
 
 void Game::updateAsteroids(){
