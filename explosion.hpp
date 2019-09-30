@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "colorschema.hpp"
+
 #include "primitive/point.hpp"
 #include "primitive/time.hpp"
 
@@ -10,14 +12,12 @@ struct SDL_Renderer;
 
 class Asteroid;
 
-class Explosion{
-public:
-    Asteroid* ast;
+class Explosion {
 private:
     primitive::Point p_;
     SDL_Renderer *renderer_;
     primitive::Time destroy_time_;
-    class Fragment{
+    class Fragment {
         primitive::Time fragment_shift_delay_;
         int dots_number_;
         double x_shift_;
@@ -28,9 +28,9 @@ private:
         std::vector<primitive::Point> dots;
         void display(SDL_Renderer *);
         void shift();
-        Fragment(Asteroid*, primitive::Point, primitive::Point, int);
-        Fragment(Asteroid*, primitive::Point, primitive::Point, primitive::Point);
-        Asteroid *ast;
+        Fragment(ColorGenerator cg, primitive::Point, primitive::Point, int);
+        Fragment(ColorGenerator cg, primitive::Point, primitive::Point, primitive::Point);
+        ColorGenerator cg_;
     };
     std::vector<Fragment> fragments_;
 public:
@@ -38,7 +38,6 @@ public:
     void shift(primitive::Direction);
     void display();
     bool isAlive();
-    ~Explosion();
 };
 
 #endif // EXPLOSION_HPP

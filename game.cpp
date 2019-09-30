@@ -29,7 +29,8 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
   for (int i = 0; i < 10; ++i) {
       double tmp_x = rand() % screen_size_.width;
       double tmp_y = rand() % screen_size_.height;
-      asteroids_.push_back(new Asteroid(renderer, {tmp_x, tmp_y}));
+      asteroids_.push_back(std::make_unique<Asteroid>(renderer,
+          primitive::Point{tmp_x, tmp_y}));
   }
 
   // Initiating delays
@@ -44,26 +45,20 @@ void Game::createAsteroid(){
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
-    asteroids_.push_back(new Asteroid(renderer_, p.rotate(ship_center, theta)));
+    asteroids_.push_back(std::make_unique<Asteroid>(renderer_, p.rotate(ship_center, theta)));
 }
 
 void Game::updateAsteroids(){
     if (update_asteroids_delay_ >= primitive::now()){ return; }
     auto tmp_p = ship_.CalcMedianIntersaction();
     primitive::Point *ap = nullptr;
-    double distance;
+
     double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
-    auto iter = asteroids_.begin();
-    while (iter != asteroids_.end())
-    {
-        ap = dynamic_cast<Asteroid*>(*iter)->getFirstPoint();
-        distance = sqrt(pow(tmp_p.x - ap->x, 2) + pow(tmp_p.y - ap->y, 2));
+    for (auto it = std::begin(asteroids_); it != std::end(asteroids_); ++it) {
+        ap = (*it)->getFirstPoint();
+        double distance = sqrt(pow(tmp_p.x - ap->x, 2) + pow(tmp_p.y - ap->y, 2));
         if (distance >= 1.5 * diagonal){
-            SpaceObject *tmp = *iter;
-            asteroids_.erase(iter++);
-            delete tmp;
-        } else {
-            ++iter;
+            it = asteroids_.erase(it);
         }
     }
     update_asteroids_delay_ = primitive::delay(kAsteroidsRemovingDelay);
@@ -134,15 +129,14 @@ void Game::checkShipHits()
     }
 }
 
-void Game::shipHitsLoop(){
-
-    std::vector<primitive::Point*> tmpPoints;
+void Game::shipHitsLoop()
+{
     bool hitStatus = false;
 
     for (auto ast = asteroids_.begin(); ast != asteroids_.end(); ++ast){
         hitStatus = false;
         if (!(*ast)->isAlive()){ continue; }
-        tmpPoints = dynamic_cast<Asteroid*>(*ast)->get_points();
+        auto tmpPoints = (*ast)->get_points();
         primitive::Point *p1, *p2;
         primitive::Point sp1, sp2;
         for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
@@ -199,9 +193,9 @@ void Game::histLoop()
 {
     for (auto& ball: projectiles_) {
         if (!ball->isAlive()) { continue; }
-        for (auto ast: asteroids_) {
+        for (auto& ast: asteroids_) {
             if (!ast->isAlive()) { continue; }
-            auto tmpPoints = dynamic_cast<Asteroid*>(ast)->get_points();
+            auto tmpPoints = ast->get_points();
             primitive::Point *p1, *p2;
 
             for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
@@ -228,7 +222,7 @@ void Game::histLoop()
 void Game::generateExplosion(Asteroid *tmp_ast){
     double middle_x = 0.0, middle_y = 0.0;
 
-    std::vector<primitive::Point*> tmpPoints = tmp_ast->get_points();
+    auto tmpPoints = tmp_ast->get_points();
     for (auto iter = tmpPoints.begin(); iter != tmpPoints.end(); ++iter){
         middle_x += (*iter)->x;
         middle_y += (*iter)->y;
@@ -238,21 +232,18 @@ void Game::generateExplosion(Asteroid *tmp_ast){
     explosions_.push_back(new Explosion(primitive::Point{middle_x, middle_y}, renderer_, tmp_ast));
 }
 
-void Game::cleanAsteroids(){
-    auto ast = asteroids_.begin();
-    while (ast != asteroids_.end()){
-        if (!(*ast)->isAlive()){
-            Asteroid *tmp_ast = dynamic_cast<Asteroid*>(*ast);
-            generateExplosion(tmp_ast);
-            asteroids_.erase(ast++);
-            // delete tmp_ast; // will be remove in ~Explosion() 
-        } else {
-            ++ast;
+void Game::cleanAsteroids()
+{
+    for (auto it = std::begin(asteroids_); it != std::end(asteroids_); ++it) {
+        if (!(*it)->isAlive()){
+            generateExplosion(it->get());
+            it = asteroids_.erase(it);
         }
     }
 }
 
-void Game::cleanProjectiles(){
+void Game::cleanProjectiles()
+{
     for (auto it = std::begin(projectiles_); it != std::end(projectiles_); ++it) {
         if (!(*it)->isAlive()){
             it = projectiles_.erase(it);
@@ -315,8 +306,8 @@ void Game::changeObjectsPositions(){
     auto directionXY = ship_.getOffset();
     ship_.update();
 
-    for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
-        (*spaceObject)->changePosition(directionXY);
+    for (auto& spaceObject: asteroids_) {
+        spaceObject->changePosition(directionXY);
     }
 
     for (auto& ball: projectiles_) {

@@ -1,9 +1,7 @@
 #include "space_object.hpp"
 
 #include <cstdlib>
-#include <iostream>
 
-#include "colorschema.hpp"
 #include "skeleton.hpp"
 
 #include "figure/factory_shape.hpp"
@@ -12,26 +10,16 @@
 
 constexpr auto kDisplayDelay = 10ms;
 
-SpaceObject::SpaceObject(SDL_Renderer *renderer,
-                         primitive::Point coordinate)
-    : renderer_{renderer},
-      coordinate_{coordinate}
-{
-  display_delay_ = primitive::delay(kDisplayDelay);
-}
-
-SpaceObject::~SpaceObject(){
-    std::cout << "SpaceObject destructor" << std::endl;
-}
-
-bool SpaceObject::isAlive(){ return alive_; }
-void SpaceObject::markAsDead() { alive_ = false; }
+bool Asteroid::isAlive(){ return alive_; }
+void Asteroid::markAsDead() { alive_ = false; }
 
 Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Point coordinate)
-    : SpaceObject(renderer, coordinate),
+    : renderer_{renderer},
+      coordinate_{coordinate},
       cg_{{160, 177, 188}, {119, 98, 84}, {128, 0, 0}, {81, 81, 81},
           {76, 62, 54}, {139, 69, 19}}
 {
+    display_delay_ = primitive::delay(kDisplayDelay);
     //TODO: think about direction_x;direction_y
 
     int error_x = rand() % 10;
@@ -47,14 +35,6 @@ Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Point coordinate)
 }
 
 std::vector<primitive::Point*>& Asteroid::get_points(){ return pp_; }
-
-Asteroid::~Asteroid(){
-    std::cout << "Asteroid destructor" << std::endl;
-}
-
-void out(double x, double y){
-    std::cout << x << ":" << y << std::endl;
-}
 
 primitive::Point Asteroid::getCenterPoint(){
     double x = 0.0, y = 0.0;
