@@ -10,7 +10,9 @@
 
 struct SDL_Renderer;
 
+namespace space {
 class Asteroid;
+}
 
 class Explosion {
 private:
@@ -34,7 +36,7 @@ private:
     };
     std::vector<Fragment> fragments_;
 public:
-    Explosion(primitive::Point p, SDL_Renderer*, Asteroid*);
+    Explosion(primitive::Point p, SDL_Renderer*, space::Asteroid*);
     void shift(primitive::Direction);
     void display();
     bool isAlive();

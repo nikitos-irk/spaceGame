@@ -1,10 +1,10 @@
 #include "explosion.hpp"
 
 #include "skeleton.hpp"
-#include "space_object.hpp"
 
 #include "primitive/line.hpp"
 #include "primitive/point.hpp"
+#include "space/asteroid.hpp"
 
 constexpr auto kFragmentShiftDelay = 50ms;
 constexpr auto kExplosionLifeTime = 1s;
@@ -80,12 +80,13 @@ void Explosion::Fragment::shift(){
     fragment_shift_delay_ = primitive::delay(kFragmentShiftDelay);
 }
 
-Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer, Asteroid *ast){
+Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer,
+    space::Asteroid *ast){
 
     destroy_time_ = primitive::delay(kExplosionLifeTime);
     this->p_ = p;
     this->renderer_ = renderer;
-    primitive::Point p_center = ast->getCenterPoint();
+    auto p_center = ast->center();
 
     int random_number_of_ragments = 5 + rand() % 10;
     double angle_diff = 360 / random_number_of_ragments;
@@ -93,12 +94,12 @@ Explosion::Explosion(primitive::Point p, SDL_Renderer *renderer, Asteroid *ast){
     auto p_second = p_first + 1;
 
     while (p_second != ast->get_points().end()){
-        fragments_.push_back(Fragment(ast->cg_, **p_first, **p_second, p_center));
+        fragments_.push_back(Fragment(ast->colors, *p_first, *p_second, p_center));
         ++p_first;
         ++p_second;
     }
     p_second = ast->get_points().begin();
-    fragments_.push_back(Fragment(ast->cg_, **p_first, **p_second, p_center));
+    fragments_.push_back(Fragment(ast->colors, *p_first, *p_second, p_center));
 }
 
 void Explosion::display(){

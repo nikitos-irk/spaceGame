@@ -29,8 +29,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
   for (int i = 0; i < 10; ++i) {
       double tmp_x = rand() % screen_size_.width;
       double tmp_y = rand() % screen_size_.height;
-      asteroids_.push_back(std::make_unique<Asteroid>(renderer,
-          primitive::Point{tmp_x, tmp_y}));
+      asteroids_.push_back(std::make_unique<space::Asteroid>(primitive::Point{tmp_x, tmp_y}));
   }
 
   // Initiating delays
@@ -45,18 +44,17 @@ void Game::createAsteroid(){
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
-    asteroids_.push_back(std::make_unique<Asteroid>(renderer_, p.rotate(ship_center, theta)));
+    asteroids_.push_back(std::make_unique<space::Asteroid>(p.rotate(ship_center, theta)));
 }
 
 void Game::updateAsteroids(){
     if (update_asteroids_delay_ >= primitive::now()){ return; }
     auto tmp_p = ship_.CalcMedianIntersaction();
-    primitive::Point *ap = nullptr;
 
     double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
     for (auto it = std::begin(asteroids_); it != std::end(asteroids_); ++it) {
-        ap = (*it)->getFirstPoint();
-        double distance = sqrt(pow(tmp_p.x - ap->x, 2) + pow(tmp_p.y - ap->y, 2));
+        auto const& ap = (*it)->get_points().front();
+        double distance = sqrt(pow(tmp_p.x - ap.x, 2) + pow(tmp_p.y - ap.y, 2));
         if (distance >= 1.5 * diagonal){
             it = asteroids_.erase(it);
         }
@@ -137,7 +135,7 @@ void Game::shipHitsLoop()
         hitStatus = false;
         if (!(*ast)->isAlive()){ continue; }
         auto tmpPoints = (*ast)->get_points();
-        primitive::Point *p1, *p2;
+        primitive::Point p1, p2;
         primitive::Point sp1, sp2;
         for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
             if (!hitStatus){
@@ -157,7 +155,7 @@ void Game::shipHitsLoop()
                     } else {
                         sp2 = *(spacePointsIter + 1);
                     }
-                    hitStatus = intersect({*p1, *p2}, {sp1, sp2});
+                    hitStatus = intersect({p1, p2}, {sp1, sp2});
                     if (hitStatus){
                         life_amount_--;
                         if (!life_amount_){
@@ -196,7 +194,7 @@ void Game::histLoop()
         for (auto& ast: asteroids_) {
             if (!ast->isAlive()) { continue; }
             auto tmpPoints = ast->get_points();
-            primitive::Point *p1, *p2;
+            primitive::Point p1, p2;
 
             for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
                 p1 = *p;
@@ -207,7 +205,7 @@ void Game::histLoop()
                     p2 = *(p + 1);
                 }
 
-                bool hitStatus = intersect(ball->line(), {*p1, *p2});
+                bool hitStatus = intersect(ball->line(), {p1, p2});
                 if ( hitStatus ){
                     ast->markAsDead();
                     ball->markAsDead();
@@ -219,13 +217,14 @@ void Game::histLoop()
     cleanLoop();
 }
 
-void Game::generateExplosion(Asteroid *tmp_ast){
+void Game::generateExplosion(space::Asteroid *tmp_ast)
+{
     double middle_x = 0.0, middle_y = 0.0;
 
     auto tmpPoints = tmp_ast->get_points();
     for (auto iter = tmpPoints.begin(); iter != tmpPoints.end(); ++iter){
-        middle_x += (*iter)->x;
-        middle_y += (*iter)->y;
+        middle_x += iter->x;
+        middle_y += iter->y;
     }
     middle_x /= tmpPoints.size();
     middle_y /= tmpPoints.size();
@@ -279,9 +278,9 @@ void Game::displayObjects()
         }
     }
 
-    for (auto& spaceObject: asteroids_) {
-        if (spaceObject->isAlive()) {
-            spaceObject->display();
+    for (auto& asteroid: asteroids_) {
+        if (asteroid->isAlive()) {
+            asteroid->display(scene_);
         }
     }
 
@@ -303,20 +302,20 @@ void Game::changeObjectsPositions(){
 
     if (change_position_delay_ > primitive::now()){ return; }
 
-    auto directionXY = ship_.getOffset();
+    auto offset = ship_.getOffset();
     ship_.update();
 
-    for (auto& spaceObject: asteroids_) {
-        spaceObject->changePosition(directionXY);
+    for (auto& asteroid: asteroids_) {
+        asteroid->move(offset);
     }
 
     for (auto& ball: projectiles_) {
-        ball->move(directionXY);
+        ball->move(offset);
     }
 
     for (auto explosion = explosions_.begin(); explosion != explosions_.end(); ++explosion){
         if ( (*explosion)->isAlive() ){
-            (*explosion)->shift(directionXY);
+            (*explosion)->shift(offset);
         }
     }
 

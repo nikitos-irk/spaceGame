@@ -20,10 +20,10 @@ add_executable(${PROJECT_NAME}
     "primitive/point.cpp"
     "scene/sdl_scene.cpp"
     "skeleton.cpp"
+    "space/asteroid.cpp"
     "space/nozzle.cpp"
     "space/projectile.cpp"
     "space/ship.cpp"
-    "space_object.cpp"
     "speed.cpp"
 )
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

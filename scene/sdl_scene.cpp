@@ -8,6 +8,7 @@
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "skeleton.hpp"
+#include "space/asteroid.hpp"
 #include "space/background.hpp"
 #include "space/grid.hpp"
 #include "space/life_amount.hpp"
@@ -92,68 +93,111 @@ void SdlScene::draw(space::Nozzle const& nozzle)
 
 void SdlScene::draw(space::Projectile const& projectile)
 {
-  double error = double(-projectile.kBlockSize);
-  double tmp_x{projectile.kBlockSize - 0.5};
-  double tmp_y{0.5};
+    double error = double(-projectile.kBlockSize);
+    double tmp_x{projectile.kBlockSize - 0.5};
+    double tmp_y{0.5};
 
-  const auto& c = projectile.get_coordinate();
+    const auto& c = projectile.get_coordinate();
 
-  double cx = c.x - 0.5;
-  double cy = c.y - 0.5;
+    double cx = c.x - 0.5;
+    double cy = c.y - 0.5;
 
-  figure::FactoryShape factory{renderer_};
-  factory.color({255, 255, 0, 255});
-  while (tmp_x >= tmp_y){
-      factory.point({cx + tmp_x, cy + tmp_y}).draw();
-      factory.point({cx + tmp_y, cy + tmp_x}).draw();
+    figure::FactoryShape factory{renderer_};
+    factory.color({255, 255, 0, 255});
+    while (tmp_x >= tmp_y){
+        factory.point({cx + tmp_x, cy + tmp_y}).draw();
+        factory.point({cx + tmp_y, cy + tmp_x}).draw();
 
-      if (tmp_x != 0){
-          factory.point({cx - tmp_x, cy + tmp_y}).draw();
-          factory.point({cx + tmp_y, cy - tmp_x}).draw();
-      }
+        if (tmp_x != 0){
+            factory.point({cx - tmp_x, cy + tmp_y}).draw();
+            factory.point({cx + tmp_y, cy - tmp_x}).draw();
+        }
 
-      if (tmp_y != 0){
-          factory.point({cx + tmp_x, cy - tmp_y}).draw();
-          factory.point({cx - tmp_y, cy + tmp_x}).draw();
-      }
+        if (tmp_y != 0){
+            factory.point({cx + tmp_x, cy - tmp_y}).draw();
+            factory.point({cx - tmp_y, cy + tmp_x}).draw();
+        }
 
-      if (tmp_x != 0 && tmp_y != 0){
-          factory.point({cx - tmp_x, cy - tmp_y}).draw();
-          factory.point({cx - tmp_y, cy - tmp_x}).draw();
-      }
+        if (tmp_x != 0 && tmp_y != 0){
+            factory.point({cx - tmp_x, cy - tmp_y}).draw();
+            factory.point({cx - tmp_y, cy - tmp_x}).draw();
+        }
 
-      error += tmp_y;
-      ++tmp_y;
-      error += tmp_y;
+        error += tmp_y;
+        ++tmp_y;
+        error += tmp_y;
 
-      if (error >= 0){
-          --tmp_x;
-          error -= tmp_x;
-          error -= tmp_x;
-      }
-  }
+        if (error >= 0){
+            --tmp_x;
+            error -= tmp_x;
+            error -= tmp_x;
+        }
+    }
 
-  factory.color({128, 0, 128, 255});
-  for (double dy = 1; dy <= projectile.kBlockSize; dy += 1.0){
-      double dx = std::floor(std::sqrt((2.0 * projectile.kBlockSize * dy) - (dy * dy)));
-      factory.line({cx - dx, cy + dy - projectile.kBlockSize},
-                   {cx + dx, cy + dy - projectile.kBlockSize}).draw();
-      factory.line({cx - dx, cy - dy + projectile.kBlockSize},
-                   {cx + dx, cy - dy + projectile.kBlockSize}).draw();
-  }
+    factory.color({128, 0, 128, 255});
+    for (double dy = 1; dy <= projectile.kBlockSize; dy += 1.0){
+        double dx = std::floor(std::sqrt((2.0 * projectile.kBlockSize * dy) - (dy * dy)));
+        factory.line({cx - dx, cy + dy - projectile.kBlockSize},
+                     {cx + dx, cy + dy - projectile.kBlockSize}).draw();
+        factory.line({cx - dx, cy - dy + projectile.kBlockSize},
+                     {cx + dx, cy - dy + projectile.kBlockSize}).draw();
+    }
 }
 
 void SdlScene::draw(space::LifeAmount const& lifes)
 {
-  figure::FactoryShape factory{renderer_};
-  factory.color({0, 255, 0, 255})
-      .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
+    figure::FactoryShape factory{renderer_};
+    factory.color({0, 255, 0, 255})
+        .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
 
-  factory.color({255, 0, 0, 255});
-  for (int i = 0; i < lifes.get_amount(); ++i) {
-      factory.rectangle({10.0 + i * 15, double(size_.height - 30)},
-                        lifes.kBarSize).fill();
-  }
+    factory.color({255, 0, 0, 255});
+    for (int i = 0; i < lifes.get_amount(); ++i) {
+        factory.rectangle({10.0 + i * 15, double(size_.height - 30)},
+                          lifes.kBarSize).fill();
+    }
+}
+
+void SdlScene::draw(space::Asteroid const& asteroid)
+{
+    const auto& points = asteroid.get_points();
+    primitive::Point p1;
+    primitive::Point p2;
+    figure::FactoryShape factory{renderer_};
+    factory.color({0, 0, 255, 255});
+    auto iter = std::begin(points);
+    for (; iter != std::end(points)-1; ++iter) {
+        p1 = *iter;
+        p2 = *(iter+1);
+        factory.line(p1, p2).draw();
+    }
+    p1 = *std::begin(points);
+    factory.line(p1, p2).draw();
+
+    auto center_point = asteroid.center();
+    int blocksize = 3;
+
+    iter = std::begin(asteroid.get_points());
+    auto iter_next = iter + 1;
+
+    p1 = *iter;
+    p2 = *iter_next;
+
+    Skeleton skeleton{renderer_, asteroid.colors};
+    while (iter_next != std::end(asteroid.get_points())) {
+        p1 = *iter;
+        p2 = *iter_next;
+        skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
+                        primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1,
+                        blocksize, false, true);
+        ++iter;
+        ++iter_next;
+    }
+    iter_next = std::begin(asteroid.get_points());
+    p1 = *iter;
+    p2 = *iter_next;
+    skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
+                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1,
+                    blocksize, false, true);
 }
 
 }  // namespace scene

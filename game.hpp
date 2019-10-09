@@ -12,18 +12,13 @@
 #include "primitive/size.hpp"
 #include "primitive/time.hpp"
 #include "scene/sdl_scene.hpp"
+#include "space/asteroid.hpp"
 #include "space/background.hpp"
 #include "space/life_amount.hpp"
 #include "space/projectile.hpp"
 #include "space/ship.hpp"
 
-#include "space_object.hpp"
-
-class Asteroid;
-class Background;
 class Explosion;
-class SpaceShip;
-class SpaceObject;
 
 struct SDL_Renderer;
 
@@ -68,8 +63,7 @@ private:
     space::Background background_;
     space::Ship ship_;
     std::list<space::ProjectilePtr> projectiles_;
-
-    std::list<std::unique_ptr<Asteroid>> asteroids_;
+    std::list<space::AsteroidPtr> asteroids_;
     std::list<Explosion*> explosions_;
 
     scene::SdlScene scene_;
@@ -104,7 +98,7 @@ private:
     void shipHitsLoop();
     void update();
 
-    void generateExplosion(Asteroid*);
+    void generateExplosion(space::Asteroid*);
 public:
     Game(SDL_Renderer*, primitive::Size, int);
     void run();

@@ -2,6 +2,7 @@
 #define SCENE_SCENE_HPP_
 
 namespace space {
+class Asteroid;
 class Background;
 class Grid;
 class LifeAmount;
@@ -21,6 +22,7 @@ public:
     virtual void draw(space::Nozzle const& nozzle) = 0;
     virtual void draw(space::Projectile const& projectile) = 0;
     virtual void draw(space::LifeAmount const& lifes) = 0;
+    virtual void draw(space::Asteroid const& asteroid) = 0;
 };
 
 }  // namespace scene

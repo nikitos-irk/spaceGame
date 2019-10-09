@@ -4,10 +4,10 @@
 
 int main()
 try {
-    constexpr int kScreenWidth = 640;
-    constexpr int kScreenHeight = 480;
+    constexpr int kWidth = 640;
+    constexpr int kHeight = 480;
 
-    Application{primitive::Size{kScreenWidth, kScreenHeight}}.run();
+    Application{{kWidth, kHeight}}.run();
 }
 catch (SdlError const& error) {
     std::cout << error.what() << '\n';
