@@ -26,7 +26,7 @@ public:
     void move(primitive::Direction const& d);
 
     void update() override;
-    void display(scene::Scene& scene) override { scene.draw(*this); }
+    void display(scene::Scene& scene) const override { scene.draw(*this); }
 
 private:
     bool alive_{true};

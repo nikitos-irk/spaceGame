@@ -10,6 +10,7 @@
 #include "skeleton.hpp"
 #include "space/asteroid.hpp"
 #include "space/background.hpp"
+#include "space/explosion.hpp"
 #include "space/grid.hpp"
 #include "space/life_amount.hpp"
 #include "space/projectile.hpp"
@@ -42,7 +43,7 @@ void SdlScene::draw(space::Background const& background)
                           {size_.width, kCitizenSize})
                .fill();
     }
-    if (background.grid) this->draw(*background.grid);
+    if (background.grid) background.grid->display(*this);
 }
 
 void SdlScene::draw(space::Grid const& grid)
@@ -72,8 +73,8 @@ void SdlScene::draw(space::Ship const& ship)
                    primitive::Point{border[1].x/2 + border[2].x/2,
                                     border[1].y/2 + border[2].y/2},
                    border[2], 4, true, true);
-    this->draw(ship.get_left_nozzle());
-    this->draw(ship.get_right_nozzle());
+    ship.get_left_nozzle().display(*this);
+    ship.get_right_nozzle().display(*this);
 }
 
 void SdlScene::draw(space::Nozzle const& nozzle)
@@ -198,6 +199,23 @@ void SdlScene::draw(space::Asteroid const& asteroid)
     skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
                     primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1,
                     blocksize, false, true);
+}
+
+void SdlScene::draw(space::Explosion const& explosion)
+{
+    for (const auto& part: explosion.fragments()) {
+        part.display(*this);
+    }
+}
+
+void SdlScene::draw(space::Fragment const& fragment)
+{
+  int blocksize = 3;
+  primitive::Point p1 = *(fragment.dots.begin());
+  primitive::Point p2 = *(fragment.dots.begin() + 1);
+  primitive::Point p3 = *(fragment.dots.begin() + 2);
+  Skeleton{renderer_, fragment.colors}.update(0.0, primitive::Line{p3, p2}.length(),
+      p2, primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 
 }  // namespace scene

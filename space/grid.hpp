@@ -11,7 +11,7 @@ public:
     static constexpr primitive::Color color{192, 192, 192, 255};
     static constexpr auto cell_size{25};
 
-    void display(scene::Scene& scene) override { scene.draw(*this); }
+    void display(scene::Scene& scene) const override { scene.draw(*this); }
 };
 }  // namespace space
 

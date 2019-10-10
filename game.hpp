@@ -13,12 +13,11 @@
 #include "primitive/time.hpp"
 #include "scene/sdl_scene.hpp"
 #include "space/asteroid.hpp"
+#include "space/explosion.hpp"
 #include "space/background.hpp"
 #include "space/life_amount.hpp"
 #include "space/projectile.hpp"
 #include "space/ship.hpp"
-
-class Explosion;
 
 struct SDL_Renderer;
 
@@ -64,7 +63,7 @@ private:
     space::Ship ship_;
     std::list<space::ProjectilePtr> projectiles_;
     std::list<space::AsteroidPtr> asteroids_;
-    std::list<Explosion*> explosions_;
+    std::list<space::ExplosionPtr> explosions_;
 
     scene::SdlScene scene_;
 

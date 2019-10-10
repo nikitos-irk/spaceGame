@@ -26,6 +26,8 @@ public:
     void draw(space::Projectile const& projectile) override;
     void draw(space::LifeAmount const& lifes) override;
     void draw(space::Asteroid const& asteroid) override;
+    void draw(space::Explosion const& explosion) override;
+    void draw(space::Fragment const& fragment) override;
 
 private:
     SDL_Renderer* renderer_{nullptr};

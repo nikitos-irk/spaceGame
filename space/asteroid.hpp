@@ -28,7 +28,7 @@ public:
     const std::vector<primitive::Point>& get_points() const { return pp_; }
 
     void update() override {}
-    void display(scene::Scene& scene) override { scene.draw(*this); }
+    void display(scene::Scene& scene) const override { scene.draw(*this); }
 
 private:
     std::vector<primitive::Point> pp_;

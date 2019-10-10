@@ -25,7 +25,7 @@ public:
   void rotate(bool clockwise);
 
   void update() override;
-  void display(scene::Scene& scene) override { scene.draw(*this); }
+  void display(scene::Scene& scene) const override { scene.draw(*this); }
 
 private:
   Ship const& ship_;

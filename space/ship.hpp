@@ -50,7 +50,7 @@ public:
   primitive::Direction getOffset();
 
   void update() override;
-  void display(scene::Scene& scene) override { scene.draw(*this); }
+  void display(scene::Scene& scene) const override { scene.draw(*this); }
 
 private:
   Border border_;

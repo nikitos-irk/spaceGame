@@ -6,8 +6,6 @@
 
 #include <unistd.h>
 
-#include "explosion.hpp"
-
 #include "figure/factory_shape.hpp"
 #include "space/grid.hpp"
 
@@ -228,7 +226,8 @@ void Game::generateExplosion(space::Asteroid *tmp_ast)
     }
     middle_x /= tmpPoints.size();
     middle_y /= tmpPoints.size();
-    explosions_.push_back(new Explosion(primitive::Point{middle_x, middle_y}, renderer_, tmp_ast));
+    explosions_.push_back(std::make_unique<space::Explosion>(
+        primitive::Point{middle_x, middle_y}, *tmp_ast));
 }
 
 void Game::cleanAsteroids()
@@ -250,15 +249,11 @@ void Game::cleanProjectiles()
     }
 }
 
-void Game::cleanExplosions(){
-    auto expl = explosions_.begin();
-    while (expl != explosions_.end()){
-        if (!(*expl)->isAlive()){
-            Explosion *tmp_expl = *expl;
-            explosions_.erase(expl++);
-            delete tmp_expl;
-        } else {
-            ++expl;
+void Game::cleanExplosions()
+{
+    for (auto it = std::begin(explosions_); it != std::end(explosions_); ++it) {
+        if (!(*it)->isAlive()) {
+            it = explosions_.erase(it);
         }
     }
 }
@@ -286,11 +281,9 @@ void Game::displayObjects()
 
     for (auto& explosion: explosions_) {
         if (explosion->isAlive()) {
-            explosion->display();
+            explosion->display(scene_);
         }
     }
-
-    cleanExplosions();
 
     life_amount_.display(scene_);
 
@@ -315,8 +308,9 @@ void Game::changeObjectsPositions(){
 
     for (auto explosion = explosions_.begin(); explosion != explosions_.end(); ++explosion){
         if ( (*explosion)->isAlive() ){
-            (*explosion)->shift(offset);
+            (*explosion)->move(offset);
         }
+        (*explosion)->update();
     }
 
     change_position_delay_ = primitive::delay(kChangePositionDelay);
@@ -423,7 +417,7 @@ void Game::run()
         if (right_pushed_) {
           ship_.rotate(true);
         }
-        {
+
         if (space_pushed_) {
             auto ball = ship_.shoot();
             if (ball) {
@@ -436,7 +430,8 @@ void Game::run()
         if (asteroids_.size() <= 20){
             createAsteroid();
         }
-        }
+
+        cleanExplosions();
         projectiles_mutex_.unlock();
         asteroids_mutex_.unlock();
 

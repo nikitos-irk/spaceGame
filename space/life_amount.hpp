@@ -18,7 +18,7 @@ public:
     LifeAmount& operator--(int) { --amount_; return *this; }
 
     void update() override {}
-    void display(scene::Scene& scene) override { scene.draw(*this); }
+    void display(scene::Scene& scene) const override { scene.draw(*this); }
 
 private:
     int amount_;

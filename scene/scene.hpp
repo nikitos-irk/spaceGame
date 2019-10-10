@@ -4,6 +4,8 @@
 namespace space {
 class Asteroid;
 class Background;
+class Explosion;
+class Fragment;
 class Grid;
 class LifeAmount;
 class Nozzle;
@@ -23,6 +25,8 @@ public:
     virtual void draw(space::Projectile const& projectile) = 0;
     virtual void draw(space::LifeAmount const& lifes) = 0;
     virtual void draw(space::Asteroid const& asteroid) = 0;
+    virtual void draw(space::Explosion const& explosion) = 0;
+    virtual void draw(space::Fragment const& fragment) = 0;
 };
 
 }  // namespace scene

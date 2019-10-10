@@ -17,7 +17,7 @@ public:
     std::unique_ptr<Grid> grid{nullptr};
 
     void update() override {}
-    void display(scene::Scene& scene) override { scene.draw(*this); }
+    void display(scene::Scene& scene) const override { scene.draw(*this); }
 };
 
 }  // namespace space

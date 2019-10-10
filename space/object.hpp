@@ -11,7 +11,7 @@ class Object {
 public:
     virtual ~Object() = default;
     virtual void update() = 0;
-    virtual void display(scene::Scene& scene) = 0;
+    virtual void display(scene::Scene& scene) const = 0;
 };
 
 }  // namespace
