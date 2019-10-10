@@ -1,4 +1,6 @@
-#include <space/asteroid.hpp>
+#include "asteroid.hpp"
+
+#include <algorithm>
 #include <cstdlib>
 
 #include "skeleton.hpp"
