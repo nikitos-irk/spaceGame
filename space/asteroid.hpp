@@ -12,8 +12,6 @@
 #include "primitive/time.hpp"
 #include "scene/scene.hpp"
 
-struct SDL_Renderer;
-
 namespace space {
 
 class Asteroid : public Object {

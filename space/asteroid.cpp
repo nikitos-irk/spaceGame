@@ -5,17 +5,12 @@
 
 #include "skeleton.hpp"
 
-#include "figure/factory_shape.hpp"
-#include "primitive/color.hpp"
-#include "primitive/line.hpp"
-
 namespace space {
 
 Asteroid::Asteroid(primitive::Point coordinate)
     : coordinate_{coordinate}
 {
     display_delay_ = primitive::delay(kDisplayDelay);
-    //TODO: think about direction_x;direction_y
 
     int error_x = rand() % 10;
     int error_y = rand() % 10;
