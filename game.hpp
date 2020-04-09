@@ -13,7 +13,11 @@
 #include "primitive/time.hpp"
 #include "scene/sdl_scene.hpp"
 #include "space/background.hpp"
-#include "space_ship.hpp"
+#include "space/life_amount.hpp"
+#include "space/projectile.hpp"
+#include "space/ship.hpp"
+
+#include "space_object.hpp"
 
 class Asteroid;
 class Background;
@@ -48,7 +52,7 @@ class Game{
 private:
     SDL_Renderer *renderer_{nullptr};
     primitive::Size screen_size_;
-    int live_amount_;
+    space::LifeAmount life_amount_;
     std::atomic_bool running_{false};
 
     primitive::Time change_position_delay_;
@@ -62,10 +66,12 @@ private:
     SDL_Event e_;
 
     space::Background background_;
-    SpaceShip my_ship_;
+    space::Ship ship_;
+    std::list<space::ProjectilePtr> projectiles_;
+
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
-    std::list<SpaceObject*> projectiles_;
+    std::list<std::unique_ptr<Projectile>> projectiles_old_;
     std::list<Explosion*> explosions_;
 
     scene::SdlScene scene_;
@@ -99,7 +105,6 @@ private:
     void checkShipHits();
     void shipHitsLoop();
     void update();
-    void displayLifeAmount();
 
     void generateExplosion(Asteroid*);
 public:

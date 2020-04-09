@@ -1,5 +1,7 @@
 #include "factory_shape.hpp"
 
+#include <algorithm>
+
 #include <SDL2/SDL.h>
 
 #include "exception.hpp"
@@ -53,5 +55,12 @@ FactoryShape& FactoryShape::color(primitive::Color const& color)
     return *this;
 }
 
-}  // namespace figure
+Polygon FactoryShape::polygon(std::vector<primitive::Point> const& points) const
+{
+    Polygon::Points ps;
+    std::transform(begin(points), end(points), std::back_inserter(ps),
+        [](const auto& p) { return std::make_pair(p.x, p.y); });
+    return {renderer_, ps};
+}
 
+}  // namespace figure

@@ -7,19 +7,22 @@
 #include <unistd.h>
 
 #include "explosion.hpp"
+
+#include "figure/factory_shape.hpp"
 #include "space/grid.hpp"
 
 constexpr auto kAsteroidsRemovingDelay = 10ms;
 constexpr auto kChangePositionDelay = 30ms;
 constexpr auto kInertiaDelay = 10ms;
 
-Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
+Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
     : renderer_{renderer},
       screen_size_{size},
-      live_amount_{live_amount},
-      my_ship_{renderer, screen_size_, 50},
+      life_amount_{life_amount},
+      ship_{{double(screen_size_.width)/2, double(screen_size_.height)/2}},
       scene_{renderer_, screen_size_}
 {
+//  Uncomment to show grid
 //  background_.grid = std::make_unique<space::Grid>();
 
   // Create asteroids
@@ -37,7 +40,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int live_amount)
 
 void Game::createAsteroid(){
     double theta = (rand() % 360)/M_PI;
-    primitive::Point ship_center = my_ship_.getMedianIntersaction();
+    auto ship_center = ship_.CalcMedianIntersaction();
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
@@ -46,7 +49,7 @@ void Game::createAsteroid(){
 
 void Game::updateAsteroids(){
     if (update_asteroids_delay_ >= primitive::now()){ return; }
-    primitive::Point tmp_p = my_ship_.getMedianIntersaction();
+    auto tmp_p = ship_.CalcMedianIntersaction();
     primitive::Point *ap = nullptr;
     double distance;
     double diagonal = sqrt(pow(screen_size_.width, 2) + pow(screen_size_.height, 2));
@@ -67,15 +70,9 @@ void Game::updateAsteroids(){
 }
 
 void Game::updateProjectiles(){
-    auto iter = projectiles_.begin();
-    while (iter != projectiles_.end())
-    {
-        if (dynamic_cast<Projectile*>(*iter)->get_life_time() < primitive::now()){
-            SpaceObject *tmp = *iter;
-            projectiles_.erase(iter++);
-            delete tmp;
-        } else {
-            ++iter;
+    for (auto it = std::begin(projectiles_old_); it != std::end(projectiles_old_); ++it) {
+        if ((*it)->get_life_time() < primitive::now()) {
+            it = projectiles_old_.erase(it);
         }
     }
 }
@@ -150,18 +147,19 @@ void Game::shipHitsLoop(){
                 } else {
                     p2 = *(p + 1);
                 }
-                for (auto spacePointsIter = my_ship_.pp.begin(); spacePointsIter != my_ship_.pp.end() - 1; ++spacePointsIter){
+                auto border = ship_.get_border();
+                for (auto spacePointsIter = border.begin(); spacePointsIter != border.end() - 1; ++spacePointsIter){
                     sp1 = *spacePointsIter;
                     sp2 = *(spacePointsIter+1);
-                    if (my_ship_.pp.end()-1 == spacePointsIter){
-                        sp2 = *my_ship_.pp.begin();
+                    if (border.end()-1 == spacePointsIter){
+                        sp2 = *border.begin();
                     } else {
                         sp2 = *(spacePointsIter + 1);
                     }
                     hitStatus = intersect(*p1, *p2, sp1, sp2);
                     if (hitStatus){
-                        live_amount_--;
-                        if (!live_amount_){
+                        life_amount_--;
+                        if (!life_amount_){
                             try{
                                 throw GameOverException();
                             }catch (...){
@@ -190,17 +188,13 @@ void Game::checkHits()
     }
 }
 
-void Game::histLoop(){
+void Game::histLoop() {
 
-    std::vector<primitive::Point*> tmpPoints;
-    bool hitStatus;
-
-    for (auto pr = projectiles_.begin(); pr != projectiles_.end(); ++pr){
-        if (!(*pr)->isAlive()) { continue; }
-        hitStatus = false;
-        for (auto ast = asteroids_.begin(); ast != asteroids_.end(); ++ast){
-            if (!(*ast)->isAlive()) { continue; }
-            tmpPoints = dynamic_cast<Asteroid*>(*ast)->get_points();
+    for (auto& pr: projectiles_old_) {
+        if (!pr->isAlive()) { continue; }
+        for (auto ast: asteroids_) {
+            if (!ast->isAlive()) { continue; }
+            auto tmpPoints = dynamic_cast<Asteroid*>(ast)->get_points();
             primitive::Point *p1, *p2, *px;
 
             for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
@@ -212,13 +206,13 @@ void Game::histLoop(){
                     p2 = *(p + 1);
                 }
 
-                px = dynamic_cast<Projectile*>(*pr)->getXY();
-                std::pair<primitive::Point, primitive::Point> pLine = dynamic_cast<Projectile*>(*pr)->getLine();
+                px = pr->getXY();
+                auto pLine = pr->getLine();
 
                 bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
                 if ( hitStatus ){
-                    (*ast)->markAsDead();
-                    (*pr)->markAsDead();
+                    ast->markAsDead();
+                    pr->markAsDead();
                     break;
                 }
             }
@@ -255,12 +249,10 @@ void Game::cleanAsteroids(){
 }
 
 void Game::cleanProjectiles(){
-    auto pr = projectiles_.begin();
-    while (pr != projectiles_.end()){
+    auto pr = projectiles_old_.begin();
+    while (pr != projectiles_old_.end()){
         if (!(*pr)->isAlive()){
-            Projectile *tmp_pr = dynamic_cast<Projectile*>(*pr);
-            projectiles_.erase(pr++);
-            delete tmp_pr;
+            projectiles_old_.erase(pr++);
         } else {
             ++pr;
         }
@@ -288,27 +280,32 @@ void Game::cleanLoop(){
 void Game::displayObjects()
 {
     background_.display(scene_);
-
-    my_ship_.display();
-
-    for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
-        if ((*spaceObject)->isAlive()){
-            (*spaceObject)->display();
-        }
-    }
-    for (auto spaceObject = projectiles_.begin(); spaceObject != projectiles_.end(); ++spaceObject){
-        if ((*spaceObject)->isAlive()){
-            (*spaceObject)->display();
-        }
+    ship_.display(scene_);
+    for (auto& ball: projectiles_) {
+        ball->display(scene_);
     }
 
-    for (auto explosion = explosions_.begin(); explosion != explosions_.end(); ++explosion){
-        if ( (*explosion)->isAlive() ){
-            (*explosion)->display();
+    for (auto& spaceObject: asteroids_) {
+        if (spaceObject->isAlive()) {
+            spaceObject->display();
         }
     }
+    for (auto& spaceObject: projectiles_old_) {
+        if (spaceObject->isAlive()) {
+            spaceObject->display();
+        }
+    }
+
+    for (auto& explosion: explosions_) {
+        if (explosion->isAlive()) {
+            explosion->display();
+        }
+    }
+
     cleanExplosions();
-    displayLifeAmount();
+
+    life_amount_.display(scene_);
+
     SDL_RenderPresent(renderer_);
     SDL_RenderClear(renderer_);
 }
@@ -317,12 +314,13 @@ void Game::changeObjectsPositions(){
 
     if (change_position_delay_ > primitive::now()){ return; }
 
-    auto directionXY = my_ship_.getOffset();
+    auto directionXY = ship_.getOffset();
+    ship_.update();
 
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
     }
-    for (auto spaceObject = projectiles_.begin(); spaceObject != projectiles_.end(); ++spaceObject){
+    for (auto spaceObject = projectiles_old_.begin(); spaceObject != projectiles_old_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
     }
     for (auto explosion = explosions_.begin(); explosion != explosions_.end(); ++explosion){
@@ -332,19 +330,6 @@ void Game::changeObjectsPositions(){
     }
 
     change_position_delay_ = primitive::delay(kChangePositionDelay);
-}
-
-void Game::displayLifeAmount(){
-    figure::FactoryShape factory{renderer_};
-    constexpr primitive::Size size{5 * 15 + 4, 24};
-    factory.color({0, 255, 0, 255})
-        .rectangle({5.0, double(screen_size_.height - 32)}, size).fill();
-
-    for (int i = 0; i < live_amount_; ++i){
-        constexpr primitive::Size size{10, 20};
-        factory.color({255, 0, 0, 255})
-            .rectangle({10.0 + i * 15, double(screen_size_.height - 30)}, size).fill();
-    }
 }
 
 void Game::run()
@@ -357,7 +342,6 @@ void Game::run()
     std::thread ship_hits_monitoring(&Game::checkShipHits, this);
 
     int quit = 1;
-    SpaceObject *tmp_space_obj;
     while(quit) {
 
         if (globalExceptionPtr)
@@ -399,9 +383,9 @@ void Game::run()
                         break;
                     case SDLK_SPACE:{
                             space_pushed_ = true;
-                            tmp_space_obj = my_ship_.shoot();
-                            if (nullptr != tmp_space_obj) {
-                                projectiles_.push_back(tmp_space_obj);
+                            auto ball = ship_.shoot(renderer_);
+                            if (ball) {
+                                projectiles_old_.push_back(std::move(ball));
                             }
                     }
                         break;
@@ -434,27 +418,31 @@ void Game::run()
         }
 
         if (up_pushed_) {
-          my_ship_.backwardAccelarate();
-          my_ship_.slowdown();
+          ship_.backwardAccelarate();
+          ship_.slowdown();
         }
         else if (up_unpushed_) {
-          my_ship_.backwardSlowdown();
+          ship_.backwardSlowdown();
         }
         if (down_pushed_) {
-          my_ship_.accelarate();
-          my_ship_.backwardSlowdown();
+          ship_.accelarate();
+          ship_.backwardSlowdown();
         }
         else if (down_unpushed_) {
-          my_ship_.slowdown();
+          ship_.slowdown();
         }
 
-        if (left_pushed_)     { my_ship_.changeX(false); }
-        if (right_pushed_)     { my_ship_.changeX(true); }
+        if (left_pushed_) {
+          ship_.rotate(false);
+        }
+        if (right_pushed_) {
+          ship_.rotate(true);
+        }
         {
         if (space_pushed_)     {
-            tmp_space_obj = my_ship_.shoot();
-            if (nullptr != tmp_space_obj) {
-                projectiles_.push_back(tmp_space_obj);
+            auto ball = ship_.shoot(renderer_);
+            if (ball) {
+                projectiles_old_.push_back(std::move(ball));
             }
         }
         changeObjectsPositions();

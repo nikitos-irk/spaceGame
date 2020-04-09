@@ -1,8 +1,9 @@
 #include "explosion.hpp"
 
-#include "space_ship.hpp"
-#include "primitive/line.hpp"
+#include "space_object.hpp"
 #include "skeleton.hpp"
+
+#include "primitive/line.hpp"
 
 constexpr auto kFragmentShiftDelay = 50ms;
 constexpr auto kExplosionLifeTime = 1s;
