@@ -29,7 +29,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
   for (int i = 0; i < 10; ++i) {
       double tmp_x = rand() % screen_size_.width;
       double tmp_y = rand() % screen_size_.height;
-      asteroids_.push_back(new Asteroid(renderer, screen_size_, {tmp_x, tmp_y}));
+      asteroids_.push_back(new Asteroid(renderer, {tmp_x, tmp_y}));
   }
 
   // Initiating delays
@@ -44,7 +44,7 @@ void Game::createAsteroid(){
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
     double tmp_y = ship_center.y;
     primitive::Point p{tmp_x, tmp_y};
-    asteroids_.push_back(new Asteroid(renderer_, screen_size_, p.rotate(ship_center, theta)));
+    asteroids_.push_back(new Asteroid(renderer_, p.rotate(ship_center, theta)));
 }
 
 void Game::updateAsteroids(){
@@ -70,9 +70,10 @@ void Game::updateAsteroids(){
 }
 
 void Game::updateProjectiles(){
-    for (auto it = std::begin(projectiles_old_); it != std::end(projectiles_old_); ++it) {
+    for (auto it = std::begin(projectiles_); it != std::end(projectiles_); ++it) {
+        (*it)->update();
         if ((*it)->get_life_time() < primitive::now()) {
-            it = projectiles_old_.erase(it);
+          it = projectiles_.erase(it);
         }
     }
 }
@@ -88,33 +89,39 @@ inline int det (int a, int b, int c, int d) {
     return a * d - b * c;
 }
 
-inline bool between (int a, int b, double c) {
+inline bool between(int a, int b, double c)
+{
     double epsilon = 1E-9;
     return std::min(a,b) <= c + epsilon && c <= std::max(a,b) + epsilon;
 }
 
-inline bool intersect_1 (int a, int b, int c, int d) {
+inline bool intersect_1(int a, int b, int c, int d)
+{
     if (a > b)  std::swap(a, b);
     if (c > d)  std::swap(c, d);
     return std::max(a,c) <= std::min(b,d);
 }
 
 
-bool intersect (primitive::Point a, primitive::Point b,
-                primitive::Point c, primitive::Point d) {
-    int A1 = a.y-b.y,  B1 = b.x-a.x,  C1 = -A1*a.x - B1*a.y;
-    int A2 = c.y-d.y,  B2 = d.x-c.x,  C2 = -A2*c.x - B2*c.y;
+bool intersect(primitive::Line l1, primitive::Line l2)
+{
+    int A1 = l1.begin.y-l1.end.y;
+    int B1 = l1.end.x-l1.begin.x;
+    int C1 = -A1*l1.begin.x - B1*l1.begin.y;
+    int A2 = l2.begin.y-l2.end.y;
+    int B2 = l2.end.x-l2.begin.x;
+    int C2 = -A2*l2.begin.x - B2*l2.begin.y;
     int zn = det (A1, B1, A2, B2);
     if (zn != 0) {
-        double x = - det (C1, B1, C2, B2) * 1. / zn;
-        double y = - det (A1, C1, A2, C2) * 1. / zn;
-        return between (a.x, b.x, x) && between (a.y, b.y, y)
-            && between (c.x, d.x, x) && between (c.y, d.y, y);
+        double x = - det(C1, B1, C2, B2) * 1. / zn;
+        double y = - det(A1, C1, A2, C2) * 1. / zn;
+        return between(l1.begin.x, l1.end.x, x) && between(l1.begin.y, l1.end.y, y)
+            && between(l2.begin.x, l2.end.x, x) && between(l2.begin.y, l2.end.y, y);
     }
     else
-        return det (A1, C1, A2, C2) == 0 && det (B1, C1, B2, C2) == 0
-            && intersect_1 (a.x, b.x, c.x, d.x)
-            && intersect_1 (a.y, b.y, c.y, d.y);
+        return det(A1, C1, A2, C2) == 0 && det(B1, C1, B2, C2) == 0
+            && intersect_1(l1.begin.x, l1.end.x, l2.begin.x, l2.end.x)
+            && intersect_1(l1.begin.y, l1.end.y, l2.begin.y, l2.end.y);
 }
 
 void Game::checkShipHits()
@@ -156,7 +163,7 @@ void Game::shipHitsLoop(){
                     } else {
                         sp2 = *(spacePointsIter + 1);
                     }
-                    hitStatus = intersect(*p1, *p2, sp1, sp2);
+                    hitStatus = intersect({*p1, *p2}, {sp1, sp2});
                     if (hitStatus){
                         life_amount_--;
                         if (!life_amount_){
@@ -188,14 +195,14 @@ void Game::checkHits()
     }
 }
 
-void Game::histLoop() {
-
-    for (auto& pr: projectiles_old_) {
-        if (!pr->isAlive()) { continue; }
+void Game::histLoop()
+{
+    for (auto& ball: projectiles_) {
+        if (!ball->isAlive()) { continue; }
         for (auto ast: asteroids_) {
             if (!ast->isAlive()) { continue; }
             auto tmpPoints = dynamic_cast<Asteroid*>(ast)->get_points();
-            primitive::Point *p1, *p2, *px;
+            primitive::Point *p1, *p2;
 
             for (auto p = tmpPoints.begin(); p != tmpPoints.end() - 1; ++p){
                 p1 = *p;
@@ -206,13 +213,10 @@ void Game::histLoop() {
                     p2 = *(p + 1);
                 }
 
-                px = pr->getXY();
-                auto pLine = pr->getLine();
-
-                bool hitStatus = intersect(*p1, *p2, pLine.first, pLine.second);
+                bool hitStatus = intersect(ball->line(), {*p1, *p2});
                 if ( hitStatus ){
                     ast->markAsDead();
-                    pr->markAsDead();
+                    ball->markAsDead();
                     break;
                 }
             }
@@ -249,12 +253,9 @@ void Game::cleanAsteroids(){
 }
 
 void Game::cleanProjectiles(){
-    auto pr = projectiles_old_.begin();
-    while (pr != projectiles_old_.end()){
-        if (!(*pr)->isAlive()){
-            projectiles_old_.erase(pr++);
-        } else {
-            ++pr;
+    for (auto it = std::begin(projectiles_); it != std::end(projectiles_); ++it) {
+        if (!(*it)->isAlive()){
+            it = projectiles_.erase(it);
         }
     }
 }
@@ -282,15 +283,12 @@ void Game::displayObjects()
     background_.display(scene_);
     ship_.display(scene_);
     for (auto& ball: projectiles_) {
-        ball->display(scene_);
+        if (ball->isAlive()) {
+            ball->display(scene_);
+        }
     }
 
     for (auto& spaceObject: asteroids_) {
-        if (spaceObject->isAlive()) {
-            spaceObject->display();
-        }
-    }
-    for (auto& spaceObject: projectiles_old_) {
         if (spaceObject->isAlive()) {
             spaceObject->display();
         }
@@ -320,9 +318,11 @@ void Game::changeObjectsPositions(){
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
     }
-    for (auto spaceObject = projectiles_old_.begin(); spaceObject != projectiles_old_.end(); ++spaceObject){
-        (*spaceObject)->changePosition(directionXY);
+
+    for (auto& ball: projectiles_) {
+        ball->move(directionXY);
     }
+
     for (auto explosion = explosions_.begin(); explosion != explosions_.end(); ++explosion){
         if ( (*explosion)->isAlive() ){
             (*explosion)->shift(directionXY);
@@ -381,13 +381,8 @@ void Game::run()
                     case SDLK_RIGHT:
                         right_pushed_ = true;
                         break;
-                    case SDLK_SPACE:{
-                            space_pushed_ = true;
-                            auto ball = ship_.shoot(renderer_);
-                            if (ball) {
-                                projectiles_old_.push_back(std::move(ball));
-                            }
-                    }
+                    case SDLK_SPACE:
+                        space_pushed_ = true;
                         break;
                     default:
                         break;
@@ -439,10 +434,10 @@ void Game::run()
           ship_.rotate(true);
         }
         {
-        if (space_pushed_)     {
-            auto ball = ship_.shoot(renderer_);
+        if (space_pushed_) {
+            auto ball = ship_.shoot();
             if (ball) {
-                projectiles_old_.push_back(std::move(ball));
+                projectiles_.push_back(std::move(ball));
             }
         }
         changeObjectsPositions();

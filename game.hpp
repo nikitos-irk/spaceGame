@@ -71,7 +71,6 @@ private:
 
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
-    std::list<std::unique_ptr<Projectile>> projectiles_old_;
     std::list<Explosion*> explosions_;
 
     scene::SdlScene scene_;

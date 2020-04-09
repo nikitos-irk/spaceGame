@@ -1,5 +1,7 @@
 #include "sdl_scene.hpp"
 
+#include <cmath>
+
 #include "colorschema.hpp"
 #include "figure/factory_shape.hpp"
 #include "primitive/color.hpp"
@@ -90,6 +92,55 @@ void SdlScene::draw(space::Nozzle const& nozzle)
 
 void SdlScene::draw(space::Projectile const& projectile)
 {
+  double error = double(-projectile.kBlockSize);
+  double tmp_x{projectile.kBlockSize - 0.5};
+  double tmp_y{0.5};
+
+  const auto& c = projectile.get_coordinate();
+
+  double cx = c.x - 0.5;
+  double cy = c.y - 0.5;
+
+  figure::FactoryShape factory{renderer_};
+  factory.color({255, 255, 0, 255});
+  while (tmp_x >= tmp_y){
+      factory.point({cx + tmp_x, cy + tmp_y}).draw();
+      factory.point({cx + tmp_y, cy + tmp_x}).draw();
+
+      if (tmp_x != 0){
+          factory.point({cx - tmp_x, cy + tmp_y}).draw();
+          factory.point({cx + tmp_y, cy - tmp_x}).draw();
+      }
+
+      if (tmp_y != 0){
+          factory.point({cx + tmp_x, cy - tmp_y}).draw();
+          factory.point({cx - tmp_y, cy + tmp_x}).draw();
+      }
+
+      if (tmp_x != 0 && tmp_y != 0){
+          factory.point({cx - tmp_x, cy - tmp_y}).draw();
+          factory.point({cx - tmp_y, cy - tmp_x}).draw();
+      }
+
+      error += tmp_y;
+      ++tmp_y;
+      error += tmp_y;
+
+      if (error >= 0){
+          --tmp_x;
+          error -= tmp_x;
+          error -= tmp_x;
+      }
+  }
+
+  factory.color({128, 0, 128, 255});
+  for (double dy = 1; dy <= projectile.kBlockSize; dy += 1.0){
+      double dx = std::floor(std::sqrt((2.0 * projectile.kBlockSize * dy) - (dy * dy)));
+      factory.line({cx - dx, cy + dy - projectile.kBlockSize},
+                   {cx + dx, cy + dy - projectile.kBlockSize}).draw();
+      factory.line({cx - dx, cy - dy + projectile.kBlockSize},
+                   {cx + dx, cy - dy + projectile.kBlockSize}).draw();
+  }
 }
 
 void SdlScene::draw(space::LifeAmount const& lifes)
