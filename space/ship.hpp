@@ -27,7 +27,7 @@ public:
   static constexpr auto kShootingDelay = 100ms;
   static constexpr int kMaxSpeed{50};
   static constexpr primitive::Size size{30, 60};
-  const ColorSchema colors{{255, 255, 0}, {255,8,0}};
+  const ColorSchema colors{{255, 255, 0}, {255,8,0}, {0, 0, 0}};
 
   explicit Ship(primitive::Point coordinate);
   Border const& get_border() const { return border_; }

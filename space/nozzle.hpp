@@ -17,7 +17,7 @@ public:
 
   static constexpr double kAngle{M_PI/15};
   static constexpr primitive::Size size{15, 25};
-  ColorSchema colors{{255, 17, 0}, {255, 237, 0}};
+  ColorSchema colors{{255, 17, 0}, {255, 237, 0}, {0, 220, 255}};
 
   Nozzle(Ship const& ship, primitive::Point coordinate);
   Border const& get_border() const { return border_; }

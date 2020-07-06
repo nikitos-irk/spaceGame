@@ -20,7 +20,8 @@ double Nozzle::getTiltAngel() const
 void Nozzle::update()
 {
     double offsetLength = ship_.get_speed().get_current_a();
-    colors.update(offsetLength);
+    // colors.update(offsetLength);
+    colors.update_(ship_.get_speed().get_current_a_signed());
     border_.clear();
     std::copy(border_origin_.begin(), border_origin_.end(),
         std::back_inserter(border_));

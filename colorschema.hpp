@@ -10,14 +10,16 @@
 class ColorSchema {
     const primitive::Color color_a_;
     const primitive::Color color_b_;
+    const primitive::Color color_c_;
     primitive::Color color_;
     primitive::Time change_colorchema_delay_;
     double color_mix_{1.0};
     bool flag_{false};
 
 public:
-    ColorSchema(primitive::Color, primitive::Color);
-    void update();
+    ColorSchema(primitive::Color, primitive::Color, primitive::Color);
+    // void update();
+    void update_(double);
     void update(double);
     primitive::Color get_color() const { return color_; }
 };
