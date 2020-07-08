@@ -21,6 +21,7 @@ public:
     primitive::Direction getOffsetXY(primitive::Direction,
                                      primitive::Direction);
     double get_current_a() const;
+    double get_current_a_signed() const;
 };
 
 #endif // SPEED_H

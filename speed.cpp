@@ -16,6 +16,7 @@ primitive::Direction Speed::getOffsetXY(primitive::Direction p1,
 }
 
 double Speed::get_current_a() const { return std::abs(current_a_); }
+double Speed::get_current_a_signed() const { return current_a_; }
 
 void Speed::accelarate(){
     if (forward_offset_ <= 0.0){

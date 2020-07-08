@@ -4,8 +4,8 @@
 
 int main()
 try {
-    constexpr int kScreenWidth = 640;
-    constexpr int kScreenHeight = 480;
+    constexpr int kScreenWidth = 640 * 2;
+    constexpr int kScreenHeight = 480 * 2;
 
     Application{primitive::Size{kScreenWidth, kScreenHeight}}.run();
 }

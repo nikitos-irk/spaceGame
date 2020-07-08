@@ -1,6 +1,6 @@
 #include "nozzle.hpp"
-
 #include "ship.hpp"
+
 
 namespace space {
 Nozzle::Nozzle(Ship const& ship, primitive::Point coordinate)
@@ -19,23 +19,35 @@ double Nozzle::getTiltAngel() const
 
 void Nozzle::update()
 {
-    double offsetLength = ship_.get_speed().get_current_a();
-    colors.update(offsetLength);
+    double offsetLength = ship_.get_speed().get_current_a_signed();
+    colors.update_(ship_.get_speed().get_current_a_signed());
     border_.clear();
     std::copy(border_origin_.begin(), border_origin_.end(),
         std::back_inserter(border_));
+    double Cx, Cy, Cx2, Cy2;
 
-    double Cx = (border_[1].x - border_[0].x) * (offsetLength);
-    double Cy = (border_[1].y - border_[0].y) * (offsetLength);
+    bool flag{offsetLength < 0 ? false: true};
+    offsetLength = std::abs(offsetLength);
+    
+    Cx = (border_[1].x - border_[0].x) * offsetLength;
+    Cy = (border_[1].y - border_[0].y) * offsetLength;
 
-    double Cx2 = (border_[0].x - border_[2].x) * (offsetLength);
-    double Cy2 = (border_[0].y - border_[2].y) * (offsetLength);
+    Cx2 = (border_[0].x - border_[2].x) * offsetLength;
+    Cy2 = (border_[0].y - border_[2].y) * offsetLength;
 
-    border_[1].x += Cx;
-    border_[1].y += Cy;
+    if (flag) {
+        border_[1].x += Cx2;
+        border_[1].y += Cy2;
 
-    border_[2].x -= Cx2;
-    border_[2].y -= Cy2;
+        border_[2].x -= Cx;
+        border_[2].y -= Cy;
+    } else {
+        border_[1].x += Cx;
+        border_[1].y += Cy;
+
+        border_[2].x -= Cx2;
+        border_[2].y -= Cy2;
+    }
 }
 
 void Nozzle::rotate(bool clockwise)
