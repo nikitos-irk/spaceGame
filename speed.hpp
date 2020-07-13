@@ -33,6 +33,7 @@ private:
     float shiftY_;
 
 public:
+    float angularShift_;
     Movement();
     Direction getOffset();
 
