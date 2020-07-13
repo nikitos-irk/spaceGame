@@ -72,6 +72,7 @@ private:
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
     std::list<Explosion*> explosions_;
+    std::list<SpaceObject*> stars_;
 
     scene::SdlScene scene_;
 

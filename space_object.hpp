@@ -9,6 +9,7 @@
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "primitive/time.hpp"
+#include "gravity/gravity.hpp"
 
 struct SDL_Renderer;
 
@@ -29,10 +30,15 @@ public:
     void markAsDead();
 };
 
-class Asteroid: public SpaceObject {
+class Asteroid: public SpaceObject, public space::Gravity {
 private:
     std::vector<primitive::Point*> pp_;
     void fill();
+    double getTriangleArea(primitive::Point *a, primitive::Point *b);
+    primitive::Point centralPoint;
+    double mass;
+    bool massIsReady {false};
+    primitive::Movement *movement;
 public:
     ColorGenerator cg_;
     primitive::Point getCenterPoint();
@@ -41,6 +47,8 @@ public:
     Asteroid(SDL_Renderer*, primitive::Point coordinate);
     void changePosition(primitive::Direction) override;
     primitive::Point* getFirstPoint();
+    double getArea();
+    double getMass();
     ~Asteroid();
 };
 

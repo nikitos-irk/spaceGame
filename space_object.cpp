@@ -44,9 +44,41 @@ Asteroid::Asteroid(SDL_Renderer *renderer, primitive::Point coordinate)
     pp_.push_back(new primitive::Point{coordinate_.x + size + rand() % 5, coordinate_.y + size * 2 + rand() % 5});
     pp_.push_back(new primitive::Point{coordinate_.x + size * 2 + rand() % 5, coordinate_.y + size + rand() % 5});
     pp_.push_back(new primitive::Point{coordinate_.x + size + rand() % 5, coordinate_.y + rand() % 5});
+    
+    Gravity(getMass());
+    movement = new primitive::Movement();
 }
 
 std::vector<primitive::Point*>& Asteroid::get_points(){ return pp_; }
+
+double Asteroid::getTriangleArea(primitive::Point *a, primitive::Point *b) {
+
+    primitive::Point c = getCenterPoint();
+    auto ab = sqrt(pow(a->x - b->x, 2) + pow(a->y - b->y, 2));
+    auto bc = sqrt(pow(b->x - c.x, 2) + pow(b->y - c.y, 2));
+    auto ca = sqrt(pow(a->x - c.x, 2) + pow(a->y - c.y, 2));
+    auto perimeter = ab + bc + ca;
+
+    return sqrt(
+        perimeter * (perimeter - ab) * (perimeter - bc) * (perimeter - ca)
+    );
+}
+
+double Asteroid::getMass() {
+    if (massIsReady) { return mass; }
+    mass = getArea() * space::asteroidDensity;
+    massIsReady = true;
+    return mass;
+}
+
+double Asteroid::getArea() {
+    if (pp_.empty()) { return 0; }
+    double area;
+    for (auto iter = pp_.begin(); iter != pp_.end() - 1; ++iter) {
+        area += getTriangleArea(*iter, *(iter+1));
+    }
+    return area;
+}
 
 Asteroid::~Asteroid(){
     std::cout << "Asteroid destructor" << std::endl;
@@ -68,21 +100,21 @@ primitive::Point Asteroid::getCenterPoint(){
 
 void Asteroid::fill(){
     
-  primitive::Point center_point = getCenterPoint();
+    primitive::Point center_point = getCenterPoint();
     int blocksize = 3;
 
     auto iter = pp_.begin();
     auto iter_next = iter + 1;
-    
+
     primitive::Point p1 = **iter;
     primitive::Point p2 = **iter_next;
-    
+
     Skeleton skeleton{renderer_, cg_};
     while (iter_next != pp_.end()){
         p1 = **iter;
         p2 = **iter_next;
         skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
-                       primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
+                        primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
         ++iter;
         ++iter_next;
         // break;
@@ -91,7 +123,7 @@ void Asteroid::fill(){
     p1 = **iter;
     p2 = **iter_next;
     skeleton.update(0.0, primitive::Line{p1, p2}.length(), center_point,
-                   primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
+                    primitive::Point{(p1.x + p2.x)/2, (p1.y + p2.y)/2}, p1, blocksize, false, true);
 }
 
 void Asteroid::display()
@@ -113,7 +145,8 @@ void Asteroid::display()
 
 void Asteroid::changePosition(primitive::Direction direction_xy){
     for (auto iter = pp_.begin(); iter != pp_.end(); ++iter){
-        (*iter)->move(direction_xy);
+        primitive::Direction tmpDirection{direction_xy.x + movement->getOffset().x, direction_xy.y + movement->getOffset().y};
+        (*iter)->move(tmpDirection);
     }
 }
 

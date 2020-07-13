@@ -33,7 +33,7 @@ public:
   Border const& get_border() const { return border_; }
   Nozzle const& get_left_nozzle() const { return left_nozzle_; }
   Nozzle const& get_right_nozzle() const { return right_nozzle_; }
-  Speed const& get_speed() const { return speed_; }
+  primitive::Speed const& get_speed() const { return speed_; }
   primitive::Point const& get_initial_median_intersaction() const
   { return initial_median_intersection_; }
   double getTiltAngel() const;
@@ -56,7 +56,7 @@ private:
   Border border_;
   Nozzle left_nozzle_;
   Nozzle right_nozzle_;
-  Speed speed_{kMaxSpeed};
+  primitive::Speed speed_{kMaxSpeed};
   primitive::Time rotation_delay_;
   primitive::Point initial_median_intersection_;
   primitive::Time shoot_delay_;

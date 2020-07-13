@@ -10,12 +10,14 @@ bool doubleEquals(double a, double b, double epsilon = 0.000000001)
 }
 }  // namespace
 
-namespace primitive
-{
+namespace primitive {
+
 struct Direction {
     double x{0.0};
     double y{0.0};
-    Direction & operator *=(int value);
+    Direction& operator *=(int value);
+    Direction& operator +=(const Direction&);
+    Direction& operator -=(const Direction&);
 };
 
 struct Point{
