@@ -146,9 +146,9 @@ void Asteroid::display()
 void Asteroid::changePosition(primitive::Direction direction_xy){
     auto tmp = getCenterPoint();
     for (auto iter = pp_.begin(); iter != pp_.end(); ++iter){
-        primitive::Direction tmpDirection{direction_xy.x + movement->getOffset().x, direction_xy.y + movement->getOffset().y};
-        (*iter)->move(tmpDirection);
+        primitive::Direction tmpDirection {movement->getOffset().x + direction_xy.x, movement->getOffset().y + direction_xy.y};
         (*iter)->rotate(tmp, movement->angularShift_);
+        (*iter)->move(tmpDirection);
     }
 }
 
