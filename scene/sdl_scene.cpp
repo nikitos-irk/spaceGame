@@ -102,7 +102,7 @@ void SdlScene::draw(space::Projectile const& projectile)
   double cy = c.y - 0.5;
 
   figure::FactoryShape factory{renderer_};
-  factory.color({255, 255, 0, 255});
+  factory.color({0, 255, 255, 255});
   while (tmp_x >= tmp_y){
       factory.point({cx + tmp_x, cy + tmp_y}).draw();
       factory.point({cx + tmp_y, cy + tmp_x}).draw();
@@ -133,7 +133,7 @@ void SdlScene::draw(space::Projectile const& projectile)
       }
   }
 
-  factory.color({128, 0, 128, 255});
+  factory.color({255, 255, 102, 255});
   for (double dy = 1; dy <= projectile.kBlockSize; dy += 1.0){
       double dx = std::floor(std::sqrt((2.0 * projectile.kBlockSize * dy) - (dy * dy)));
       factory.line({cx - dx, cy + dy - projectile.kBlockSize},
