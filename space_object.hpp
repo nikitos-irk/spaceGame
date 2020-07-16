@@ -52,4 +52,16 @@ public:
     ~Asteroid();
 };
 
+class Star: public SpaceObject, public space::Gravity {
+private:
+    double radius_;
+
+public:
+    Star(SDL_Renderer*, primitive::Point, double);
+    void display() override;
+    void changePosition(primitive::Direction) override;
+    double getArea();
+    double getMass();
+};
+
 #endif

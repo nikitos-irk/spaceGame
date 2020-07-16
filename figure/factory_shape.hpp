@@ -18,7 +18,7 @@ class Size;
 namespace figure
 {
 class FactoryShape
-{
+{   
 public:
     explicit FactoryShape(SDL_Renderer* renderer);
     FactoryShape& color(primitive::Color const& color);

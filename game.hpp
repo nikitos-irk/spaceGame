@@ -92,6 +92,7 @@ private:
     void changeObjectsPositions();
 
     void createAsteroid();
+    void createStars();
     void updateAsteroids();
     void updateProjectiles();
 
