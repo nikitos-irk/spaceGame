@@ -174,22 +174,25 @@ void Star::changePosition(primitive::Direction direction_xy){
 
 void Star::display()
 {
-    double angle_start  { 0.0 };
-    double angle_finish { 360.0 };
-    double angle_step   { 15.0 };
-    
-    auto p_start_ = primitive::Point{coordinate_.x - radius_, coordinate_.y - radius_};
-    auto p_tmp_ = p_start_;
-    auto p_ = primitive::Point{0.0};
+    double angle_start      { 0.0 };
+    double angle_finish     { 360.0 };
+    double angle_step       { M_PI / 10 };
+    int number_of_layers    { 10 };
     
     figure::FactoryShape factory{renderer_};
     factory.color({255, 255, 0, 255});
 
-    for (double angle = angle_step; angle <= angle_finish; angle += angle_step) {
-        p_ = primitive::Point{coordinate_.x - radius_, coordinate_.y - radius_};
-        p_.rotate(coordinate_, angle / M_PI);
-        factory.line(p_tmp_, p_).draw();
-        p_tmp_ = p_;
+    for (double r = radius_; r > 0; r -= radius_ / number_of_layers ){
+        
+        auto p_start_ = primitive::Point{coordinate_.x - r, coordinate_.y - r};
+        auto p_tmp_ = p_start_;
+        auto p_ = primitive::Point{0.0};
+        
+        for (double angle = angle_step; angle <= angle_finish; angle += angle_step) {
+            p_ = primitive::Point{coordinate_.x - r, coordinate_.y - r};
+            p_.rotate(coordinate_, angle);
+            factory.line(p_tmp_, p_).draw();
+            p_tmp_ = p_;
+        }
     }
-    factory.line(p_tmp_, p_start_).draw();
 }
