@@ -93,23 +93,6 @@ primitive::Direction Ship::getOffset(std::list<SpaceObject*>* stars, bool gravit
 
         speed_offset.x -= directionXY_gravity.x;
         speed_offset.y -= directionXY_gravity.y;
-
-        // std::cout << "speed_offset.x =          " << speed_offset.x << std::endl;
-        // std::cout << "directionXY_gravity.x =   " << directionXY_gravity.x << std::endl;
-        
-        // if (speed_offset.x * directionXY_gravity.x > 0 ){
-        //     if (abs(speed_offset.x) - abs(directionXY_gravity.x) < 0.001 ) {
-        //         directionXY_gravity.x = 0;
-        //     }
-        // }
-        // if (speed_offset.y * directionXY_gravity.y > 0 ){
-        //     if (abs(speed_offset.y) - abs(directionXY_gravity.y) < 0.001 ) {
-        //         directionXY_gravity.y = 0;
-        //     }
-        // }
-        // if (speed_offset.y - directionXY_gravity.y < 0.000001 ){
-        //     directionXY_gravity.y = 0;
-        // }
             
         gravity_->update_inertia(speed_offset);
     }
