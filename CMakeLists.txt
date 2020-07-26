@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
     "primitive/point.cpp"
     "scene/sdl_scene.cpp"
     "skeleton.cpp"
+	"space/gravity.cpp"
     "space/nozzle.cpp"
     "space/projectile.cpp"
     "space/ship.cpp"

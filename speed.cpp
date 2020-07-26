@@ -62,6 +62,13 @@ Movement::Movement(){
     shiftY_ = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
     angularShift_ = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
     angularShift_ /= 10;
+    
+    // if ( rand() % 2) {
+    //     shiftX_ = 0;
+    // } else {
+    //     shiftY_ = 0;
+    // }
+    // angularShift_ = 0.0;
 };
 Direction Movement::getOffset() { return Direction{shiftX_, shiftY_}; }
 

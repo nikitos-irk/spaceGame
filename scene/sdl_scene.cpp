@@ -145,15 +145,31 @@ void SdlScene::draw(space::Projectile const& projectile)
 
 void SdlScene::draw(space::LifeAmount const& lifes)
 {
-  figure::FactoryShape factory{renderer_};
-  factory.color({0, 255, 0, 255})
-      .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
+    figure::FactoryShape factory{renderer_};
+    factory.color({0, 255, 0, 255})
+        .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
 
-  factory.color({255, 0, 0, 255});
-  for (int i = 0; i < lifes.get_amount(); ++i) {
-      factory.rectangle({10.0 + i * 15, double(size_.height - 30)},
-                        lifes.kBarSize).fill();
-  }
+    factory.color({255, 0, 0, 255});
+    for (int i = 0; i < lifes.get_amount(); ++i) {
+        std::vector<primitive::Point> life_element_points {
+            primitive::Point{5.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{10.0 + i * 20, double(size_.height - 30)},
+            primitive::Point{15.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{20.0 + i * 20, double(size_.height - 30)},
+            primitive::Point{25.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{15.0 + i * 20, double(size_.height - 10)}
+        };
+
+        auto tmp_p_ = life_element_points.begin();
+        auto iter = tmp_p_ + 1;
+        auto start_ = tmp_p_;
+        
+        for (; iter != life_element_points.end(); ++iter){
+            factory.line(*tmp_p_, *iter).draw();
+            tmp_p_ = iter;
+        }
+        factory.line(*tmp_p_, *start_).draw();
+    }
 }
 
 }  // namespace scene

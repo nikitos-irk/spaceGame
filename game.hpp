@@ -16,7 +16,6 @@
 #include "space/life_amount.hpp"
 #include "space/projectile.hpp"
 #include "space/ship.hpp"
-
 #include "space_object.hpp"
 
 class Asteroid;
@@ -111,6 +110,7 @@ private:
 public:
     Game(SDL_Renderer*, primitive::Size, int);
     void run();
+    bool gravity { true };
 };
 
 #endif

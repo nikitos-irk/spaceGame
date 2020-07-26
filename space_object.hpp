@@ -9,9 +9,12 @@
 #include "primitive/point.hpp"
 #include "primitive/size.hpp"
 #include "primitive/time.hpp"
-#include "gravity/gravity.hpp"
+#include "space/gravity.hpp"
 
 struct SDL_Renderer;
+
+class Star;
+namespace space { class Gravity; }
 
 class SpaceObject{
 protected:
@@ -30,7 +33,7 @@ public:
     void markAsDead();
 };
 
-class Asteroid: public SpaceObject, public space::Gravity {
+class Asteroid: public SpaceObject {
 private:
     std::vector<primitive::Point*> pp_;
     void fill();
@@ -46,15 +49,19 @@ public:
     std::vector<primitive::Point*>& get_points();
     Asteroid(SDL_Renderer*, primitive::Point coordinate);
     void changePosition(primitive::Direction) override;
+    void rotate();
+    void changePosition(Star*);
     primitive::Point* getFirstPoint();
     double getArea();
     double getMass();
     ~Asteroid();
+    space::Gravity *gravity_;
 };
 
-class Star: public SpaceObject, public space::Gravity {
+class Star: public SpaceObject {
 private:
     double radius_;
+    double rotation_;
 
 public:
     Star(SDL_Renderer*, primitive::Point, double);
@@ -62,6 +69,7 @@ public:
     void changePosition(primitive::Direction) override;
     double getArea();
     double getMass();
+    primitive::Point getCoordinates() const {return coordinate_;};
 };
 
 #endif

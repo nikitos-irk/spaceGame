@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <list>
 
 #include "colorschema.hpp"
 #include "speed.hpp"
@@ -14,7 +15,10 @@
 #include "primitive/size.hpp"
 #include "scene/scene.hpp"
 #include "space/projectile.hpp"
+#include "space_object.hpp"
 
+class SpaceObject;
+namespace space { class Gravity; }
 
 namespace space {
 
@@ -47,10 +51,12 @@ public:
                             double angle) const;
   ProjectilePtr shoot();
   primitive::Point CalcMedianIntersaction() const;
-  primitive::Direction getOffset();
+  primitive::Direction getOffset(std::list<SpaceObject*>*, bool);
 
   void update() override;
   void display(scene::Scene& scene) override { scene.draw(*this); }
+  int getMass() { return mass; }
+  Gravity *gravity_;
 
 private:
   Border border_;
@@ -60,6 +66,7 @@ private:
   primitive::Time rotation_delay_;
   primitive::Point initial_median_intersection_;
   primitive::Time shoot_delay_;
+  int mass;
 };
 
 }  // namespace space
