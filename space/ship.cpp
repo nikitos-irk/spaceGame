@@ -1,6 +1,7 @@
 #include "ship.hpp"
 
 #include "primitive/line.hpp"
+#include "iostream"
 
 namespace space {
 
@@ -13,10 +14,12 @@ Ship::Ship(primitive::Point coordinate)
       left_nozzle_{*this, {coordinate.x - double(size.width)/2,
                     coordinate.y + double(size.height)}},
       right_nozzle_{*this, {coordinate.x + double(size.width)/2,
-                    coordinate.y + double(size.height)}}
+                    coordinate.y + double(size.height)}},
+      mass {1000}
 {
     initial_median_intersection_ = CalcMedianIntersaction();
     rotation_delay_ = primitive::delay(kRotationDelay);
+    gravity_ = new Gravity(mass);
 }
 
 double Ship::getTiltAngel() const
@@ -80,10 +83,21 @@ void Ship::update()
     right_nozzle_.update();
 }
 
-primitive::Direction Ship::getOffset()
+primitive::Direction Ship::getOffset(std::list<SpaceObject*>* stars, bool gravity)
 {
-    auto mediana = primitive::median(border_[1], border_[2]);
-    return speed_.getOffsetXY({mediana.x, mediana.y}, {border_[0].x, border_[0].y});
+    auto tmp = get_initial_median_intersaction();
+    auto speed_offset = speed_.getOffsetXY({tmp.x, tmp.y}, {border_[0].x, border_[0].y});
+    
+    if (gravity) {
+        auto directionXY_gravity = gravity_->get_offset(stars, get_initial_median_intersaction());
+
+        speed_offset.x -= directionXY_gravity.x;
+        speed_offset.y -= directionXY_gravity.y;
+            
+        gravity_->update_inertia(speed_offset);
+    }
+    
+    return speed_offset;
 }
 
 void Ship::slowdown()

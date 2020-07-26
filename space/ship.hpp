@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <list>
 
 #include "colorschema.hpp"
 #include "speed.hpp"
@@ -14,7 +15,10 @@
 #include "primitive/size.hpp"
 #include "scene/scene.hpp"
 #include "space/projectile.hpp"
+#include "space_object.hpp"
 
+class SpaceObject;
+namespace space { class Gravity; }
 
 namespace space {
 
@@ -33,7 +37,7 @@ public:
   Border const& get_border() const { return border_; }
   Nozzle const& get_left_nozzle() const { return left_nozzle_; }
   Nozzle const& get_right_nozzle() const { return right_nozzle_; }
-  Speed const& get_speed() const { return speed_; }
+  primitive::Speed const& get_speed() const { return speed_; }
   primitive::Point const& get_initial_median_intersaction() const
   { return initial_median_intersection_; }
   double getTiltAngel() const;
@@ -47,19 +51,22 @@ public:
                             double angle) const;
   ProjectilePtr shoot();
   primitive::Point CalcMedianIntersaction() const;
-  primitive::Direction getOffset();
+  primitive::Direction getOffset(std::list<SpaceObject*>*, bool);
 
   void update() override;
   void display(scene::Scene& scene) override { scene.draw(*this); }
+  int getMass() { return mass; }
+  Gravity *gravity_;
 
 private:
   Border border_;
   Nozzle left_nozzle_;
   Nozzle right_nozzle_;
-  Speed speed_{kMaxSpeed};
+  primitive::Speed speed_{kMaxSpeed};
   primitive::Time rotation_delay_;
   primitive::Point initial_median_intersection_;
   primitive::Time shoot_delay_;
+  int mass;
 };
 
 }  // namespace space

@@ -16,7 +16,6 @@
 #include "space/life_amount.hpp"
 #include "space/projectile.hpp"
 #include "space/ship.hpp"
-
 #include "space_object.hpp"
 
 class Asteroid;
@@ -72,6 +71,7 @@ private:
     std::vector<SpaceObject*> space_objects_;
     std::list<SpaceObject*> asteroids_;
     std::list<Explosion*> explosions_;
+    std::list<SpaceObject*> stars_;
 
     scene::SdlScene scene_;
 
@@ -91,6 +91,7 @@ private:
     void changeObjectsPositions();
 
     void createAsteroid();
+    void createStars();
     void updateAsteroids();
     void updateProjectiles();
 
@@ -109,6 +110,7 @@ private:
 public:
     Game(SDL_Renderer*, primitive::Size, int);
     void run();
+    bool gravity { true };
 };
 
 #endif

@@ -10,20 +10,29 @@ bool doubleEquals(double a, double b, double epsilon = 0.000000001)
 }
 }  // namespace
 
-namespace primitive
-{
+namespace primitive {
+
 struct Direction {
     double x{0.0};
     double y{0.0};
-    Direction & operator *=(int value);
+    Direction& operator *=(int value);
+    Direction& operator +=(const Direction&);
+    Direction& operator -=(const Direction&);
 };
 
-struct Point{
+struct Point {
     double x{0.0};
     double y{0.0};
     Point& rotate(Point const& center, double angle);
     Point& move(Direction const& d);
+    // Point(const Point&);
+    // Point(double x, double y): x{x}, y{y}{};
 };
+
+// Point(const Point& p_){
+//     x = p_.x;
+//     y = p_.y;
+// }
 
 inline bool operator==(const Point& p1, const Point& p2) {
     return doubleEquals(p1.x, p2.x) && doubleEquals(p1.y, p2.y);

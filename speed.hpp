@@ -2,8 +2,10 @@
 #define SPEED_H
 
 #include "primitive/point.hpp"
+namespace primitive {
 
-class Speed{
+class Speed {
+
 private:
     double max_offset_{};
     double forward_offset_{};
@@ -18,10 +20,25 @@ public:
     void accelarate();
     void backwardSlowdown();
     void backwardAccelarate();
-    primitive::Direction getOffsetXY(primitive::Direction,
-                                     primitive::Direction);
+    Direction getOffsetXY(Direction, Direction);
     double get_current_a() const;
     double get_current_a_signed() const;
 };
+
+class Movement {
+
+private:
+    // BASE SPEED
+    float shiftX_;
+    float shiftY_;
+
+public:
+    float angularShift_;
+    Movement();
+    Direction getOffset();
+
+};
+
+}
 
 #endif // SPEED_H

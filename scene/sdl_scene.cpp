@@ -102,7 +102,7 @@ void SdlScene::draw(space::Projectile const& projectile)
   double cy = c.y - 0.5;
 
   figure::FactoryShape factory{renderer_};
-  factory.color({255, 255, 0, 255});
+  factory.color({0, 255, 255, 255});
   while (tmp_x >= tmp_y){
       factory.point({cx + tmp_x, cy + tmp_y}).draw();
       factory.point({cx + tmp_y, cy + tmp_x}).draw();
@@ -133,7 +133,7 @@ void SdlScene::draw(space::Projectile const& projectile)
       }
   }
 
-  factory.color({128, 0, 128, 255});
+  factory.color({255, 255, 102, 255});
   for (double dy = 1; dy <= projectile.kBlockSize; dy += 1.0){
       double dx = std::floor(std::sqrt((2.0 * projectile.kBlockSize * dy) - (dy * dy)));
       factory.line({cx - dx, cy + dy - projectile.kBlockSize},
@@ -145,15 +145,31 @@ void SdlScene::draw(space::Projectile const& projectile)
 
 void SdlScene::draw(space::LifeAmount const& lifes)
 {
-  figure::FactoryShape factory{renderer_};
-  factory.color({0, 255, 0, 255})
-      .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
+    figure::FactoryShape factory{renderer_};
+    factory.color({0, 255, 0, 255})
+        .rectangle({5.0, double(size_.height - 32)}, lifes.kSize).fill();
 
-  factory.color({255, 0, 0, 255});
-  for (int i = 0; i < lifes.get_amount(); ++i) {
-      factory.rectangle({10.0 + i * 15, double(size_.height - 30)},
-                        lifes.kBarSize).fill();
-  }
+    factory.color({255, 0, 0, 255});
+    for (int i = 0; i < lifes.get_amount(); ++i) {
+        std::vector<primitive::Point> life_element_points {
+            primitive::Point{5.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{10.0 + i * 20, double(size_.height - 30)},
+            primitive::Point{15.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{20.0 + i * 20, double(size_.height - 30)},
+            primitive::Point{25.0 + i * 20, double(size_.height - 25)},
+            primitive::Point{15.0 + i * 20, double(size_.height - 10)}
+        };
+
+        auto tmp_p_ = life_element_points.begin();
+        auto iter = tmp_p_ + 1;
+        auto start_ = tmp_p_;
+        
+        for (; iter != life_element_points.end(); ++iter){
+            factory.line(*tmp_p_, *iter).draw();
+            tmp_p_ = iter;
+        }
+        factory.line(*tmp_p_, *start_).draw();
+    }
 }
 
 }  // namespace scene

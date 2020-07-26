@@ -9,7 +9,7 @@ namespace space {
 
 class LifeAmount : public Object {
 public:
-    const primitive::Size kSize{5 * 15 + 4, 24};
+    const primitive::Size kSize{5 * 20 + 4, 24};
     const primitive::Size kBarSize{10, 20};
 
     explicit LifeAmount(int amount) : amount_{amount} {}

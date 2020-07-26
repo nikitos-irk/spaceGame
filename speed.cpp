@@ -1,13 +1,15 @@
 #include "speed.hpp"
 
 #include <cmath>
+#include <cstdlib>
+
+namespace primitive {
 
 constexpr auto kAcceleration = 100;
 
 Speed::Speed(double max_offset) : max_offset_{max_offset} {}
 
-primitive::Direction Speed::getOffsetXY(primitive::Direction p1,
-                                        primitive::Direction p2)
+Direction Speed::getOffsetXY(Direction p1, Direction p2)
 {
     double vl = std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
     current_a_ = (forward_offset_ - backward_offset_) / vl;
@@ -50,4 +52,24 @@ void Speed::backwardSlowdown(){
         backward_offset_ -= backward_offset_/kAcceleration;
     }
     if (backward_offset_ <= 0) { backward_offset_ = 0.0; }
+}
+
+// MOVEMENT
+
+Movement::Movement(){
+    auto LO{-1.0}, HI{1.0};
+    shiftX_ = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    shiftY_ = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    angularShift_ = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    angularShift_ /= 10;
+    
+    // if ( rand() % 2) {
+    //     shiftX_ = 0;
+    // } else {
+    //     shiftY_ = 0;
+    // }
+    // angularShift_ = 0.0;
+};
+Direction Movement::getOffset() { return Direction{shiftX_, shiftY_}; }
+
 }

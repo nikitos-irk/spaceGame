@@ -14,6 +14,7 @@
 constexpr auto kAsteroidsRemovingDelay = 10ms;
 constexpr auto kChangePositionDelay = 30ms;
 constexpr auto kInertiaDelay = 10ms;
+const auto NUMBER_OF_ASTEROIDS = 10;
 
 Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
     : renderer_{renderer},
@@ -26,7 +27,7 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
 //  background_.grid = std::make_unique<space::Grid>();
 
   // Create asteroids
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < NUMBER_OF_ASTEROIDS; ++i) {
       double tmp_x = rand() % screen_size_.width;
       double tmp_y = rand() % screen_size_.height;
       asteroids_.push_back(new Asteroid(renderer, {tmp_x, tmp_y}));
@@ -36,9 +37,12 @@ Game::Game(SDL_Renderer* renderer, primitive::Size size, int life_amount)
   change_position_delay_ = primitive::delay(kChangePositionDelay);
   inertia_delay_ = primitive::delay(kInertiaDelay);
   update_asteroids_delay_ = primitive::delay(kAsteroidsRemovingDelay);
+
+  // Create Stars
+  createStars();
 }
 
-void Game::createAsteroid(){
+void Game::createAsteroid() {
     double theta = (rand() % 360)/M_PI;
     auto ship_center = ship_.CalcMedianIntersaction();
     double tmp_x = (rand() % screen_size_.width) + screen_size_.width;
@@ -47,7 +51,12 @@ void Game::createAsteroid(){
     asteroids_.push_back(new Asteroid(renderer_, p.rotate(ship_center, theta)));
 }
 
-void Game::updateAsteroids(){
+void Game::createStars() {
+    stars_.push_back(new Star(renderer_, primitive::Point{800, 800}, 250));
+    stars_.push_back(new Star(renderer_, primitive::Point{0, 500}, 100));
+}
+
+void Game::updateAsteroids() {
     if (update_asteroids_delay_ >= primitive::now()){ return; }
     auto tmp_p = ship_.CalcMedianIntersaction();
     primitive::Point *ap = nullptr;
@@ -69,7 +78,7 @@ void Game::updateAsteroids(){
     update_asteroids_delay_ = primitive::delay(kAsteroidsRemovingDelay);
 }
 
-void Game::updateProjectiles(){
+void Game::updateProjectiles() {
     for (auto it = std::begin(projectiles_); it != std::end(projectiles_); ++it) {
         (*it)->update();
         if ((*it)->get_life_time() < primitive::now()) {
@@ -300,6 +309,10 @@ void Game::displayObjects()
         }
     }
 
+    for (auto &star: stars_){
+        star->display();
+    }
+
     cleanExplosions();
 
     life_amount_.display(scene_);
@@ -312,11 +325,20 @@ void Game::changeObjectsPositions(){
 
     if (change_position_delay_ > primitive::now()){ return; }
 
-    auto directionXY = ship_.getOffset();
+    auto directionXY = ship_.getOffset(&stars_, gravity);
     ship_.update();
 
     for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
         (*spaceObject)->changePosition(directionXY);
+        dynamic_cast<Asteroid*>(*spaceObject)->rotate();
+    }
+
+    if (gravity) {
+        for (auto spaceObject = asteroids_.begin(); spaceObject != asteroids_.end(); ++spaceObject){
+            auto tmp_obj = dynamic_cast<Asteroid*>(*spaceObject);
+            auto tmp_offset = tmp_obj->gravity_->get_offset(&stars_, tmp_obj->getCenterPoint());
+            tmp_obj->changePosition(tmp_offset);
+        }
     }
 
     for (auto& ball: projectiles_) {
@@ -327,6 +349,10 @@ void Game::changeObjectsPositions(){
         if ( (*explosion)->isAlive() ){
             (*explosion)->shift(directionXY);
         }
+    }
+
+    for (auto star = stars_.begin(); star != stars_.end(); ++star){
+        (*star)->changePosition(directionXY);
     }
 
     change_position_delay_ = primitive::delay(kChangePositionDelay);
@@ -383,6 +409,10 @@ void Game::run()
                         break;
                     case SDLK_SPACE:
                         space_pushed_ = true;
+                        break;
+                    case SDLK_g:
+                        gravity = not gravity;
+                        std::cout << "Gravity: " << gravity << std::endl;
                         break;
                     default:
                         break;
@@ -443,7 +473,7 @@ void Game::run()
         changeObjectsPositions();
         updateAsteroids();
         updateProjectiles();
-        if (asteroids_.size() <= 20){
+        if (asteroids_.size() <= NUMBER_OF_ASTEROIDS-1){
             createAsteroid();
         }
         }

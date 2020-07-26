@@ -12,4 +12,4 @@ void Line::draw() const
         throw ErrorDrawing{};
     }
 }
-}  // namespace figure
+} // namespace figure

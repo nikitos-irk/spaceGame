@@ -7,7 +7,7 @@ class Scene;
 
 namespace space {
 
-class Object {
+class Object{
 public:
     virtual ~Object() = default;
     virtual void update() = 0;

@@ -28,4 +28,18 @@ Direction& Direction::operator *=(int value)
     return *this;
 }
 
+Direction& Direction::operator +=(const Direction& value)
+{
+    x += value.x;
+    y += value.y;
+    return *this;
+}
+
+Direction& Direction::operator -=(const Direction& value)
+{
+    x -= value.x;
+    y -= value.y;
+    return *this;
+}
+
 }  // namespace primitive
